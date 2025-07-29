@@ -12,7 +12,6 @@
         "Sprint": {name: "Sprint", studyTime: 15, breakTime: 5}
     }
     let selectedName = $state(studyTypes["Pomodoro"].name);
-    let selectedType = $derived(studyTypes[selectedName]);
 
     let studyTime = $state(studyTypes["Pomodoro"].studyTime);
     let breakTime = $state(studyTypes["Pomodoro"].breakTime);
@@ -38,6 +37,10 @@
         }
     })
 
+    function startTimer () {
+        return;
+    }
+
 </script>
 
 <h1>
@@ -61,7 +64,7 @@
             <NumberInput label="mins" roundtoNearest={1} increment={1} upperLimitNum={60} lowerLimitNum={0} bind:num={breakTime}/>
         </div>
     </div>
-    <Button>Start Studying</Button>
+    <Button onclick={startTimer}>Start Studying</Button>
 </Card>
 
 <style>
