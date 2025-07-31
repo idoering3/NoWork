@@ -9,7 +9,11 @@
         href?: string | undefined;
         expanded?: boolean;
         onclick?: (event: MouseEvent) => void;
+        onmousedown?: (event: MouseEvent) => void;
+        onmouseup?: (event: MouseEvent) => void;
+        onmouseleave?: (event: MouseEvent) => void;
         children?: Snippet;
+        class?: string;
     }
 
     let {
@@ -21,7 +25,7 @@
         expanded = false,
         children,
         ...props
-    } = $props();
+    }: Props = $props();
     // Determine which element to render
     let isLink = $derived(href !== undefined);
 </script>
@@ -34,7 +38,9 @@
                 <Icon size={iconSize} strokeWidth={iconStroke}></Icon>
             </span>
         {/if}
-        {@render children?.()}
+        {#if children}
+            {@render children?.()}
+        {/if}
     </a>
 {:else}
     <button class:red={flavor === 'danger'} class:ghost={flavor === 'ghost'} class:disabled={flavor === 'disabled'} {...props}>
@@ -43,7 +49,9 @@
                 <Icon size={iconSize} strokeWidth={iconStroke}></Icon>
             </span>
         {/if}
-        {@render children?.()}
+        {#if children}
+            {@render children?.()}
+        {/if}
     </button>
 {/if}
 
@@ -51,6 +59,11 @@
 
 
 <style>
+    .square {
+        width: 3rem;
+        height: 3rem;
+    }
+
     /* Default variant */
     button, a {
         user-select: none;
