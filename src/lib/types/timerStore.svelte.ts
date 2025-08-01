@@ -8,6 +8,7 @@ function createTimer() {
     let timerInterval: ReturnType<typeof setInterval> | null = null;
 
     // --- Reactive state ---
+    const audio = new Audio('test_sound.mp3');
     let timeLimit = $state(config.studyTime);
     let timeLeft = $state(config.studyTime);
     let isStudying = $state(true);
@@ -40,6 +41,7 @@ function createTimer() {
             if (timeLeft > 100) {
                 timeLeft -= 100;
             } else {
+                audio.play();
                 pause(); // Pause to switch states
                 if (!isStudying && sessionNum >= config.repetitions) {
                     pause(); // Final study session finished
