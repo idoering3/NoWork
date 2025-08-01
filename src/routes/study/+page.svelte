@@ -5,7 +5,8 @@
     import NumberInput from '$lib/NumberInput.svelte';
     import Countdown from '$lib/Countdown.svelte';
     import type { StudyType } from '$lib/types/Study.ts';
-    import type { Component } from 'svelte';
+    import { onMount, type Component } from 'svelte';
+    import { timerStore } from '$lib/types/timerStore.svelte';
     
     let studyTypes: Record<string, StudyType> = {
         "Pomodoro": {name: "Pomodoro", studyTime: 25, breakTime: 5},
@@ -40,11 +41,14 @@
         }
     })
 
-    let time = $derived(studyTime * 60 * 1000); // milliseconds
-    let timerRunning = $state(false);
-
-    function startTimer () {
-        timerRunning = true;
+    function startTimer() {
+        timerStore.init({
+            studyTime: studyTime * 60 * 1000,
+            breakTime: breakTime * 60 * 1000,
+            repetitions: repetitions,
+            timerEnabled: true
+        });
+        timerStore.start();
     }
 </script>
 
@@ -54,9 +58,9 @@
 
 
 <Card class={"evenly-space-vert"}>
-    {#if timerRunning}
+    {#if timerStore.isEnabled}
         <div class="timer">
-            <Countdown {time} bind:timerEnabled={timerRunning} bind:repetitions={repetitions}/>
+            <Countdown studyTime={studyTime * 60 * 1000} breakTime={breakTime * 60 * 1000} repetitions={repetitions}/>
         </div>
     {:else}
         <div>
