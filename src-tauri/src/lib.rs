@@ -13,7 +13,10 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             commands::greet::greet,
-            commands::database::add_database_task
+            commands::database::add_database_task,
+            commands::database::get_all_tasks,
+            commands::database::complete_task,
+            commands::database::delete_task
             ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

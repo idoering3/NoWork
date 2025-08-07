@@ -5,7 +5,7 @@
         Icon?: Component | null;
         iconSize?: number;
         iconStroke?: number;
-        flavor?: 'ghost' | 'danger' | 'default' | 'disabled';
+        flavor?: 'ghost' | 'danger' | 'default' | 'disabled' | 'outline';
         href?: string | undefined;
         expanded?: boolean;
         onclick?: (event: MouseEvent) => void;
@@ -32,7 +32,7 @@
 
 
 {#if isLink}
-    <a href={href} class:red={flavor === 'danger'} class:ghost={flavor === 'ghost'} class:disabled={flavor === 'disabled'} {...props}>
+    <a href={href} class:red={flavor === 'danger'} class:ghost={flavor === 'ghost'} class:outline={flavor === 'outline'} class:disabled={flavor === 'disabled'} {...props}>
         {#if Icon}
             <span class="icon">
                 <Icon size={iconSize} strokeWidth={iconStroke}></Icon>
@@ -43,7 +43,7 @@
         {/if}
     </a>
 {:else}
-    <button class:red={flavor === 'danger'} class:ghost={flavor === 'ghost'} class:disabled={flavor === 'disabled'} {...props}>
+    <button class:red={flavor === 'danger'} class:ghost={flavor === 'ghost'} class:outline={flavor === 'outline'} class:disabled={flavor === 'disabled'} {...props}>
         {#if Icon}
             <span class="icon">
                 <Icon size={iconSize} strokeWidth={iconStroke}></Icon>
@@ -68,7 +68,6 @@
     button, a {
         user-select: none;
         border-radius: 7px;
-        border: 1px solid var(--border-color);
         text-decoration: none;
         display: flex;
         justify-content: center;
@@ -80,11 +79,12 @@
         color: black;
         font-family: 'Inter', sans-serif;
         font-size: 1rem;
-        background-color: transparent;
+        background-color: var(--secondary-color);
+        border: 1px solid var(--secondary-color);
         box-shadow: 0px 0px 5px -2px var(--border-color);
     }
     button:hover, a:hover {
-        background-color: var(--secondary-color);
+        background-color: var(--hover-color);
         cursor:pointer;
     }
     button:active, a:active {
@@ -98,6 +98,16 @@
         border-radius: 0;
         color: var(--border-color);
     }
+
+    button.outline, a.outline {
+        background-color: transparent;
+        box-shadow: 0px 0px 5px -2px var(--border-color);
+        border: 1px solid var(--border-color);
+    }
+    button.outline:hover, a.outline:hover {
+        background-color: var(--secondary-color);
+    }
+
 
     button.ghost, a.ghost {
         box-shadow: none;
