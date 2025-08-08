@@ -12,9 +12,9 @@
 </script>
 
 <div class="task-card">
-    <Button Icon={Check} class="square"/>
+    <Button Icon={Check} class="square small"/>
     <div class="stacked">
-        <p>{task.name}</p>
+        <h7>{task.name}</h7>
         <p class="date">{task.dueDate ?? ''}</p>
     </div>
     {#if task.tags}
@@ -28,10 +28,8 @@
         display: flex;
         align-items: center;
         width: auto;
-        padding: 0 0.5rem;
+        padding: 0rem 0.5rem;
         height: 4rem;
-        border-radius: 7px;
-        border: 1px solid var(--border-color);
     }
     .date {
         font-size: 0.85rem;

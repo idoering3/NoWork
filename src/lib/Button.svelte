@@ -67,9 +67,20 @@
 
 
 <style>
+    span {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
     .square {
         width: 3rem;
         height: 3rem;
+    }
+
+    .square.small {
+        width: 2rem;
+        height: 2rem;
     }
 
     /* Default variant */
