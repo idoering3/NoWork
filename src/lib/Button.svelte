@@ -28,11 +28,19 @@
     }: Props = $props();
     // Determine which element to render
     let isLink = $derived(href !== undefined);
+
+    const flavorMap = {
+        danger: 'danger',
+        ghost: 'ghost',
+        outline: 'outline',
+        disabled: 'disabled',
+        default: 'default'
+    }
 </script>
 
 
 {#if isLink}
-    <a href={href} class:red={flavor === 'danger'} class:ghost={flavor === 'ghost'} class:outline={flavor === 'outline'} class:disabled={flavor === 'disabled'} {...props}>
+    <a href={href} class={`${flavorMap[flavor] ?? ''} ${props.class ?? ''}`} {...props}>
         {#if Icon}
             <span class="icon">
                 <Icon size={iconSize} strokeWidth={iconStroke}></Icon>

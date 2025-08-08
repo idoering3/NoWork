@@ -14,4 +14,4 @@
 
 
 <h1>Welcome, {userName}!</h1>
-<h6 transition:fly={{ y: 25, delay: 150, duration: 1000, easing: sineInOut }}>{message}</h6>
+<h6 transition:fly={{ y: 10, delay: 150, duration: 1000, easing: sineInOut }}>{message}</h6>
