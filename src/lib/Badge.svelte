@@ -19,7 +19,7 @@
     }
 </script>
 
-<div transition:scale={{ duration: 300, easing: quartInOut, start: 0.75, opacity: 0 }} class={[`${flavorMap[flavor] ?? ''}`, 'badge', noPadding ? 'no-padding' : '']}>
+<div transition:scale={{ duration: 150, easing: quartInOut, start: 0.75, opacity: 0 }} class={[`${flavorMap[flavor] ?? ''}`, 'badge', noPadding ? 'no-padding' : '']}>
     {@render children?.()}
 </div>
 

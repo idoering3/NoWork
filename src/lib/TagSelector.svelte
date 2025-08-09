@@ -105,14 +105,14 @@
                 <div class="tag-container">
                     {#each allTags as tag}
                         <Badge noPadding flavor="outline">
-                            <Button flavor="ghost" class="square xsmall rounded" Icon={X} 
+                            <Button flavor="ghost" class="square xsmall circular" Icon={X} 
                             onclick={(event) => {
                                 event.stopPropagation(); 
                                 removeTag(tag);
                             }}
                             />
                                 {tag}
-                            <Button flavor="ghost" class="square xsmall rounded" Icon={Plus}
+                            <Button flavor="ghost" class="square xsmall circular" Icon={Plus}
                                 onclick={(event) => {
                                     event.stopPropagation();
                                     addTagToTask(tag);

@@ -9,8 +9,9 @@
     import ArrowUp from "@lucide/svelte/icons/arrow-up";
     import TagSelector from "$lib/TagSelector.svelte";
     import { X } from "@lucide/svelte";
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import Datepicker from "$lib/DatePicker.svelte";
+    import { fly } from "svelte/transition";
 
     let tasks: Task[] = $state([]);
 
@@ -55,10 +56,10 @@
 
     async function submitTask () {
         if (taskName) {
-            await invoke('add_database_task', {name: taskName, dueDate: dueDate, tags: selectedTags});
+            await invoke('add_database_task', {name: taskName, dueDate: selectedDate?.toISOString(), tags: selectedTags});
             getIncompleteTasks();
-            console.log(tasks);
             selectedTags = [];
+            selectedDate = null;
             taskName = '';
         }
     }
@@ -74,45 +75,95 @@
     }
 
     let selectedTags: string[] = $state([]);
-    let dueDate: string | null = $state(null);
+    let selectedDate: Date | null = $state(null);
+
+
+
+	let taskContainer: HTMLDivElement;
+	let header: HTMLHeadingElement;
+	let taskBar: HTMLDivElement;
+
+    function getOuterHeight(el: HTMLElement) {
+        const style = getComputedStyle(el);
+        const marginTop = parseFloat(style.marginTop) || 0;
+        const marginBottom = parseFloat(style.marginBottom) || 0;
+        return el.offsetHeight + marginTop + marginBottom;
+    }
+
+    function resize() {
+        if (taskContainer && header && taskBar) {
+            const availableHeight = window.innerHeight 
+                - getOuterHeight(header) 
+                - getOuterHeight(taskBar)
+                - 175;
+            taskContainer.style.height = `${availableHeight}px`;
+        }
+    }
+
+	onMount(() => {
+		requestAnimationFrame(resize);
+		window.addEventListener("resize", resize);
+	});
+
+	onDestroy(() => {
+		window.removeEventListener("resize", resize);
+	});
 </script>
 
-<h1>
-    Task List
-</h1>
 
 <div class='container'>
-    <Card expanded>
+    <h1 bind:this={header}>
+        Task List
+    </h1>
+
+    <div class='task-container' bind:this={taskContainer}>
         {#each tasks as task (task.id)}
             <TaskCard {task} onComplete={completeTask}/>
         {/each}
-    </Card>
+    </div>
     
-    <Card expanded class="short">
-        <Textbox bind:value={taskName} onkeydown={(event: KeyboardEvent) => handleKeydown(event)} {placeholders} />
-        {#each selectedTags as tag}
-            <Badge flavor="outline" noPadding>
-                <span style="padding-left: 0.5rem">
-                    {tag}
-                </span>
-                <Button flavor="ghost" class="square xsmall rounded" Icon={X} 
-                    onclick={() => {
-                        removeTagFromTask(tag);
-                    }}    
-                />
-            </Badge>
-        {/each}
-        <TagSelector bind:selectedTags={selectedTags} />
-        <Datepicker />
-        <Button onclick={submitTask} class="square" flavor="primary" Icon={ArrowUp} />
-    </Card>
+    <div class="task-bar" bind:this={taskBar}>
+        <Card expanded class="short">
+            <Textbox bind:value={taskName} onkeydown={(event: KeyboardEvent) => handleKeydown(event)} {placeholders} />
+            {#each selectedTags as tag}
+                <Badge flavor="outline" noPadding>
+                    <span style="padding-left: 0.5rem">
+                        {tag}
+                    </span>
+                    <Button flavor="ghost" class="square xsmall circular" Icon={X} 
+                        onclick={() => {
+                            removeTagFromTask(tag);
+                        }}    
+                    />
+                </Badge>
+            {/each}
+            {#if selectedDate}
+                {selectedDate.toLocaleDateString()}
+            {/if}
+            <TagSelector bind:selectedTags={selectedTags} />
+            <Datepicker bind:selectedDate={selectedDate}/>
+            <Button onclick={submitTask} class="square" flavor="primary" Icon={ArrowUp} />
+        </Card>
+    </div>
 </div>
 
 <style>
+
     .container {
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
+		width: 100%;
+		height: 100%;
+		/* display: flex;
+		flex-direction: column; */
     }
+
+    .task-container {
+        min-height: 0;
+        overflow-y: auto;
+        box-shadow: 0px 0px 5px -2px #b8b8b8;
+        border: 1px solid #b8b8b8;
+        border-radius: 15px;
+        padding: 1rem;
+        margin: 1rem;
+    }
+    
 </style>
