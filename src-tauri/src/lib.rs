@@ -16,7 +16,14 @@ pub fn run() {
             commands::database::add_database_task,
             commands::database::get_all_tasks,
             commands::database::complete_task,
-            commands::database::delete_task
+            commands::database::delete_task,
+            commands::database::get_all_tags,
+            commands::database::add_tag,
+            commands::database::remove_tag,
+            commands::database::add_tag_to_task,
+            commands::database::remove_tag_from_task,
+            commands::database::reset_database,
+            commands::database::get_incomplete_tasks
             ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -6,20 +6,29 @@
 
     interface Props {
         task: Task
+        onComplete: (id: number) => void;
     }
 
-    let { task = $bindable() }: Props = $props();
+    let { task = $bindable(), onComplete = $bindable()}: Props = $props();
+
+    function complete() {
+        onComplete(task.id);
+    }
 </script>
 
 <div class="task-card">
-    <Button Icon={Check} class="square small"/>
+    <Button onclick={complete} Icon={Check} flavor="outline" class="square small"/>
     <div class="stacked">
         <h7>{task.name}</h7>
         <p class="date">{task.dueDate ?? ''}</p>
     </div>
-    {#if task.tags}
-        <Badge flavor="outline">{task.tags}</Badge>
-    {/if}
+    <div class="tags">
+        {#if task.tags}
+            {#each task.tags as tag}
+                <Badge flavor="outline">{tag}</Badge>
+            {/each}
+        {/if}
+    </div>
 </div>
 
 <style>
@@ -38,5 +47,10 @@
     .stacked {
         display: flex;
         flex-direction: column;
+    }
+
+    .tags {
+        display: flex;
+        gap: 0.5rem;
     }
 </style>

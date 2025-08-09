@@ -5,5 +5,5 @@ export interface Task {
   createdAt: string;
   completed: boolean;
   completedAt?: string | null;
-  tags?: string | null;
+  tags?: string[] | null;
 }

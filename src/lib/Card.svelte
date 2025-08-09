@@ -29,6 +29,7 @@
         flex-direction: column;
         align-content: center;
         gap: 0.5rem;
+        height: 25rem;
     }
 
     div.short {
@@ -38,6 +39,8 @@
         flex-direction: row;
         align-items: center;
         justify-content: space-between;
+        display: flex;
+        flex-direction: row;
     }
 
     div.expanded {

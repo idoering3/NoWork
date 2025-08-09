@@ -1,13 +1,16 @@
 <script lang='ts'>
     import type { Snippet } from "svelte";
+    import { quartInOut } from "svelte/easing";
+    import { scale } from "svelte/transition";
 
 
     interface Props {
         flavor?: 'default' | 'outline' | 'danger',
-        children: Snippet
+        children: Snippet,
+        noPadding?: boolean;
     }
 
-    let { flavor ='default', children }: Props = $props();
+    let { flavor ='default', children, noPadding = false }: Props = $props();
 
     const flavorMap = {
         default: 'default',
@@ -16,14 +19,19 @@
     }
 </script>
 
-<div class={[`${flavorMap[flavor] ?? ''}`, 'badge']}>
+<div transition:scale={{ duration: 300, easing: quartInOut, start: 0.75, opacity: 0 }} class={[`${flavorMap[flavor] ?? ''}`, 'badge', noPadding ? 'no-padding' : '']}>
     {@render children?.()}
 </div>
 
 <style>
+    .badge.no-padding {
+        padding: 0;
+    }
+
     .badge {
+        gap: 0.25rem;
         display: flex;
-        font-size: 0.8rem;;
+        font-size: 0.8rem;
         padding: 0 0.5rem;
         height: 1.5rem;
         align-items: center;

@@ -1,5 +1,14 @@
 <script lang='ts'>
-    let { value = $bindable(), placeholders } = $props();
+    import type { Snippet } from "svelte";
+
+    interface Props {
+        value?: string,
+        placeholders: string[]
+        onkeydown?: ((event: KeyboardEvent) => void) | undefined;
+        children?: Snippet
+    }
+
+    let { value = $bindable(), placeholders, onkeydown, children }: Props = $props();
 
     let placeholder = $state(placeholders[Math.floor(Math.random() * placeholders.length)]);
 
@@ -14,11 +23,13 @@
 </script>
 
 <div class="custom-input">
-    <input bind:value placeholder={`Type something, like '${placeholder}'`} oninput={onInput}/>
+    <input bind:value placeholder={`Type something, like '${placeholder}'`} oninput={onInput} onkeydown={onkeydown}/>
+    {@render children?.()}
 </div>
 
 <style>
     .custom-input {
+        gap: 0.5rem;
         width: 100%;
         height: 100%;
     }

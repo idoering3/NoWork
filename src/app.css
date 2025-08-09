@@ -14,6 +14,9 @@
 }
 
 :root {
+    --primary-light: white;
+    --primary-dark: rgb(56, 56, 56);
+    --hover-primary-dark: rgb(32, 32, 32);
     --primary-color: white;
     --secondary-color: #f8dae0;
     --highlight-color: #8d6577;
@@ -75,6 +78,16 @@ h6 {
     font-size: 1.4rem;
     font-family: 'Inter', sans-serif;
     font-weight: normal;
+}
+
+h7 {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+}
+
+h8 {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
 }
 
 p {

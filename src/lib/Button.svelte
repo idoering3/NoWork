@@ -5,7 +5,7 @@
         Icon?: Component | null;
         iconSize?: number;
         iconStroke?: number;
-        flavor?: 'ghost' | 'danger' | 'default' | 'disabled' | 'outline';
+        flavor?: 'ghost' | 'danger' | 'default' | 'disabled' | 'outline' | 'primary';
         href?: string | undefined;
         expanded?: boolean;
         onclick?: (event: MouseEvent) => void;
@@ -29,18 +29,24 @@
     // Determine which element to render
     let isLink = $derived(href !== undefined);
 
+    const extraClass = props.class ?? '';
+    delete props.class;
+
     const flavorMap = {
-        danger: 'danger',
+        danger: 'red',
         ghost: 'ghost',
         outline: 'outline',
         disabled: 'disabled',
-        default: 'default'
+        default: 'default',
+        primary: 'primary'
     }
+
+    const flavorName = `${flavorMap[flavor] ?? ''} ${extraClass}`.trim();
 </script>
 
 
 {#if isLink}
-    <a href={href} class={`${flavorMap[flavor] ?? ''} ${props.class ?? ''}`} {...props}>
+    <a href={href} class={flavorName} {...props}>
         {#if Icon}
             <span class="icon">
                 <Icon size={iconSize} strokeWidth={iconStroke}></Icon>
@@ -51,7 +57,7 @@
         {/if}
     </a>
 {:else}
-    <button class:red={flavor === 'danger'} class:ghost={flavor === 'ghost'} class:outline={flavor === 'outline'} class:disabled={flavor === 'disabled'} {...props}>
+    <button class={flavorName} {...props}>
         {#if Icon}
             <span class="icon">
                 <Icon size={iconSize} strokeWidth={iconStroke}></Icon>
@@ -63,9 +69,6 @@
     </button>
 {/if}
 
-
-
-
 <style>
     span {
         display: flex;
@@ -73,12 +76,19 @@
         align-items: center;
     }
 
-    .square {
+    button.square, a.square {
         width: 3rem;
         height: 3rem;
+        flex-shrink: 0;
     }
 
-    .square.small {
+    button.square.xsmall.rounded, a.square.xsmall.rounded {
+        border-radius: 15px;
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+
+    button.square.small, a.square.small {
         width: 2rem;
         height: 2rem;
     }
@@ -118,9 +128,18 @@
         color: var(--border-color);
     }
 
+    button.primary, a.primary {
+        background-color: var(--primary-dark);
+        color: var(--primary-light);
+
+    }
+
+    button.primary:hover, button.primary:hover {
+        background-color: var(--hover-primary-dark);
+    }
+
     button.outline, a.outline {
-        background-color: transparent;
-        box-shadow: 0px 0px 5px -2px var(--border-color);
+        background-color: white;
         border: 1px solid var(--border-color);
     }
     button.outline:hover, a.outline:hover {
@@ -156,5 +175,9 @@
     {
         background-color: red;
         color:white;
+    }
+
+    button.rounded, a.rounded {
+        border-radius: 7px;
     }
 </style>
