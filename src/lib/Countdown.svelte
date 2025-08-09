@@ -47,10 +47,10 @@
         </h7>
         <div class="timer-buttons">
             {#if timerStore.isRunning}
-                <Button onclick={timerStore.pause} Icon={Pause} class={"square"} />
+                <Button flavor={"outline"} onclick={timerStore.pause} Icon={Pause} class={"square"} />
             {:else}
-                <Button onclick={timerStore.start} Icon={Play} class={"square"}/>
-                <Button onclick={timerStore.reset} Icon={IterationCw} class={"square"}/>
+                <Button flavor={"outline"} onclick={timerStore.start} Icon={Play} class={"square"}/>
+                <Button flavor={"outline"} onclick={timerStore.reset} Icon={IterationCw} class={"square"}/>
             {/if}
         </div>
     </div>

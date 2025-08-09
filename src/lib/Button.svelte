@@ -5,7 +5,7 @@
         Icon?: Component | null;
         iconSize?: number;
         iconStroke?: number;
-        flavor?: 'ghost' | 'danger' | 'default' | 'disabled';
+        flavor?: 'ghost' | 'danger' | 'default' | 'disabled' | 'outline' | 'primary';
         href?: string | undefined;
         expanded?: boolean;
         onclick?: (event: MouseEvent) => void;
@@ -28,11 +28,25 @@
     }: Props = $props();
     // Determine which element to render
     let isLink = $derived(href !== undefined);
+
+    const extraClass = props.class ?? '';
+    delete props.class;
+
+    const flavorMap = {
+        danger: 'red',
+        ghost: 'ghost',
+        outline: 'outline',
+        disabled: 'disabled',
+        default: 'default',
+        primary: 'primary'
+    }
+
+    const flavorName = `${flavorMap[flavor] ?? ''} ${extraClass}`.trim();
 </script>
 
 
 {#if isLink}
-    <a href={href} class:red={flavor === 'danger'} class:ghost={flavor === 'ghost'} class:disabled={flavor === 'disabled'} {...props}>
+    <a href={href} class={flavorName} {...props}>
         {#if Icon}
             <span class="icon">
                 <Icon size={iconSize} strokeWidth={iconStroke}></Icon>
@@ -43,7 +57,7 @@
         {/if}
     </a>
 {:else}
-    <button class:red={flavor === 'danger'} class:ghost={flavor === 'ghost'} class:disabled={flavor === 'disabled'} {...props}>
+    <button class={flavorName} {...props}>
         {#if Icon}
             <span class="icon">
                 <Icon size={iconSize} strokeWidth={iconStroke}></Icon>
@@ -55,20 +69,34 @@
     </button>
 {/if}
 
-
-
-
 <style>
-    .square {
+    span {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    button.square, a.square {
         width: 3rem;
         height: 3rem;
+        flex-shrink: 0;
+    }
+
+    button.square.xsmall.rounded, a.square.xsmall.rounded {
+        border-radius: 15px;
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+
+    button.square.small, a.square.small {
+        width: 2rem;
+        height: 2rem;
     }
 
     /* Default variant */
     button, a {
         user-select: none;
         border-radius: 7px;
-        border: 1px solid var(--border-color);
         text-decoration: none;
         display: flex;
         justify-content: center;
@@ -80,11 +108,12 @@
         color: black;
         font-family: 'Inter', sans-serif;
         font-size: 1rem;
-        background-color: transparent;
+        background-color: var(--secondary-color);
+        border: 1px solid var(--secondary-color);
         box-shadow: 0px 0px 5px -2px var(--border-color);
     }
     button:hover, a:hover {
-        background-color: var(--secondary-color);
+        background-color: var(--hover-color);
         cursor:pointer;
     }
     button:active, a:active {
@@ -98,6 +127,25 @@
         border-radius: 0;
         color: var(--border-color);
     }
+
+    button.primary, a.primary {
+        background-color: var(--primary-dark);
+        color: var(--primary-light);
+
+    }
+
+    button.primary:hover, button.primary:hover {
+        background-color: var(--hover-primary-dark);
+    }
+
+    button.outline, a.outline {
+        background-color: white;
+        border: 1px solid var(--border-color);
+    }
+    button.outline:hover, a.outline:hover {
+        background-color: var(--secondary-color);
+    }
+
 
     button.ghost, a.ghost {
         box-shadow: none;
@@ -127,5 +175,9 @@
     {
         background-color: red;
         color:white;
+    }
+
+    button.rounded, a.rounded {
+        border-radius: 7px;
     }
 </style>

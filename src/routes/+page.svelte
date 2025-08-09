@@ -1,6 +1,8 @@
 <script>
     import { invoke } from "@tauri-apps/api/core";
     import { onMount } from "svelte";
+    import { sineInOut } from "svelte/easing";
+    import { fly } from "svelte/transition";
 
     let userName = 'Ian';
     let message = $state();
@@ -12,4 +14,4 @@
 
 
 <h1>Welcome, {userName}!</h1>
-<h6>{message}</h6>
+<h6 transition:fly={{ y: 10, delay: 150, duration: 1000, easing: sineInOut }}>{message}</h6>
