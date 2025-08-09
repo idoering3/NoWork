@@ -38,8 +38,8 @@
         display: flex;
         flex-wrap: wrap;
         background-color: var(--secondary-color);
-        height: 100%;
-        width: 100%;
+        height: 100vh;
+        width: 100vw;
     }
     /* I KNOW it's a bad name! */
     .main {

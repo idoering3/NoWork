@@ -92,10 +92,15 @@
 
     function resize() {
         if (taskContainer && header && taskBar) {
+            const style = getComputedStyle(taskContainer); 
+            const marginTop = parseFloat(style.marginTop);
+            const marginBottom = parseFloat(style.marginBottom);
+
             const availableHeight = window.innerHeight 
                 - getOuterHeight(header) 
                 - getOuterHeight(taskBar)
-                - 175;
+                - marginTop - marginBottom
+                - 180;
             taskContainer.style.height = `${availableHeight}px`;
         }
     }
