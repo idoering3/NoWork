@@ -5,11 +5,6 @@
     import IterationCw from '@lucide/svelte/icons/iteration-cw';
     import { timerStore, msToMinutesSeconds } from '$lib/types/timerStore.svelte';
 
-    // Props from parent component
-    let { repetitions, breakTime, studyTime } = $props();
-
-    let timerEnabled = $state(true);
-
     const FULL_DASH_ARRAY = 283;
 
     function calculateTimeFraction() {
@@ -42,9 +37,9 @@
         <h1>
             {msToMinutesSeconds(timerStore.timeLeft)}
         </h1>
-        <h7>
-            {timerStore.isStudying ? "Study" : "Break"} | Session {timerStore.sessionNum} / {repetitions}
-        </h7>
+        <p>
+            {timerStore.isStudying ? "Study" : "Break"} | Session {timerStore.sessionNum} / {timerStore.totalSessions}
+        </p>
         <div class="timer-buttons">
             {#if timerStore.isRunning}
                 <Button flavor={"outline"} onclick={timerStore.pause} Icon={Pause} class={"square"} />
@@ -57,6 +52,9 @@
 </div>
 
 <style>
+    p {
+        font-size: 1rem;
+    }
 
     path {
         transition: stroke-dasharray 0.1s linear;
@@ -77,6 +75,8 @@
         gap: 1rem;
         justify-content: center;
         align-items: center;
+        width: 25rem;
+        height: 25rem;
     }
 
 

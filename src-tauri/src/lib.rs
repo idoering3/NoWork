@@ -23,7 +23,8 @@ pub fn run() {
             commands::database::add_tag_to_task,
             commands::database::remove_tag_from_task,
             commands::database::reset_database,
-            commands::database::get_incomplete_tasks
+            commands::database::get_incomplete_tasks,
+            commands::database::get_completed_task_count
             ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

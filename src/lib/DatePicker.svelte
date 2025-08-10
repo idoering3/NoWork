@@ -3,11 +3,11 @@
     import Button from "./Button.svelte";
     import Calendar from "@lucide/svelte/icons/calendar";
     import { onMount } from "svelte";
-    import { ArrowLeft, ArrowRight } from "@lucide/svelte";
+    import { ChevronLeft, ChevronRight } from "@lucide/svelte";
 
     let dropdownOpen = $state(false);
 
-        let dropdownEl: HTMLElement;
+    let dropdownEl: HTMLElement;
 
     function handleClickOutside(event: MouseEvent) {
         const target = event.target as HTMLElement;
@@ -28,6 +28,121 @@
         return () => document.removeEventListener('click', handleClickOutside);
     });
 
+    const dayLabels = [
+        'Su',
+        "Mo",
+        "Tu",
+        "We",
+        "Th",
+        "Fr",
+        "Sa"
+    ];
+
+    type CalendarDay = {
+        day: number;
+        month: number; // 0-based
+        year: number;
+        date: Date;
+        inCurrentMonth: boolean;
+    };
+
+    function getDaysInMonth(year: number, month: number) {
+        return new Date(year, month + 1, 0).getDate();
+    }
+
+    function generateCalendarDays(year: number, month: number): CalendarDay[] {
+        const firstDayIndex = new Date(year, month, 1).getDay();
+        const totalDays = getDaysInMonth(year, month);
+
+        // Previous month
+        const prevMonth = (month - 1 + 12) % 12;
+        const prevYear = month === 0 ? year - 1 : year;
+        const prevMonthDays = getDaysInMonth(prevYear, prevMonth);
+
+        // Leading days from previous month
+        const leadingDays: CalendarDay[] = Array.from(
+            { length: firstDayIndex },
+            (_, i) => {
+                const dayNum = prevMonthDays - firstDayIndex + i + 1;
+                return {
+                    day: dayNum,
+                    month: prevMonth,
+                    year: prevYear,
+                    date: new Date(prevYear, prevMonth, dayNum),
+                    inCurrentMonth: false
+                };
+            }
+        );
+
+        // Current month days
+        const currentDays: CalendarDay[] = Array.from(
+            { length: totalDays },
+            (_, i) => {
+                const dayNum = i + 1;
+                return {
+                    day: dayNum,
+                    month,
+                    year,
+                    date: new Date(year, month, dayNum),
+                    inCurrentMonth: true
+                };
+            }
+        );
+
+        // Next month
+        const nextMonth = (month + 1) % 12;
+        const nextYear = month === 11 ? year + 1 : year;
+
+        // Fill trailing days so total = 42 (6 weeks)
+        const trailingDaysCount = 42 - (leadingDays.length + currentDays.length);
+        const trailingDays: CalendarDay[] = Array.from(
+            { length: trailingDaysCount },
+            (_, i) => {
+                const dayNum = i + 1;
+                return {
+                    day: dayNum,
+                    month: nextMonth,
+                    year: nextYear,
+                    date: new Date(nextYear, nextMonth, dayNum),
+                    inCurrentMonth: false
+                };
+            }
+        );
+
+        return [...leadingDays, ...currentDays, ...trailingDays];
+    }
+
+
+    const getMonthName = (monthIndex: number): string => {
+        const date = new Date();
+        date.setMonth(monthIndex);
+        return new Intl.DateTimeFormat('en-US', { month: 'long' }).format(date);
+    };
+
+    let currentDate = new Date();
+    let year = currentDate.getFullYear();
+    let month = $state(currentDate.getMonth());
+    let monthText = $derived(getMonthName(month));
+
+    let days = $derived(generateCalendarDays(year, month));
+
+    function increaseMonth() {
+        month += 1;
+    }
+
+    function decreaseMonth() {
+        month -= 1;
+    }
+
+    function selectDate (date: CalendarDay) {
+        selectedDate = date.date;
+    }
+
+    interface Props {
+        selectedDate: Date | null
+    }
+
+    let { selectedDate = $bindable() }: Props = $props();
 </script>
 
 <div class='container' bind:this={dropdownEl}>
@@ -35,17 +150,60 @@
     {#if dropdownOpen}
         <div class='context-menu' transition:slide={{ duration: 150 }}>
             <div class="top">
-                <Button flavor="ghost" class="square small rounded" Icon={ ArrowLeft } />
+                <Button flavor="ghost" class="square small rounded" Icon={ ChevronLeft } onclick={increaseMonth} />
                 <h8>
-                    Date
+                    {monthText} {year}
                 </h8>
-                <Button flavor="ghost" class="square small rounded" Icon={ ArrowRight } />
+                <Button flavor="ghost" class="square small rounded" Icon={ ChevronRight } onclick={decreaseMonth} />
+            </div>
+            <div class="calendar">
+                {#each dayLabels as day}
+                    <div class="calendar-obj faded">
+                        {day}
+                    </div>
+                {/each}
+                {#each days as day}
+                    <div class="calendar-obj">
+                        <Button class="square small rounded" flavor={
+                            (
+                                currentDate.getFullYear() === day.year &&
+                                currentDate.getMonth() === day.month &&
+                                currentDate.getDate() === day.day
+                            ) ? "default" :"ghost"}
+                            onclick={() => selectDate(day)}
+                        >
+                            <span class:faded={!day.inCurrentMonth}>
+                                {day.day}
+                            </span>
+                        </Button>
+                    </div>
+                {/each}
             </div>
         </div>
     {/if}
 </div>
 
 <style>
+    .faded {
+        color: rgb(112, 112, 112);
+    }
+
+    .calendar-obj {
+        display: flex;
+        font-size: 0.85rem;
+        aspect-ratio: 1 / 1;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .calendar {
+        flex-grow: 1;
+        gap: 0.5rem;
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        grid-template-rows: repeat(7, 1fr);
+    }
+
     .top {
         display: flex;
         width: 100%;
@@ -72,8 +230,8 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        width: 20rem;
-        height: 20rem;
+        min-width: 15rem;
+        min-height: 15rem;
         bottom: 3.25rem;
         gap: 1rem;
     }

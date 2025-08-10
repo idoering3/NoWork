@@ -80,17 +80,7 @@ h6 {
     font-weight: normal;
 }
 
-h7 {
-    font-family: 'Inter', sans-serif;
-    font-size: 1rem;
-}
-
-h8 {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.9rem;
-}
-
 p {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-family: 'Inter', sans-serif;
 }

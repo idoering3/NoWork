@@ -82,8 +82,7 @@
         flex-shrink: 0;
     }
 
-    button.square.xsmall.rounded, a.square.xsmall.rounded {
-        border-radius: 15px;
+    button.square.xsmall, a.square.xsmall {
         width: 1.5rem;
         height: 1.5rem;
     }
@@ -110,7 +109,6 @@
         font-size: 1rem;
         background-color: var(--secondary-color);
         border: 1px solid var(--secondary-color);
-        box-shadow: 0px 0px 5px -2px var(--border-color);
     }
     button:hover, a:hover {
         background-color: var(--hover-color);
@@ -136,6 +134,10 @@
 
     button.primary:hover, button.primary:hover {
         background-color: var(--hover-primary-dark);
+    }
+
+    button.primary:active, button.primary:active {
+        color: var(--border-color);
     }
 
     button.outline, a.outline {
@@ -179,5 +181,9 @@
 
     button.rounded, a.rounded {
         border-radius: 7px;
+    }
+
+    button.circular, a.circular {
+        border-radius: 15px;
     }
 </style>

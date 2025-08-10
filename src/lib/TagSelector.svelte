@@ -11,7 +11,7 @@
 
     let dropdownOpen = $state(false);
 
-        let dropdownEl: HTMLElement;
+    let dropdownEl: HTMLElement;
 
     function handleClickOutside(event: MouseEvent) {
         const target = event.target as HTMLElement;
@@ -35,9 +35,7 @@
     }
 
 
-    let { selectedTags = $bindable([]) } = $props();
-
-    let allTags: string[] = $state([]);
+    let { selectedTags = $bindable([]), refreshTags = $bindable(), allTags = $bindable([]) } = $props();
     let search = "";
 
     // Fetch tags from Tauri backend
@@ -45,6 +43,7 @@
         try {
             const tags = await invoke("get_all_tags") as { id: number, name: string }[];
             allTags = tags.map(t => t.name);
+            return allTags;
         } catch (err) {
             console.error("Failed to load tags:", err);
         }
@@ -80,6 +79,7 @@
         selectedTags = selectedTags.filter(t => t !== tag);
         await invoke("remove_tag", { tagName: tag });
         await loadTags();
+        refreshTags();
     }
 
     let tagName = $state('');
@@ -105,14 +105,14 @@
                 <div class="tag-container">
                     {#each allTags as tag}
                         <Badge noPadding flavor="outline">
-                            <Button flavor="ghost" class="square xsmall rounded" Icon={X} 
+                            <Button flavor="ghost" class="square xsmall circular" Icon={X} 
                             onclick={(event) => {
                                 event.stopPropagation(); 
                                 removeTag(tag);
                             }}
                             />
                                 {tag}
-                            <Button flavor="ghost" class="square xsmall rounded" Icon={Plus}
+                            <Button flavor="ghost" class="square xsmall circular" Icon={Plus}
                                 onclick={(event) => {
                                     event.stopPropagation();
                                     addTagToTask(tag);

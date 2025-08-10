@@ -270,6 +270,16 @@ pub fn get_incomplete_tasks(app: tauri::AppHandle) -> Result<Vec<Task>, String> 
     Ok(tasks)
 }
 
+#[tauri::command]
+pub fn get_completed_task_count(app: tauri::AppHandle) -> Result<i64, String> {
+    let conn = Connection::open(get_db_path(app)).map_err(|e| e.to_string())?;
+    let count: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM tasks WHERE completed = 1",
+        [],
+        |row| row.get(0),
+    ).map_err(|e| e.to_string())?;
+    Ok(count)
+}
 
 
 #[tauri::command]

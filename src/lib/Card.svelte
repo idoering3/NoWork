@@ -23,13 +23,11 @@
         border-radius: 15px;
         padding: 1rem;
         margin: 1rem;
-        width: 25rem;
-        min-height: 2rem;
+        width: fit-content;
         display: flex;
         flex-direction: column;
         align-content: center;
         gap: 0.5rem;
-        height: 25rem;
     }
 
     div.short {
@@ -44,6 +42,10 @@
     }
 
     div.expanded {
-        width: auto;
+        height: 100%;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
     }
 </style>

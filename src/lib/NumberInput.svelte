@@ -152,7 +152,7 @@
             bind:value={numStr}
             bind:this={inputField}
             />
-            <h7>{label}</h7>
+            <p>{label}</p>
         </div>
         <div class="buttons">
             <Button 
@@ -176,7 +176,7 @@
 </div>
 
 <style>
-    h7 {
+    p {
         font-family: 'Inter', sans-serif;
         font-size: 0.9rem;
     }

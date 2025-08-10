@@ -5,16 +5,15 @@
     import { page } from '$app/state';
     import { fade, fly } from 'svelte/transition';
     import { circInOut, quartInOut } from 'svelte/easing';
-    function toggleSidebar () {
-        const sidebar = document.getElementById("navbar-toggle");
-        sidebar?.classList.toggle("collapsed");
-        sidebar?.classList.toggle("expanded");
-    }
+    import MiniCountdown from '$lib/MiniCountdown.svelte';
+    import { timerStore } from '$lib/types/timerStore.svelte';
 
     let { children } = $props();
 </script>
 
-
+{#if timerStore.isEnabled && page.url.pathname !== "/study"}
+    <MiniCountdown />
+{/if}
 
 <div class="grid">
     <Header />
@@ -38,8 +37,8 @@
         display: flex;
         flex-wrap: wrap;
         background-color: var(--secondary-color);
-        height: 100%;
-        width: 100%;
+        height: 100vh;
+        width: 100vw;
     }
     /* I KNOW it's a bad name! */
     .main {
