@@ -8,10 +8,11 @@
     import Button from "$lib/Button.svelte";
     import ArrowUp from "@lucide/svelte/icons/arrow-up";
     import TagSelector from "$lib/TagSelector.svelte";
-    import { X } from "@lucide/svelte";
+    import { ArrowDownUp, Search, X } from "@lucide/svelte";
     import { onDestroy, onMount } from "svelte";
     import Datepicker from "$lib/DatePicker.svelte";
-    import { fly } from "svelte/transition";
+    import { fade, fly } from "svelte/transition";
+    import { quartInOut } from "svelte/easing";
 
     let tasks: Task[] = $state([]);
 
@@ -23,6 +24,17 @@
 
     async function getIncompleteTasks() {
         tasks = await invoke('get_incomplete_tasks');
+    }
+
+    function sortTasksByDueDate(tasks: Task[]): Task[] {
+        return [...tasks].sort((a, b) => {
+            if (!a.dueDate && !b.dueDate) return 0; // both missing
+            if (!a.dueDate) return 1; // a goes last
+            if (!b.dueDate) return -1; // b goes last
+
+            // Compare dates
+            return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+        });
     }
 
     onMount (async () => {
@@ -113,6 +125,27 @@
 	onDestroy(() => {
 		window.removeEventListener("resize", resize);
 	});
+
+    interface SortOption {
+        value: string,
+        label: string
+    }
+
+    let sortOptions: SortOption[] = [
+        { value:"due", label: "due date"},
+        { value:"tag", label: "tag"}
+    ]
+    let sortIndex = $state(0);
+
+    function changeSort() {
+        if (sortIndex < sortOptions.length - 1) {
+            sortIndex += 1; 
+        } else {
+            sortIndex = 0;
+        }
+    }
+
+    let tags = $state([]);
 </script>
 
 
@@ -120,11 +153,53 @@
     <h1 bind:this={header}>
         Task List
     </h1>
-
     <div class='task-container' bind:this={taskContainer}>
-        {#each tasks as task (task.id)}
-            <TaskCard {task} onComplete={completeTask}/>
-        {/each}
+        <div class='task-utilities'>
+            <!-- <div class='search'>
+                <Textbox preamble={''} placeholders={["Search for task"]}>
+                    <Search size={18} strokeWidth={1.5} /> 
+                </Textbox>
+            </div> -->
+            <div class="sort">
+                <Button class="square small" flavor="primary" Icon={ArrowDownUp} onclick={changeSort} />
+                <p>
+                    Sorting: 
+                    {#key sortIndex}
+                        <span style="position: absolute; padding-left: 0.25rem" 
+                            in:fly={{ y:10, duration: 150, easing: quartInOut }} 
+                            out:fly={{ y:-10, duration: 150, easing: quartInOut }}
+                        >
+                            {sortOptions[sortIndex].label}
+                        </span>
+                    {/key}
+                </p>
+            </div>
+        </div>
+        <div>
+            {#key sortOptions[sortIndex].value}
+                <div style="position: absolute" 
+                    in:fade={{ duration: 150, easing: quartInOut }} 
+                    out:fade={{ duration: 150, easing: quartInOut }}
+                >
+                    {#if sortOptions[sortIndex].value === 'due'}
+                        {#each sortTasksByDueDate(tasks) as task (task.id)}
+                            <TaskCard {task} onComplete={completeTask} />
+                        {/each}
+                    {:else if sortOptions[sortIndex].value === 'tag'}
+                        {#each tags as tagCat}
+                            <span style="text-transform: capitalize">
+                                <h4>{tagCat}</h4>
+                            </span>
+                            {#each sortTasksByDueDate(tasks) as task (task.id)}
+                                {#if task.tags?.some(tag => tag === tagCat)}
+                                    <TaskCard {task} onComplete={completeTask} />
+                                {/if}
+                            {/each}
+                        {/each}
+                    {/if}
+                </div>
+            {/key}
+        </div>
     </div>
     
     <div class="task-bar" bind:this={taskBar}>
@@ -135,17 +210,17 @@
                     <span style="padding-left: 0.5rem">
                         {tag}
                     </span>
-                    <Button flavor="ghost" class="square xsmall circular" Icon={X} 
+                    <Button flavor="ghost" class="square xsmall circular" Icon={X}
                         onclick={() => {
                             removeTagFromTask(tag);
-                        }}    
+                        }}
                     />
                 </Badge>
             {/each}
             {#if selectedDate}
                 {selectedDate.toLocaleDateString()}
             {/if}
-            <TagSelector bind:selectedTags={selectedTags} />
+            <TagSelector bind:selectedTags={selectedTags} refreshTags={getIncompleteTasks()} bind:allTags={tags} />
             <Datepicker bind:selectedDate={selectedDate}/>
             <Button onclick={submitTask} class="square" flavor="primary" Icon={ArrowUp} />
         </Card>
@@ -153,15 +228,39 @@
 </div>
 
 <style>
+    p {
+        font-size: 1rem;
+    }
+
+    .search {
+        box-shadow: 0px 0px 5px -2px #b8b8b8;
+        border: 1px solid #b8b8b8;
+        border-radius: 15px;
+        padding: 0.25rem 1rem;
+    }
+
+    .sort {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .task-utilities {
+        display: flex;
+        gap: 0.5rem;
+        width: 100%;
+    }
 
     .container {
 		width: 100%;
 		height: 100%;
-		/* display: flex;
-		flex-direction: column; */
+        display: flex;
+        flex-direction: column;
     }
 
     .task-container {
+        position: relative;
         min-height: 0;
         overflow-y: auto;
         box-shadow: 0px 0px 5px -2px #b8b8b8;
@@ -169,6 +268,9 @@
         border-radius: 15px;
         padding: 1rem;
         margin: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
     }
     
 </style>

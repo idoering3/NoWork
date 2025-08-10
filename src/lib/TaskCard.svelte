@@ -24,7 +24,7 @@
 <div class="task-card" transition:scale={{ duration: 150, easing: quartInOut, start: 0.75, opacity: 0 }}>
     <Button onclick={complete} Icon={Check} flavor="outline" class="square small"/>
     <div class="stacked">
-        <h7>{task.name}</h7>
+        <p style="font-size: 1rem">{task.name}</p>
         <p class="date" 
             class:due-today={
                 dueDate?.toLocaleDateString() === now.toLocaleDateString()
@@ -53,7 +53,7 @@
         min-height: 0;
     }
     .date {
-        font-size: 0.85rem;
+        font-size: 0.8rem;
     }
 
     .date.due-today {

@@ -136,6 +136,10 @@
         background-color: var(--hover-primary-dark);
     }
 
+    button.primary:active, button.primary:active {
+        color: var(--border-color);
+    }
+
     button.outline, a.outline {
         background-color: white;
         border: 1px solid var(--border-color);

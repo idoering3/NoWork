@@ -42,9 +42,9 @@
         <h1>
             {msToMinutesSeconds(timerStore.timeLeft)}
         </h1>
-        <h7>
+        <p>
             {timerStore.isStudying ? "Study" : "Break"} | Session {timerStore.sessionNum} / {repetitions}
-        </h7>
+        </p>
         <div class="timer-buttons">
             {#if timerStore.isRunning}
                 <Button flavor={"outline"} onclick={timerStore.pause} Icon={Pause} class={"square"} />
@@ -57,6 +57,9 @@
 </div>
 
 <style>
+    p {
+        font-size: 1rem;
+    }
 
     path {
         transition: stroke-dasharray 0.1s linear;
@@ -77,6 +80,8 @@
         gap: 1rem;
         justify-content: center;
         align-items: center;
+        width: 25rem;
+        height: 25rem;
     }
 
 
