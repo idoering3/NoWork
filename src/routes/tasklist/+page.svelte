@@ -8,10 +8,10 @@
     import Button from "$lib/Button.svelte";
     import ArrowUp from "@lucide/svelte/icons/arrow-up";
     import TagSelector from "$lib/TagSelector.svelte";
-    import { ArrowDownUp, Search, X } from "@lucide/svelte";
+    import { ArrowDownUp, Network, Search, X } from "@lucide/svelte";
     import { onDestroy, onMount } from "svelte";
     import Datepicker from "$lib/DatePicker.svelte";
-    import { fade, fly } from "svelte/transition";
+    import { fade, fly, slide } from "svelte/transition";
     import { quartInOut } from "svelte/easing";
 
     let tasks: Task[] = $state([]);
@@ -82,6 +82,10 @@
         getIncompleteTasks();
     }
 
+    async function getCompletedTaskCount (): Promise<number> {
+        return await invoke<number>('get_completed_task_count');
+    }
+
     function removeTagFromTask(tag: string) {
         selectedTags = selectedTags.filter(t => t !== tag);
     }
@@ -146,13 +150,42 @@
     }
 
     let tags = $state([]);
+
+    function dueToday(task: Task) {
+        const dueDate: Date | null = task.dueDate ? new Date(task.dueDate) : null;
+        const now: Date = new Date();
+        if (dueDate?.toLocaleDateString() === now.toLocaleDateString()) {
+            return true;
+        }
+        return false;
+    }
 </script>
 
 
 <div class='container'>
-    <h1 bind:this={header}>
-        Task List
-    </h1>
+    <div class='header'>
+        <h1 bind:this={header}>
+            Task List
+        </h1>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <h6>
+                {tasks.filter(task => dueToday(task)).length} task{tasks.filter(task => dueToday(task)).length !== 1 ? "s" : ''} due today
+            </h6>
+            <h6>
+                {#key tasks}
+                    {#await getCompletedTaskCount() then completedTasks}
+                    <span
+                            in:fly={{ y:10, duration: 150, easing: quartInOut }}
+                            out:fly={{ y:-10, duration: 150, easing: quartInOut }}
+                    >
+                            {completedTasks}
+                    </span>
+                        total tasks completed
+                    {/await}
+                {/key}
+            </h6>
+        </div>
+    </div>
     <div class='task-container' bind:this={taskContainer}>
         <div class='task-utilities'>
             <!-- <div class='search'>
@@ -230,6 +263,12 @@
 <style>
     p {
         font-size: 1rem;
+    }
+
+    .header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
     }
 
     .search {

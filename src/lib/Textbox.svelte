@@ -1,17 +1,22 @@
 <script lang='ts'>
-    import type { Snippet } from "svelte";
+    import { onMount, type Snippet } from "svelte";
 
     interface Props {
         value?: string,
         placeholders: string[],
-        preamble?: string,
+        preamble?: boolean,
         onkeydown?: ((event: KeyboardEvent) => void) | undefined;
         children?: Snippet
     }
 
-    let { value = $bindable(), placeholders, preamble = "Type something, like ", onkeydown, children }: Props = $props();
+    let { value = $bindable(), placeholders, preamble = true, onkeydown, children }: Props = $props();
 
     let placeholder = $state(placeholders[Math.floor(Math.random() * placeholders.length)]);
+    onMount(() => {
+        if (preamble) {
+            placeholder = `Type something, like '${placeholder}'`; 
+        }
+    })
 
     function onInput(event: Event) {
         value = (event.target as HTMLInputElement).value;
@@ -24,7 +29,7 @@
 </script>
 
 <div class="custom-input">
-    <input class='input' bind:value placeholder={preamble + placeholder} oninput={onInput} onkeydown={onkeydown}/>
+    <input class='input' bind:value placeholder={placeholder} oninput={onInput} onkeydown={onkeydown}/>
     <div class='absolutely'>
         {@render children?.()}
     </div>

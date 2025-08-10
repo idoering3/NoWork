@@ -5,7 +5,6 @@
     import NumberInput from '$lib/NumberInput.svelte';
     import Countdown from '$lib/Countdown.svelte';
     import type { StudyType } from '$lib/types/Study.ts';
-    import { onMount, type Component } from 'svelte';
     import { timerStore } from '$lib/types/timerStore.svelte';
     
     let studyTypes: Record<string, StudyType> = {
@@ -56,12 +55,11 @@
     Study
 </h1>
 
-
 <Card class={"evenly-space-vert"}>
     <div class="container">
         {#if timerStore.isEnabled}
             <div class="timer">
-                <Countdown studyTime={studyTime * 60 * 1000} breakTime={breakTime * 60 * 1000} repetitions={repetitions}/>
+                <Countdown />
             </div>
         {:else}
             <div>
@@ -73,16 +71,16 @@
                 </div>
                 <div class="side-by-side">
                     <div class="stack">
-                        <p class="header">Study</p>
+                        <h7 class="header">Study</h7>
                         <NumberInput label="mins" roundtoNearest={5} bind:num={studyTime}/>
                     </div>
                     <div class="stack">
-                        <p class="header">Break</p>
+                        <h7 class="header">Break</h7>
                         <NumberInput label="mins" roundtoNearest={1} increment={1} upperLimitNum={60} lowerLimitNum={0} bind:num={breakTime}/>
                     </div>
                 </div>
                     <div class="stack">
-                        <p class="header">Repetitions</p>
+                        <h7 class="header">Repetitions</h7>
                         <NumberInput label="times" roundtoNearest={1} increment={1} upperLimitNum={30} lowerLimitNum={0} bind:num={repetitions}/>
                     </div>
                 <Button onclick={startTimer}>Start Studying</Button>
