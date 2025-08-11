@@ -141,7 +141,7 @@
     }
 
     button.outline, a.outline {
-        background-color: white;
+        background-color: var(--primary-light);
         border: 1px solid var(--border-color);
     }
     button.outline:hover, a.outline:hover {
@@ -185,5 +185,9 @@
 
     button.circular, a.circular {
         border-radius: 15px;
+    }
+
+    button.border {
+        border: 1px solid;
     }
 </style>

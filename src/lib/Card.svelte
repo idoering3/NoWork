@@ -19,6 +19,7 @@
     
     div {
         box-shadow: 0px 0px 5px -2px #b8b8b8;
+        background-color: var(--primary-light);
         border: 1px solid #b8b8b8;
         border-radius: 15px;
         padding: 1rem;
@@ -43,7 +44,6 @@
 
     div.expanded {
         height: 100%;
-        overflow-y: auto;
         display: flex;
         flex-direction: column;
         min-height: 0;

@@ -174,12 +174,7 @@
             <h6>
                 {#key tasks}
                     {#await getCompletedTaskCount() then completedTasks}
-                    <span
-                            in:fly={{ y:10, duration: 150, easing: quartInOut }}
-                            out:fly={{ y:-10, duration: 150, easing: quartInOut }}
-                    >
-                            {completedTasks}
-                    </span>
+                        {completedTasks}
                         total tasks completed
                     {/await}
                 {/key}
@@ -271,13 +266,6 @@
         gap: 1rem;
     }
 
-    .search {
-        box-shadow: 0px 0px 5px -2px #b8b8b8;
-        border: 1px solid #b8b8b8;
-        border-radius: 15px;
-        padding: 0.25rem 1rem;
-    }
-
     .sort {
         display: flex;
         align-items: center;
@@ -304,6 +292,7 @@
         overflow-y: auto;
         box-shadow: 0px 0px 5px -2px #b8b8b8;
         border: 1px solid #b8b8b8;
+        background-color: var(--primary-light);
         border-radius: 15px;
         padding: 1rem;
         margin: 1rem;

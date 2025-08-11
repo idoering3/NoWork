@@ -14,10 +14,10 @@
 }
 
 :root {
-    --primary-light: white;
-    --primary-dark: rgb(56, 56, 56);
-    --hover-primary-dark: rgb(32, 32, 32);
-    --primary-color: white;
+    --primary-light: #ffffff;
+    --primary-dark: #383838;
+    --hover-primary-dark: #202020;
+    --primary-color: #f8edf0;
     --secondary-color: #f8dae0;
     --highlight-color: #8d6577;
     --border-color: #b8b8b8;
@@ -38,9 +38,10 @@ body, html {
     overflow: hidden;
 }
 
-h1, h2, h3, h4, h5, h6, h7, p {
+h1, h2, h3, h4, h5, h6, p {
     padding: 0;
     margin: 0;
+    color: var(--primary-dark);
 }
 
 

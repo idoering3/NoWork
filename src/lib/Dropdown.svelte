@@ -1,6 +1,6 @@
 <script lang='ts'>
     import { ChevronDown } from '@lucide/svelte';
-    import { fade, slide } from 'svelte/transition';
+    import { fade, fly, slide } from 'svelte/transition';
     import { onMount } from 'svelte';
     import { quartInOut } from 'svelte/easing';
 
@@ -37,24 +37,32 @@
 <div class="container">
     <div class="dropdown-container" bind:this={dropdownEl}>
         <button class="dropdown" onclick={() => dropdownOpen = !dropdownOpen}>
-            {#if selected}
-                <span transition:fade={{ duration: 300, easing: quartInOut}}>{selected}</span>
-            {/if}
+                {#if selected}
+                    {#key selected}
+                        <span class='selected-ob' transition:fade={{ duration: 300, easing: quartInOut}}>{selected}</span>
+                    {/key}
+                {/if}
             <span class="right-align"><ChevronDown size={20} strokeWidth={1}/></span>
         </button>
         {#if dropdownOpen}
-            <div transition:slide={{ duration: 300, easing: quartInOut}} class="options">
-                {#each options as thing}
-                    {#if thing}
-                        {@render option(thing)}
-                    {/if}
-                {/each}
+            <div style='position:relative; display: flex; align-items: center; justify-content: center;'>
+                <div transition:fly={{y: -15, duration: 150, easing: quartInOut}} class="options">
+                    {#each options as thing}
+                        {#if thing}
+                            {@render option(thing)}
+                        {/if}
+                    {/each}
                 </div>
+            </div>
         {/if}
     </div>
 </div>
 
 <style>
+    .selected-ob {
+        
+    }
+
     .right-align {
         margin-left: auto;
     }
@@ -102,8 +110,10 @@
         background-color: var(--secondary-color);
     }
     .options {
+        z-index: 50;
         align-items: center;
         overflow: hidden;
+        top: 0rem;
         position: absolute;
         border-radius: 7px;
         background-color: var(--primary-color);

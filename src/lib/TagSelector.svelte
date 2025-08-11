@@ -1,5 +1,5 @@
 <script lang='ts'>
-    import { slide } from "svelte/transition";
+    import { fly, slide } from "svelte/transition";
     import Button from "./Button.svelte";
     import Tags from "@lucide/svelte/icons/tags";
     import { quartInOut } from "svelte/easing";
@@ -100,7 +100,7 @@
         <Button class="square" flavor="outline" Icon={Tags} onclick={() => dropdownOpen = !dropdownOpen}>
         </Button>
         {#if dropdownOpen}
-            <div class="context-menu" transition:slide={{ duration: 150 }}>
+            <div class="context-menu" transition:fly={{y: 15, easing: quartInOut, duration: 150 }}>
                 <h8>Tags</h8>
                 <div class="tag-container">
                     {#each allTags as tag}

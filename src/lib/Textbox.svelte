@@ -29,7 +29,7 @@
 </script>
 
 <div class="custom-input">
-    <input class='input' bind:value placeholder={placeholder} oninput={onInput} onkeydown={onkeydown}/>
+    <input id='input' class='input' bind:value placeholder={placeholder} oninput={onInput} onkeydown={onkeydown}/>
     <div class='absolutely'>
         {@render children?.()}
     </div>

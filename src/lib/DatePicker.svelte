@@ -1,9 +1,10 @@
 <script lang='ts'>
-    import { slide } from "svelte/transition";
+    import { fly, slide } from "svelte/transition";
     import Button from "./Button.svelte";
     import Calendar from "@lucide/svelte/icons/calendar";
     import { onMount } from "svelte";
     import { ChevronLeft, ChevronRight } from "@lucide/svelte";
+    import { quartInOut } from "svelte/easing";
 
     let dropdownOpen = $state(false);
 
@@ -148,7 +149,7 @@
 <div class='container' bind:this={dropdownEl}>
     <Button class="square" flavor="outline" Icon={Calendar} onclick={() => dropdownOpen = !dropdownOpen}/>
     {#if dropdownOpen}
-        <div class='context-menu' transition:slide={{ duration: 150 }}>
+        <div class='context-menu' transition:fly={{ y: 15, duration: 150, easing: quartInOut }}>
             <div class="top">
                 <Button flavor="ghost" class="square small rounded" Icon={ ChevronLeft } onclick={increaseMonth} />
                 <h8>
