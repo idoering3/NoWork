@@ -1,2 +1,2 @@
-pub mod greet;
 pub mod database;
+pub mod greet;

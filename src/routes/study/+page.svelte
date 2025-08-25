@@ -83,7 +83,9 @@
                         <h7 class="header">Repetitions</h7>
                         <NumberInput label="times" roundtoNearest={1} increment={1} upperLimitNum={30} lowerLimitNum={0} bind:num={repetitions}/>
                     </div>
-                <Button onclick={startTimer}>Start Studying</Button>
+                <div>
+                    <Button onclick={startTimer}>Start Studying</Button>
+                </div>
             </div>
         {/if}
     </div>
@@ -91,8 +93,8 @@
 
 <style>
     .container {
-        height: 25rem;
-        width: 25rem;
+        height: 27rem;
+        width: 27rem;
     }
 
     .timer {

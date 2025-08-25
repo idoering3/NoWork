@@ -1,4 +1,4 @@
-<script>
+<script lang='ts'>
     import '../app.css';
     import Header from '$lib/Header.svelte';
     import Sidebar from '$lib/Sidebar.svelte';
@@ -7,8 +7,28 @@
     import { circInOut, quartInOut } from 'svelte/easing';
     import MiniCountdown from '$lib/MiniCountdown.svelte';
     import { timerStore } from '$lib/types/timerStore.svelte';
+    import { load } from '@tauri-apps/plugin-store';
+    import { setColors, type Theme } from '$lib/theme';
+    import { onMount } from 'svelte';
+    import { theme, themes } from "$lib/stores.svelte";
 
     let { children } = $props();
+    
+    const root = document.documentElement;
+
+    onMount(async () => {
+
+        const store = await load(".settings.json");
+        const value = await store.get<{ value: Theme }>("theme");
+
+        if (value?.value) {
+            theme.theme = value.value;
+            setColors(root, theme.theme);
+        } else {
+            theme.theme = themes["Pink Light"];
+        }
+    });
+
 </script>
 
 {#if timerStore.isEnabled && page.url.pathname !== "/study"}
@@ -42,7 +62,6 @@
     }
     /* I KNOW it's a bad name! */
     .main {
-        display: grid;
         overflow: hidden;
         width: 100%;
         background-color: var(--primary-color);

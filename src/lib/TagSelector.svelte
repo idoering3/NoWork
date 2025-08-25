@@ -161,7 +161,7 @@
         overflow: hidden;
         position: absolute;
         border-radius: 7px;
-        background-color: var(--primary-color);
+        background-color: var(--primary-light);
         border: 1px solid var(--border-color);
         box-shadow: 0px 0px 5px -2px #b8b8b8;
         display: flex;

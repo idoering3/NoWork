@@ -192,6 +192,7 @@
     }
     
     input {
+        color: var(--primary-dark);
         background-color: var(--primary-light);
         margin: 0;
         padding: 0;

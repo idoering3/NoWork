@@ -28,7 +28,12 @@
     background: var(--secondary-color);
 }
 
+input {
+    color: var(--primary-dark);
+}
+
 body, html {
+    color: var(--primary-dark);
     user-select: none;
     font-family: 'Inter', sans-serif;
     margin: 0;

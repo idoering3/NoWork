@@ -5,6 +5,7 @@ use crate::commands::database::init_db;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             let handle = app.handle();
@@ -25,7 +26,7 @@ pub fn run() {
             commands::database::reset_database,
             commands::database::get_incomplete_tasks,
             commands::database::get_completed_task_count
-            ])
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

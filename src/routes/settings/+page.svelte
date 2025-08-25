@@ -1,10 +1,14 @@
-<script>
+<script lang='ts'>
     import AlertDialog from "$lib/AlertDialog.svelte";
     import Button from "$lib/Button.svelte";
     import Card from "$lib/Card.svelte";
     import Dropdown from "$lib/Dropdown.svelte";
     import Swatch from "$lib/Swatch.svelte";
+    import { setColors, type Theme } from "$lib/theme";
     import { invoke } from "@tauri-apps/api/core";
+    import { load } from "@tauri-apps/plugin-store";
+    import { theme, themes } from "$lib/stores.svelte";
+    import { onMount } from "svelte";
 
     async function resetDatabase() {
         await invoke('reset_database');
@@ -20,10 +24,46 @@
         if (confirmDialog === "continue") {
             resetDatabase();
         }
-    })
+    });
 
     let databaseConfirmDialogOpen = $state(false);
     let confirmDialog = $state();
+    
+    let selectedTheme: string = $derived("");
+     
+    async function updateTheme(newThemeName: string) {
+        if (newThemeName) {
+            theme.theme = themes[newThemeName]
+            const store = await load(".settings.json");
+            await store.set("theme", { value: themes[newThemeName] });
+            await store.save();
+            setColors(document.documentElement, themes[newThemeName]);
+        }
+    }
+
+    $effect(() => {
+        if (selectedTheme) {
+            updateTheme(selectedTheme);
+        }
+    });
+
+    const root = document.documentElement;
+
+    onMount(async () => {
+        if (theme.theme) {
+            selectedTheme = theme.theme.name;
+        } else {
+            const store = await load(".settings.json");
+            const value = await store.get<{ value: Theme }>("theme");
+
+            if (value?.value) {
+                theme.theme = value.value;
+                selectedTheme = theme.theme.name;
+            }
+        }
+    })
+
+
 </script>
 
 <h1>
@@ -40,7 +80,7 @@
         <p>
             Choose between a preselected theme or make your own!
         </p>
-        <Dropdown options={["Pink Light", "Pink Dark"]} />
+        <Dropdown options={["Pink Light", "Pink Dark"]} bind:selected={selectedTheme}/>
         <p>
             Theme colors
         </p>

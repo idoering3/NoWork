@@ -5,16 +5,22 @@
     import Badge from "./Badge.svelte";
     import { scale } from "svelte/transition";
     import { quartInOut } from "svelte/easing";
+    import { Trash } from "@lucide/svelte";
 
     interface Props {
-        task: Task
-        onComplete: (id: number) => void;
+        task: Task,
+        onComplete: (id: number) => void,
+        onDelete: (id: number) => void
     }
 
-    let { task = $bindable(), onComplete = $bindable()}: Props = $props();
+    let { task = $bindable(), onComplete = $bindable(), onDelete = $bindable()}: Props = $props();
 
     function complete() {
         onComplete(task.id);
+    }
+
+    function deleted() {
+        onDelete(task.id);
     }
 
     const dueDate: Date | null = task.dueDate ? new Date(task.dueDate) : null;
@@ -22,24 +28,27 @@
 </script>
 
 <div class="task-card" transition:scale={{ duration: 150, easing: quartInOut, start: 0.75, opacity: 0 }}>
-    <Button onclick={complete} Icon={Check} flavor="outline" class="square small"/>
-    <div class="stacked">
-        <p style="font-size: 1rem">{task.name}</p>
-        <p class="date" 
-            class:due-today={
-                dueDate?.toLocaleDateString() === now.toLocaleDateString()
-                }
-        >
-            {dueDate?.toLocaleDateString() ?? ''}
-        </p>
+    <div class='task-card'>
+        <Button onclick={complete} Icon={Check} flavor="outline" class="square small"/>
+        <div class="stacked">
+            <p style="font-size: 1rem">{task.name}</p>
+            <p class="date" 
+                class:due-today={
+                    dueDate?.toLocaleDateString() === now.toLocaleDateString()
+                    }
+            >
+                {dueDate?.toLocaleDateString() ?? ''}
+            </p>
+        </div>
+        <div class="tags">
+            {#if task.tags}
+                {#each task.tags as tag}
+                    <Badge flavor="outline">{tag}</Badge>
+                {/each}
+            {/if}
+        </div>
     </div>
-    <div class="tags">
-        {#if task.tags}
-            {#each task.tags as tag}
-                <Badge flavor="outline">{tag}</Badge>
-            {/each}
-        {/if}
-    </div>
+    <Button onclick={deleted} Icon={Trash} flavor="outline" class="square small"/>
 </div>
 
 <style>
@@ -47,6 +56,7 @@
         gap: 1rem;
         display: flex;
         align-items: center;
+        justify-content: space-between;
         width: fit-content;
         padding: 0rem 0.5rem;
         height: 3rem;

@@ -37,12 +37,14 @@
 <div class="container">
     <div class="dropdown-container" bind:this={dropdownEl}>
         <button class="dropdown" onclick={() => dropdownOpen = !dropdownOpen}>
+            <div style="position:relative; display: flex; width:100%; align-items: center;">
                 {#if selected}
                     {#key selected}
-                        <span class='selected-ob' transition:fade={{ duration: 300, easing: quartInOut}}>{selected}</span>
+                        <span class="selected-ob" transition:fade={{ duration: 300, easing: quartInOut}}>{selected}</span>
                     {/key}
                 {/if}
-            <span class="right-align"><ChevronDown size={20} strokeWidth={1}/></span>
+                <span class="right-align"><ChevronDown size={20} strokeWidth={1}/></span>
+            </div>
         </button>
         {#if dropdownOpen}
             <div style='position:relative; display: flex; align-items: center; justify-content: center;'>
@@ -60,7 +62,7 @@
 
 <style>
     .selected-ob {
-        
+        position: absolute;
     }
 
     .right-align {
@@ -94,6 +96,7 @@
         background-color: transparent;
     }
     .dropdown {
+        position:relative;
         vertical-align: middle;
         align-items: center;
         display: flex;
@@ -104,7 +107,8 @@
         border-radius: 7px;
         border: 1px solid var(--border-color);
         transition: 0.15s ease-in-out;
-        box-shadow: 0px 0px 5px -2px #b8b8b8;
+        box-shadow: 0px 0px 5px -2px var(--border-color);
+        color: var(--primary-dark);
     }
     .dropdown:hover {
         background-color: var(--secondary-color);
@@ -113,20 +117,22 @@
         z-index: 50;
         align-items: center;
         overflow: hidden;
-        top: 0rem;
+        top: 0.5rem;
         position: absolute;
         border-radius: 7px;
-        background-color: var(--primary-color);
+        background-color: var(--primary-light);
         border: 1px solid var(--border-color);
-        box-shadow: 0px 0px 5px -2px #b8b8b8;
+        box-shadow: 0px 0px 5px -2px var(--border-color);
         display: flex;
         flex-direction: column;
         min-width: 15rem;
+        color: var(--primary-dark);
     }
     .option {
         transition: 0.15s ease-in-out;
         padding: 1rem;
         width: 100%;
+        color: var(--primary-dark);
     }
     .option:hover {
         background-color: var(--secondary-color);

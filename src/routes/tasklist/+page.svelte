@@ -77,8 +77,12 @@
     }
 
     async function completeTask (taskId: number) {
-        console.log("completing task...");
         await invoke('complete_task', { taskId: taskId });
+        getIncompleteTasks();
+    }
+
+    async function deleteTask (taskId: number) {
+        await invoke("delete_task", {taskId: taskId});
         getIncompleteTasks();
     }
 
@@ -183,11 +187,6 @@
     </div>
     <div class='task-container' bind:this={taskContainer}>
         <div class='task-utilities'>
-            <!-- <div class='search'>
-                <Textbox preamble={''} placeholders={["Search for task"]}>
-                    <Search size={18} strokeWidth={1.5} /> 
-                </Textbox>
-            </div> -->
             <div class="sort">
                 <Button class="square small" flavor="primary" Icon={ArrowDownUp} onclick={changeSort} />
                 <p>
@@ -211,7 +210,7 @@
                 >
                     {#if sortOptions[sortIndex].value === 'due'}
                         {#each sortTasksByDueDate(tasks) as task (task.id)}
-                            <TaskCard {task} onComplete={completeTask} />
+                            <TaskCard {task} onComplete={completeTask} onDelete={deleteTask}/>
                         {/each}
                     {:else if sortOptions[sortIndex].value === 'tag'}
                         {#each tags as tagCat}
@@ -220,7 +219,7 @@
                             </span>
                             {#each sortTasksByDueDate(tasks) as task (task.id)}
                                 {#if task.tags?.some(tag => tag === tagCat)}
-                                    <TaskCard {task} onComplete={completeTask} />
+                                    <TaskCard {task} onComplete={completeTask} onDelete={deleteTask}/>
                                 {/if}
                             {/each}
                         {/each}
@@ -290,8 +289,8 @@
         position: relative;
         min-height: 0;
         overflow-y: auto;
-        box-shadow: 0px 0px 5px -2px #b8b8b8;
-        border: 1px solid #b8b8b8;
+        box-shadow: 0px 0px 5px -2px var(--border-color);
+        border: 1px solid var(--border-color);
         background-color: var(--primary-light);
         border-radius: 15px;
         padding: 1rem;

@@ -78,8 +78,11 @@
         {#if expanded}
             <div transition:fly={{ y: 15, duration: 150, easing: quartInOut }}>
                 <Card>
-                    <Textbox bind:value={colorHex} placeholders={['']}>
-                    </Textbox>
+                    <div>
+                        <Textbox bind:value={colorHex} placeholders={['']}>
+                            <input type="color" bind:value={colorHex}>
+                        </Textbox>
+                    </div>
                 </Card>
             </div>
         {/if}

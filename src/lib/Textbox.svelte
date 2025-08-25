@@ -29,7 +29,7 @@
 </script>
 
 <div class="custom-input">
-    <input id='input' class='input' bind:value placeholder={placeholder} oninput={onInput} onkeydown={onkeydown}/>
+    <input autocomplete="off" id='input' class='input' bind:value placeholder={placeholder} oninput={onInput} onkeydown={onkeydown}/>
     <div class='absolutely'>
         {@render children?.()}
     </div>
@@ -42,6 +42,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        z-index: 50;
     }
 
     .custom-input {
@@ -72,6 +73,7 @@
     input::placeholder {
         opacity: 1;
         transition: 150ms ease-in-out;
+        color: var(--hover-primary-dark);
     }
 
     input:focus::placeholder {
