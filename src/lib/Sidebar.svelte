@@ -1,7 +1,6 @@
 <script>
     import { Blocks, Clock, House, Info, ListTodo, Menu, Settings } from "@lucide/svelte";
     import { setContext } from "svelte";
-    import Button from "./Button.svelte";
     import SidebarButton from "./SidebarButton.svelte";
 
     let sidebarExpanded = $state({ state: false });
@@ -9,7 +8,7 @@
 
 </script>
 
-<aside class="aside {sidebarExpanded.state ? 'expanded' : ''}">
+<aside class="aside">
     <div>
         <!-- <Button Icon={Menu} iconSize={20} onclick={() => sidebarExpanded.state = !sidebarExpanded.state} expanded={sidebarExpanded.state}/> -->
         <SidebarButton Icon={House} iconSize={20} href="/" name="Home"/>
@@ -29,11 +28,11 @@
         background-color: transparent;
         display: flex;
         justify-content: space-between;
-        align-items: left;
         flex-direction: column;
         transition: 0.15s ease-in-out;
+        height: calc(100vh - 3.25rem);
     }
-    .aside.expanded {
-        width: 9rem;
+    div {
+        width: min-content;
     }
 </style>

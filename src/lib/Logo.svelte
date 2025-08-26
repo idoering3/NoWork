@@ -3,14 +3,14 @@
         <defs data-tauri-drag-region >
         <style>
             .cls-1 {
-            fill: #000;
+            fill: var(--primary-dark);
             font-family: 'Playfair Display', sans-serif;
             font-size: 75px;
             }
 
             .cls-2 {
             fill: none;
-            stroke: #000;
+            stroke: var(--primary-dark);
             stroke-miterlimit: 10;
             stroke-width: 4px;
             }

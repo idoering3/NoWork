@@ -18,11 +18,11 @@
     }
     
     div {
-        box-shadow: 0px 0px 5px -2px #b8b8b8;
-        border: 1px solid #b8b8b8;
+        box-shadow: 0px 0px 5px -2px var(--border-color);
+        background-color: var(--primary-light);
+        border: 1px solid var(--border-color);
         border-radius: 15px;
         padding: 1rem;
-        margin: 1rem;
         width: fit-content;
         display: flex;
         flex-direction: column;
@@ -43,9 +43,14 @@
 
     div.expanded {
         height: 100%;
-        overflow-y: auto;
+        width: 100%;
+        padding: 0;
         display: flex;
         flex-direction: column;
         min-height: 0;
+    }
+
+    .no-padding {
+        padding: 0;
     }
 </style>

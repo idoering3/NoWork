@@ -1,9 +1,9 @@
-use tauri::{Manager, path::BaseDirectory };
-use serde::{ Deserialize, Serialize };
-use chrono::{ Datelike, Local, Weekday };
-use rand::{ rng };
-use std::collections::HashMap;
+use chrono::{Datelike, Local, Weekday};
+use rand::rng;
 use rand::seq::IndexedRandom;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use tauri::{path::BaseDirectory, Manager};
 
 #[derive(Debug, Deserialize, Serialize)]
 struct Greetings {
@@ -14,11 +14,16 @@ struct Greetings {
 #[tauri::command]
 pub fn greet(app: tauri::AppHandle) -> Result<String, String> {
     // Try to get the app's data directory
-    let resource_path = app.path().resolve("assets/greeting.json", BaseDirectory::Resource).map_err(|e| format!("Failed to resolve resource: {}", e))?;
+    let resource_path = app
+        .path()
+        .resolve("assets/greeting.json", BaseDirectory::Resource)
+        .map_err(|e| format!("Failed to resolve resource: {}", e))?;
 
-    let json_file = std::fs::File::open(&resource_path).map_err(|e| format!("Failed to read greeting.json at {:?}", e))?;
+    let json_file = std::fs::File::open(&resource_path)
+        .map_err(|e| format!("Failed to read greeting.json at {:?}", e))?;
 
-    let greetings_data: Greetings = serde_json::from_reader(&json_file).map_err(|e| format!("Failed to parse to greetings data {:?}", e))?;
+    let greetings_data: Greetings = serde_json::from_reader(&json_file)
+        .map_err(|e| format!("Failed to parse to greetings data {:?}", e))?;
 
     let today: Weekday = Local::now().weekday();
 
@@ -32,10 +37,13 @@ pub fn greet(app: tauri::AppHandle) -> Result<String, String> {
         Weekday::Sun => "Sunday",
     };
 
-    let greeting_for_day: &Vec<String> = greetings_data.greetings.get(day_name)
+    let greeting_for_day: &Vec<String> = greetings_data
+        .greetings
+        .get(day_name)
         .ok_or_else(|| format!("No greetings found for day: {}", day_name))?;
-    
-    let chosen_greeting: &String = greeting_for_day.choose(&mut rng())
+
+    let chosen_greeting: &String = greeting_for_day
+        .choose(&mut rng())
         .ok_or_else(|| format!("No greetings available for {}", day_name))?;
 
     Ok(format!("{}", chosen_greeting))

@@ -77,8 +77,12 @@
     }
 
     async function completeTask (taskId: number) {
-        console.log("completing task...");
         await invoke('complete_task', { taskId: taskId });
+        getIncompleteTasks();
+    }
+
+    async function deleteTask (taskId: number) {
+        await invoke("delete_task", {taskId: taskId});
         getIncompleteTasks();
     }
 
@@ -174,12 +178,7 @@
             <h6>
                 {#key tasks}
                     {#await getCompletedTaskCount() then completedTasks}
-                    <span
-                            in:fly={{ y:10, duration: 150, easing: quartInOut }}
-                            out:fly={{ y:-10, duration: 150, easing: quartInOut }}
-                    >
-                            {completedTasks}
-                    </span>
+                        {completedTasks}
                         total tasks completed
                     {/await}
                 {/key}
@@ -188,11 +187,6 @@
     </div>
     <div class='task-container' bind:this={taskContainer}>
         <div class='task-utilities'>
-            <!-- <div class='search'>
-                <Textbox preamble={''} placeholders={["Search for task"]}>
-                    <Search size={18} strokeWidth={1.5} /> 
-                </Textbox>
-            </div> -->
             <div class="sort">
                 <Button class="square small" flavor="primary" Icon={ArrowDownUp} onclick={changeSort} />
                 <p>
@@ -216,7 +210,7 @@
                 >
                     {#if sortOptions[sortIndex].value === 'due'}
                         {#each sortTasksByDueDate(tasks) as task (task.id)}
-                            <TaskCard {task} onComplete={completeTask} />
+                            <TaskCard {task} onComplete={completeTask} onDelete={deleteTask}/>
                         {/each}
                     {:else if sortOptions[sortIndex].value === 'tag'}
                         {#each tags as tagCat}
@@ -225,7 +219,7 @@
                             </span>
                             {#each sortTasksByDueDate(tasks) as task (task.id)}
                                 {#if task.tags?.some(tag => tag === tagCat)}
-                                    <TaskCard {task} onComplete={completeTask} />
+                                    <TaskCard {task} onComplete={completeTask} onDelete={deleteTask}/>
                                 {/if}
                             {/each}
                         {/each}
@@ -271,13 +265,6 @@
         gap: 1rem;
     }
 
-    .search {
-        box-shadow: 0px 0px 5px -2px #b8b8b8;
-        border: 1px solid #b8b8b8;
-        border-radius: 15px;
-        padding: 0.25rem 1rem;
-    }
-
     .sort {
         display: flex;
         align-items: center;
@@ -302,11 +289,12 @@
         position: relative;
         min-height: 0;
         overflow-y: auto;
-        box-shadow: 0px 0px 5px -2px #b8b8b8;
-        border: 1px solid #b8b8b8;
+        box-shadow: 0px 0px 5px -2px var(--border-color);
+        border: 1px solid var(--border-color);
+        background-color: var(--primary-light);
         border-radius: 15px;
         padding: 1rem;
-        margin: 1rem;
+        margin-bottom: 1rem;
         display: flex;
         flex-direction: column;
         gap: 1rem;

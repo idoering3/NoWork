@@ -1,4 +1,4 @@
-<script>
+<script lang='ts'>
     import '../app.css';
     import Header from '$lib/Header.svelte';
     import Sidebar from '$lib/Sidebar.svelte';
@@ -7,8 +7,28 @@
     import { circInOut, quartInOut } from 'svelte/easing';
     import MiniCountdown from '$lib/MiniCountdown.svelte';
     import { timerStore } from '$lib/types/timerStore.svelte';
+    import { load } from '@tauri-apps/plugin-store';
+    import { setColors, type Theme } from '$lib/theme';
+    import { onMount } from 'svelte';
+    import { theme, themes } from "$lib/stores.svelte";
 
     let { children } = $props();
+    
+    const root = document.documentElement;
+
+    onMount(async () => {
+
+        const store = await load(".settings.json");
+        const value = await store.get<{ value: Theme }>("theme");
+
+        if (value?.value) {
+            theme.theme = value.value;
+            setColors(root, theme.theme);
+        } else {
+            theme.theme = themes["Pink Light"];
+        }
+    });
+
 </script>
 
 {#if timerStore.isEnabled && page.url.pathname !== "/study"}
@@ -29,9 +49,6 @@
     </main>
 </div>
 
-
-
-
 <style>
     .grid {
         display: flex;
@@ -42,14 +59,12 @@
     }
     /* I KNOW it's a bad name! */
     .main {
-        display: grid;
-        overflow: hidden;
         width: 100%;
+        height: calc(100vh - 3rem);
         background-color: var(--primary-color);
         border-radius: 7px 0 0 0;
         border-top: 1px solid var(--border-color);
         border-left: 1px solid var(--border-color);
-        padding: 3rem;
         display: grid;
     }
     main {
@@ -58,8 +73,10 @@
         width: 100%;
     }
     content {
-        width: 100%;
-        height: 100%;
+        padding: 3rem;
+        overflow-y: auto;
+        width: calc(100vw - 9rem);
+        height: calc(100vh - 6rem);
         grid-column-start: 1;
         grid-column-end: 2;
         grid-row-start: 1;

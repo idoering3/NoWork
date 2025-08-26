@@ -184,14 +184,16 @@
         display:flex;
         flex-direction: column;
     }
-
+    
     .buttons {
         display: flex;
         flex-direction: column;
         border-left: 1px solid var(--border-color);
     }
-
+    
     input {
+        color: var(--primary-dark);
+        background-color: var(--primary-light);
         margin: 0;
         padding: 0;
         width: 8.5rem;

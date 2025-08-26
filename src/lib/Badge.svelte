@@ -53,7 +53,6 @@
     }
     
     .badge.outline {
-        background-color: var(--primary-color);
-        border: 1.5px solid black;
+        border: 1.5px solid var(--border-color);
     }
 </style>

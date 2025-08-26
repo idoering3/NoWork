@@ -104,7 +104,7 @@
         height: 3rem;
         width: 100%;
         transition: 0.15s ease-in-out;
-        color: black;
+        color: var(--primary-dark);
         font-family: 'Inter', sans-serif;
         font-size: 1rem;
         background-color: var(--secondary-color);
@@ -128,8 +128,8 @@
 
     button.primary, a.primary {
         background-color: var(--primary-dark);
+        stroke: var(--primary-light);
         color: var(--primary-light);
-
     }
 
     button.primary:hover, button.primary:hover {
@@ -141,7 +141,7 @@
     }
 
     button.outline, a.outline {
-        background-color: white;
+        background-color: var(--primary-light);
         border: 1px solid var(--border-color);
     }
     button.outline:hover, a.outline:hover {
@@ -176,7 +176,7 @@
     button.red:hover, a.red:hover
     {
         background-color: red;
-        color:white;
+        color:var(--primary-light);
     }
 
     button.rounded, a.rounded {
@@ -185,5 +185,9 @@
 
     button.circular, a.circular {
         border-radius: 15px;
+    }
+
+    button.border {
+        border: 1px solid;
     }
 </style>
