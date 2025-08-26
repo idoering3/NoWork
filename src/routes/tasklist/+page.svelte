@@ -294,7 +294,7 @@
         background-color: var(--primary-light);
         border-radius: 15px;
         padding: 1rem;
-        margin: 1rem;
+        margin-bottom: 1rem;
         display: flex;
         flex-direction: column;
         gap: 1rem;

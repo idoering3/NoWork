@@ -49,9 +49,6 @@
     </main>
 </div>
 
-
-
-
 <style>
     .grid {
         display: flex;
@@ -62,13 +59,12 @@
     }
     /* I KNOW it's a bad name! */
     .main {
-        overflow: hidden;
         width: 100%;
+        height: calc(100vh - 3rem);
         background-color: var(--primary-color);
         border-radius: 7px 0 0 0;
         border-top: 1px solid var(--border-color);
         border-left: 1px solid var(--border-color);
-        padding: 3rem;
         display: grid;
     }
     main {
@@ -77,8 +73,10 @@
         width: 100%;
     }
     content {
-        width: 100%;
-        height: 100%;
+        padding: 3rem;
+        overflow-y: auto;
+        width: calc(100vw - 9rem);
+        height: calc(100vh - 6rem);
         grid-column-start: 1;
         grid-column-end: 2;
         grid-row-start: 1;

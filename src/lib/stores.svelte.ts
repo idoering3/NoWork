@@ -28,3 +28,7 @@ export let themes: Record<string, Theme> = {
 export const theme = $state({
     theme: null as null | Theme
 });
+
+export const username = $state({
+    name: "Person"
+})

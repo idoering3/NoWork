@@ -24,6 +24,9 @@
         // Randomize placeholder
         const randomIndex = Math.floor(Math.random() * placeholders.length);
         placeholder = placeholders[randomIndex];
+            if (preamble) {
+                placeholder = `Type something, like '${placeholder}'`; 
+            }
         }
     }
 </script>

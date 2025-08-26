@@ -23,7 +23,6 @@
         border: 1px solid var(--border-color);
         border-radius: 15px;
         padding: 1rem;
-        margin: 1rem;
         width: fit-content;
         display: flex;
         flex-direction: column;
@@ -44,8 +43,14 @@
 
     div.expanded {
         height: 100%;
+        width: 100%;
+        padding: 0;
         display: flex;
         flex-direction: column;
         min-height: 0;
+    }
+
+    .no-padding {
+        padding: 0;
     }
 </style>

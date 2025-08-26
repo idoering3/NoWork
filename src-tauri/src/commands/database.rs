@@ -1,4 +1,4 @@
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Local, TimeZone, Utc};
 use rusqlite::{Connection, Result};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
@@ -306,6 +306,113 @@ pub fn get_completed_task_count(app: tauri::AppHandle) -> Result<i64, String> {
         )
         .map_err(|e| e.to_string())?;
     Ok(count)
+}
+
+#[tauri::command]
+pub fn get_tasks_due_today(app: tauri::AppHandle) -> Result<Vec<Task>, String> {
+    let conn = Connection::open(get_db_path(app)).map_err(|e| e.to_string())?;
+
+    // Get today's start and end in local time
+    let today_local = Local::now().date_naive();
+    let start_of_day_local = today_local.and_hms_opt(0, 0, 0).unwrap();
+    let end_of_day_local = today_local.and_hms_opt(23, 59, 59).unwrap();
+
+    // Convert to UTC (since DB stores UTC timestamps)
+    let start_utc = Local
+        .from_local_datetime(&start_of_day_local)
+        .unwrap()
+        .with_timezone(&Utc);
+    let end_utc = Local
+        .from_local_datetime(&end_of_day_local)
+        .unwrap()
+        .with_timezone(&Utc);
+
+    let mut stmt = conn
+        .prepare(
+            "SELECT id, name, due_date, created_at, completed, completed_at
+             FROM tasks
+             WHERE due_date IS NOT NULL
+               AND due_date >= ?1
+               AND due_date <= ?2",
+        )
+        .map_err(|e| e.to_string())?;
+
+    let task_rows = stmt
+        .query_map(
+            rusqlite::params![start_utc.to_rfc3339(), end_utc.to_rfc3339()],
+            |row| {
+                Ok((
+                    row.get::<_, i32>(0)?,            // id
+                    row.get::<_, String>(1)?,         // name
+                    row.get::<_, Option<String>>(2)?, // due_date
+                    row.get::<_, String>(3)?,         // created_at
+                    row.get::<_, i32>(4)?,            // completed
+                    row.get::<_, Option<String>>(5)?, // completed_at
+                ))
+            },
+        )
+        .map_err(|e| e.to_string())?;
+
+    let mut tasks = Vec::new();
+
+    for row in task_rows {
+        let (id, name, due_date_str, created_at_str, completed_int, completed_at_str) =
+            row.map_err(|e| e.to_string())?;
+
+        let due_date = match due_date_str {
+            Some(s) => Some(
+                DateTime::parse_from_rfc3339(&s)
+                    .map_err(|e| format!("Invalid due_date format: {}", e))?
+                    .with_timezone(&Utc),
+            ),
+            None => None,
+        };
+
+        let created_at = DateTime::parse_from_rfc3339(&created_at_str)
+            .map_err(|e| format!("Invalid created_at format: {}", e))?
+            .with_timezone(&Utc);
+
+        let completed_at = match completed_at_str {
+            Some(s) => Some(
+                DateTime::parse_from_rfc3339(&s)
+                    .map_err(|e| format!("Invalid completed_at format: {}", e))?
+                    .with_timezone(&Utc),
+            ),
+            None => None,
+        };
+
+        let completed = completed_int != 0;
+
+        // Fetch tags
+        let mut tag_stmt = conn
+            .prepare(
+                "SELECT tags.name FROM tags
+                 JOIN task_tags ON tags.id = task_tags.tag_id
+                 WHERE task_tags.task_id = ?1",
+            )
+            .map_err(|e| e.to_string())?;
+
+        let tag_iter = tag_stmt
+            .query_map([id], |row| row.get::<_, String>(0))
+            .map_err(|e| e.to_string())?;
+
+        let mut tags = Vec::new();
+        for t in tag_iter {
+            tags.push(t.map_err(|e| e.to_string())?);
+        }
+
+        tasks.push(Task {
+            id,
+            name,
+            due_date,
+            created_at,
+            completed,
+            completed_at,
+            tags: if tags.is_empty() { None } else { Some(tags) },
+        });
+    }
+
+    Ok(tasks)
 }
 
 #[tauri::command]
