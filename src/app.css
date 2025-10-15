@@ -19,7 +19,7 @@
     --hover-primary-dark: #202020;
     --primary-color: #f8edf0;
     --secondary-color: #f8dae0;
-    --highlight-color: #8d6577;
+    --highlight-color: var(--highlight-color);
     --border-color: #b8b8b8;
     --hover-color: #ecc7ca;
 }

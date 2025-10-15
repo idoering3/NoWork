@@ -49,7 +49,7 @@
 .skeleton-text {
   /* Add animation to the main container */
   animation: shimmer 1.5s infinite ease;
-  background: linear-gradient(to right, transparent 0%, #8d6577 50%, transparent 100%);
+  background: linear-gradient(to right, transparent 0%, var(--highlight-color) 50%, transparent 100%);
   background-size: 200% 100%;
 }
 

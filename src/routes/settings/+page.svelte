@@ -75,7 +75,7 @@
     }
 
 </script>
-<div>
+<div style="padding: 3rem;">
     <h1>
         Settings
     </h1>
@@ -109,7 +109,7 @@
                         <p>
                             Choose between a preselected theme or make your own!
                         </p>
-                        <Dropdown options={["Pink Light", "Pink Dark"]} bind:selected={selectedTheme}/>
+                        <Dropdown options={Object.keys(themes)} bind:selected={selectedTheme}/>
                         <p>
                             Theme colors
                         </p>

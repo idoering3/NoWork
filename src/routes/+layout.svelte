@@ -73,10 +73,10 @@
         width: 100%;
     }
     content {
-        padding: 3rem;
+        /* padding: 3rem; */
         overflow-y: auto;
-        width: calc(100vw - 9rem);
-        height: calc(100vh - 6rem);
+        width: calc(100vw - 3rem);
+        height: calc(100vh - 3rem);
         grid-column-start: 1;
         grid-column-end: 2;
         grid-row-start: 1;

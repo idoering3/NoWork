@@ -32,7 +32,7 @@
     .selected-bar {
         position: absolute;
         z-index: 1;
-        background-color: #8d6577;
+        background-color: var(--highlight-color);
         height: 1.75rem;
         width: 3px;
         margin-left: 4px;

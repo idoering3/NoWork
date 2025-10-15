@@ -27,14 +27,14 @@
     const now: Date = new Date();
 </script>
 
-<div class="task-card" transition:scale={{ duration: 150, easing: quartInOut, start: 0.75, opacity: 0 }}>
+<div class="task-container" transition:scale={{ duration: 150, easing: quartInOut, start: 0.75, opacity: 0 }}>
     <div class='task-card'>
         <Button onclick={complete} Icon={Check} flavor="outline" class="square small"/>
         <div class="stacked">
             <p style="font-size: 1rem">{task.name}</p>
             <p class="date" 
                 class:due-today={
-                    dueDate?.toLocaleDateString() === now.toLocaleDateString()
+                    dueDate && dueDate.toISOString().split("T")[0] <= new Date().toISOString().split("T")[0]
                     }
             >
                 {dueDate?.toLocaleDateString() ?? ''}
@@ -52,6 +52,17 @@
 </div>
 
 <style>
+    .task-container {
+        gap: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: fit-content;
+        padding: 0rem 0.5rem;
+        height: 3rem;
+        min-height: 0;
+    }
+
     .task-card {
         gap: 1rem;
         display: flex;
@@ -78,6 +89,7 @@
     }
 
     .tags {
+        position: relative;
         display: flex;
         min-height: 0;
         gap: 0.5rem;

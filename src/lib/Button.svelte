@@ -115,7 +115,7 @@
         cursor:pointer;
     }
     button:active, a:active {
-        color: #8d6577;
+        color: var(--highlight-color);
     }
 
     button.disabled, a.disabled {
@@ -161,7 +161,7 @@
         cursor:pointer;
     }
     button.ghost:active, a.ghost:active {
-        color: #8d6577;
+        color: var(--highlight-color);
     }
 
     /* Red variant */

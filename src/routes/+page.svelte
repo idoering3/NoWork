@@ -52,7 +52,15 @@
     }
 
     async function getTasksDueToday() {
-        tasks = await invoke("get_tasks_due_today");
+        tasks = []
+        let tasklist = await invoke<Task[]>("get_tasks_due_today");
+        if (tasklist) {
+            for (let task of tasklist) {
+                if (!task.completed) {
+                    tasks.push(task)   
+                }
+            }
+        }
     }
 
     async function getIncompleteTasks() {
@@ -87,57 +95,56 @@
     }
 
     let chief_messages = [
-        "Chief needs you to finish this fight!",
-        "Time to give the Covenant back their bomb.",
-        "Sir, finishing this fight.",
-        "You have a job to do.",
         "There won't be a homework if we don't stop the banished.",
-        "Don\'t make yourself a study plan… if you know you won\'t keep it.",
-        "Reach didn't fall in a day",
-        "For a brick… he flew pretty good!",
-        "Wake up, spartan."
     ];
 
     let chief_message = $state(chief_messages[Math.floor(Math.random() * chief_messages.length)]);
 </script>
 
+<div class="container">
 
-<h1>Welcome, {username.name}!</h1>
-<h5 transition:fly={{ y: 10, delay: 150, duration: 1000, easing: sineInOut }}>{message}</h5>
-<div class="cardholder">
-    <div class="taskview">
-        <Card class="expanded">
-            <div style="padding: 1rem;">
-                {#if tasks}
-                    <h6>There's stuff due today!</h6>
-                    {#each tasks as task (task.id)}
-                        <TaskCard {task} onComplete={completeTask} onDelete={deleteTask}/>
-                    {/each}
-                {:else}
-                    <h6>Wow, you're so boring...</h6>
-                {/if}
-            </div>
-        </Card>
-    </div>
-    <div>
-        <Card class="expanded no-padding">
-            <div style="display:flex; justify-content:center; position: relative; overflow:hidden; height: 25rem;">
-                {#if error}
-                    <p style="color: red;">Error: {error}</p>
-                {:else if gifPath}
-                    <img class="chief" src={gifPath} alt="Random Chief GIF" />
-                    <p style="position:absolute; bottom: 1rem; color:white;">{chief_message}</p>
-                {:else}
-                    <Skeleton/>
-                {/if}
-            </div>
-        </Card>
+    <h1>Welcome, {username.name}!</h1>
+    <h5 transition:fly={{ y: 10, delay: 150, duration: 1000, easing: sineInOut }}>{message}</h5>
+    <div class="cardholder">
+        <div class="taskview">
+            <Card class="expanded">
+                <div style="margin: 1rem; overflow: hidden;">
+                    {#if tasks}
+                        {#if tasksDueToday}
+                            <h6>There's stuff due today!</h6>
+                        {:else}
+                            <h6>Task Summary</h6>
+                        {/if}
+                        {#each tasks as task (task.id)}
+                            <TaskCard {task} onComplete={completeTask} onDelete={deleteTask}/>
+                        {/each}
+                    {:else}
+                        <h6>Wow, you're so boring...</h6>
+                    {/if}
+                </div>
+            </Card>
+        </div>
+        <div>
+            <Card class="expanded no-padding">
+                <div style="display:flex; justify-content:center; position: relative; overflow:hidden; height: 25rem; width: 35rem">
+                    {#if error}
+                        <p style="color: red;">Error: {error}</p>
+                    {:else if gifPath}
+                        <img class="chief" src={gifPath} alt="Random Chief GIF" />
+                        <p style="position:absolute; bottom: 1rem; color:white;">{chief_message}</p>
+                    {:else}
+                        <Skeleton/>
+                    {/if}
+                </div>
+            </Card>
+        </div>
     </div>
 </div>
 
 <style>
-    div {
-        width: 100%;
+    .container {
+        overflow: hidden;
+        padding: 3rem;
     }
 
     img.chief {

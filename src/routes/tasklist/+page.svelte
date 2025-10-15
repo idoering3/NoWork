@@ -8,11 +8,12 @@
     import Button from "$lib/Button.svelte";
     import ArrowUp from "@lucide/svelte/icons/arrow-up";
     import TagSelector from "$lib/TagSelector.svelte";
-    import { ArrowDownUp, Network, Search, X } from "@lucide/svelte";
+    import { ArrowDownUp, Network, Plus, Search, X } from "@lucide/svelte";
     import { onDestroy, onMount } from "svelte";
     import Datepicker from "$lib/DatePicker.svelte";
-    import { fade, fly, slide } from "svelte/transition";
-    import { quartInOut } from "svelte/easing";
+    import { fade, fly, scale, slide } from "svelte/transition";
+    import { circInOut, quartInOut } from "svelte/easing";
+    import { load, Store } from "@tauri-apps/plugin-store";
 
     let tasks: Task[] = $state([]);
 
@@ -37,10 +38,6 @@
         });
     }
 
-    onMount (async () => {
-        getIncompleteTasks();
-    });
-
     let placeholders = [
         'steal grandma\'s bagel',
         'read War and Peace',
@@ -61,7 +58,8 @@
         'drive around in a clown costume like the clown I am',
         'streak through the streets, shouting Eureka!',
         'write a strongly worded email',
-        'impersonate a drunk Lyndon B. Johnson looking for his car keys'
+        'impersonate a drunk Lyndon B. Johnson looking for his car keys',
+        'delete those incriminating Watergate tapes'
     ]
 
     let taskName = $state("");
@@ -163,98 +161,145 @@
         }
         return false;
     }
+
+    let selectedTag = $state("all");
+
+    $effect(() => {
+        (async () => {
+            if (selectedTag) {
+                if (selectedTag !== "all") {
+                    if (!selectedTags.includes(selectedTag)) {
+                        selectedTags = [selectedTag];
+                    }
+                } else {
+                    selectedTags = [];
+                }
+                const store = await load(".settings.json");
+                await store.set("selectedTag", selectedTag);
+            }
+        })();
+    });
+
+    onMount (async () => {
+        getIncompleteTasks();
+        const store = await load(".temp.json");
+        const tag = await store.get<{ value: string }>("selectedTag");
+        if (tag?.value) {
+            selectedTag = tag.value;
+            console.log(tag.value);
+        }
+    });
+
 </script>
 
-
-<div class='container'>
-    <div class='header'>
-        <h1 bind:this={header}>
-            Task List
-        </h1>
-        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-            <h6>
-                {tasks.filter(task => dueToday(task)).length} task{tasks.filter(task => dueToday(task)).length !== 1 ? "s" : ''} due today
-            </h6>
-            <h6>
-                {#key tasks}
-                    {#await getCompletedTaskCount() then completedTasks}
-                        {completedTasks}
-                        total tasks completed
-                    {/await}
-                {/key}
-            </h6>
-        </div>
+<div style="overflow: hidden; display: flex; height: calc(100vh - 3rem);">
+    <div class='sidebar'>
+        <p style="padding: 1rem; display:flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--border-color)">Tasks</p>
+        <Button flavor="ghost" onclick={() => selectedTag = "all"}><span style={"all" === selectedTag ? "color:var(--highlight-color)" : ""}>all tasks</span></Button>
+        {#each tags as tag}
+            <Button flavor="ghost" onclick={() => selectedTag = tag}><span style={tag === selectedTag ? "color:var(--highlight-color)" : ""}>{tag}</span></Button>
+        {/each}
+        <Button flavor="ghost" Icon={Plus}></Button>
     </div>
-    <div class='task-container' bind:this={taskContainer}>
-        <div class='task-utilities'>
-            <div class="sort">
-                <Button class="square small" flavor="primary" Icon={ArrowDownUp} onclick={changeSort} />
-                <p>
-                    Sorting: 
-                    {#key sortIndex}
-                        <span style="position: absolute; padding-left: 0.25rem" 
-                            in:fly={{ y:10, duration: 150, easing: quartInOut }} 
-                            out:fly={{ y:-10, duration: 150, easing: quartInOut }}
-                        >
-                            {sortOptions[sortIndex].label}
-                        </span>
+    <div class='container'>
+        <div class='header'>
+            <h1 bind:this={header}>
+                Task List
+            </h1>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <h6>
+                    {tasks.filter(task => dueToday(task)).length} task{tasks.filter(task => dueToday(task)).length !== 1 ? "s" : ''} due today
+                </h6>
+                <h6>
+                    {#key tasks}
+                        {#await getCompletedTaskCount() then completedTasks}
+                            {completedTasks}
+                            total tasks completed
+                        {/await}
                     {/key}
-                </p>
+                </h6>
             </div>
         </div>
-        <div>
-            {#key sortOptions[sortIndex].value}
-                <div style="position: absolute" 
-                    in:fade={{ duration: 150, easing: quartInOut }} 
-                    out:fade={{ duration: 150, easing: quartInOut }}
-                >
-                    {#if sortOptions[sortIndex].value === 'due'}
-                        {#each sortTasksByDueDate(tasks) as task (task.id)}
-                            <TaskCard {task} onComplete={completeTask} onDelete={deleteTask}/>
-                        {/each}
-                    {:else if sortOptions[sortIndex].value === 'tag'}
-                        {#each tags as tagCat}
-                            <span style="text-transform: capitalize">
-                                <h4>{tagCat}</h4>
+        <div class='task-container' bind:this={taskContainer}>
+            <div class='task-utilities'>
+                <div class="sort">
+                    <Button class="square small" flavor="primary" Icon={ArrowDownUp} onclick={changeSort} />
+                    <p>
+                        Sorting: 
+                        {#key sortIndex}
+                            <span style="position: absolute; padding-left: 0.25rem" 
+                                in:fly={{ y:10, duration: 150, easing: quartInOut }} 
+                                out:fly={{ y:-10, duration: 150, easing: quartInOut }}
+                            >
+                                {sortOptions[sortIndex].label}
                             </span>
-                            {#each sortTasksByDueDate(tasks) as task (task.id)}
-                                {#if task.tags?.some(tag => tag === tagCat)}
+                        {/key}
+                    </p>
+                </div>
+            </div>
+            <div style="position: relative;">
+                {#key selectedTag}
+                    <div style="position: absolute;" in:fly={{ duration: 300, y: 50, easing: circInOut}} out:fade={{ duration: 150, easing: quartInOut}}>
+                        {#each sortTasksByDueDate(tasks) as task (task.id)}
+                            {#if selectedTag !== "all"}
+                                {#if task.tags?.some(tag => tag === selectedTag)}
                                     <TaskCard {task} onComplete={completeTask} onDelete={deleteTask}/>
                                 {/if}
-                            {/each}
+                            {:else}
+                                <TaskCard {task} onComplete={completeTask} onDelete={deleteTask}/>
+                            {/if}
                         {/each}
-                    {/if}
-                </div>
-            {/key}
+                    </div>
+                {/key}
+            </div>
         </div>
-    </div>
-    
-    <div class="task-bar" bind:this={taskBar}>
-        <Card expanded class="short">
-            <Textbox bind:value={taskName} onkeydown={(event: KeyboardEvent) => handleKeydown(event)} {placeholders} />
-            {#each selectedTags as tag}
-                <Badge flavor="outline" noPadding>
-                    <span style="padding-left: 0.5rem">
-                        {tag}
-                    </span>
-                    <Button flavor="ghost" class="square xsmall circular" Icon={X}
-                        onclick={() => {
-                            removeTagFromTask(tag);
-                        }}
-                    />
-                </Badge>
-            {/each}
-            {#if selectedDate}
-                {selectedDate.toLocaleDateString()}
-            {/if}
-            <TagSelector bind:selectedTags={selectedTags} refreshTags={getIncompleteTasks()} bind:allTags={tags} />
-            <Datepicker bind:selectedDate={selectedDate}/>
-            <Button onclick={submitTask} class="square" flavor="primary" Icon={ArrowUp} />
-        </Card>
+        
+        <div class="task-bar" bind:this={taskBar}>
+            <Card expanded class="short">
+                <Textbox bind:value={taskName} onkeydown={(event: KeyboardEvent) => handleKeydown(event)} {placeholders} />
+                {#snippet tagsn(name: string)}
+                    <Badge flavor="outline" noPadding>
+                        <span style="padding-left: 0.5rem">
+                            {name}
+                        </span>
+                        <Button flavor="ghost" class="square xsmall circular" Icon={X}
+                            onclick={() => {
+                                removeTagFromTask(name);
+                            }}
+                        />
+                    </Badge>
+                {/snippet}
+                {#if selectedTag !== "all"}
+                    {@render tagsn(selectedTag)}
+                {/if}
+                {#each selectedTags as tag}
+                    {#if selectedTag !== tag}
+                        {@render tagsn(tag)}
+                    {/if}
+                {/each}
+                {#if selectedDate}
+                    {selectedDate.toLocaleDateString()}
+                {/if}
+                <TagSelector bind:selectedTags={selectedTags} refreshTags={getIncompleteTasks()} bind:allTags={tags} />
+                <Datepicker bind:selectedDate={selectedDate}/>
+                <Button onclick={submitTask} class="square" flavor="primary" Icon={ArrowUp} />
+            </Card>
+        </div>
     </div>
 </div>
 
 <style>
+    .container {
+        padding: 1rem 3rem;
+        overflow: hidden;
+    }
+
+    .sidebar {
+        width: 15rem;
+        border-right: 1px solid var(--border-color);
+        height: calc(100vh - 3rem);
+    }
+
     p {
         font-size: 1rem;
     }

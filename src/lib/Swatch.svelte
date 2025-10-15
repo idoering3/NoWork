@@ -102,6 +102,7 @@
         display: flex;
         bottom: 2.5rem;
         width: 15rem;
+        z-index: 50;
     }
 
     button {

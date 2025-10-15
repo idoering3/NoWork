@@ -20,7 +20,7 @@
     #gradient-text {
         font-weight: bold;
         display: inline-block;
-        background: linear-gradient(270deg, var(--primary-dark), #8d6577, var(--highlight-color));
+        background: linear-gradient(270deg, var(--primary-dark), var(--highlight-color), var(--highlight-color));
         background-size: 600% 600%; /* bigger than text for smooth animation */
         -webkit-text-fill-color: transparent;
         animation: move-gradient 6s ease infinite;
