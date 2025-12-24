@@ -10,7 +10,6 @@
 
 <aside class="aside">
     <div>
-        <!-- <Button Icon={Menu} iconSize={20} onclick={() => sidebarExpanded.state = !sidebarExpanded.state} expanded={sidebarExpanded.state}/> -->
         <SidebarButton Icon={House} iconSize={20} href="/" name="Home"/>
         <SidebarButton Icon={Clock} href="/study" name="Study"/>
         <SidebarButton Icon={ListTodo} iconSize={20} href="/tasklist" name="Tasks"/>
@@ -25,7 +24,6 @@
     .aside {
         margin-top: 0.25rem;
         width: 3rem;
-        background-color: transparent;
         display: flex;
         justify-content: space-between;
         flex-direction: column;

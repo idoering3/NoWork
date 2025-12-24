@@ -52,45 +52,38 @@
 </script>
 
 
-<div style="padding: 3rem;">
+<div style="padding: 3rem; display: flex; align-items:center; justify-content: center; flex-direction: column;">
     <h1>
         Study
     </h1>
-    <Card class={"evenly-space-vert"}>
-        <div class="container">
-            {#if timerStore.isEnabled}
-                <div class="timer">
-                    <Countdown />
+    <div class="container">
+        {#if timerStore.isEnabled}
+            <div class="timer">
+                <Countdown />
+            </div>
+        {:else}
+            <div>
+                <Dropdown options={["", ...Object.keys(studyTypes)]} bind:selected={selectedName}></Dropdown>
+                <div class="side-by-side">
+                    <div class="stack">
+                        <h7 class="header">Study</h7>
+                        <NumberInput label="mins" roundtoNearest={5} bind:num={studyTime}/>
+                    </div>
+                    <div class="stack">
+                        <h7 class="header">Break</h7>
+                        <NumberInput label="mins" roundtoNearest={1} increment={1} upperLimitNum={60} lowerLimitNum={0} bind:num={breakTime}/>
+                    </div>
                 </div>
-            {:else}
+                    <div class="stack">
+                        <h7 class="header">Repetitions</h7>
+                        <NumberInput label="times" roundtoNearest={1} increment={1} upperLimitNum={30} lowerLimitNum={0} bind:num={repetitions}/>
+                    </div>
                 <div>
-                    <div class="side-by-side">
-                        <p>
-                            Method
-                        </p>
-                        <Dropdown options={["", ...Object.keys(studyTypes)]} bind:selected={selectedName}></Dropdown>
-                    </div>
-                    <div class="side-by-side">
-                        <div class="stack">
-                            <h7 class="header">Study</h7>
-                            <NumberInput label="mins" roundtoNearest={5} bind:num={studyTime}/>
-                        </div>
-                        <div class="stack">
-                            <h7 class="header">Break</h7>
-                            <NumberInput label="mins" roundtoNearest={1} increment={1} upperLimitNum={60} lowerLimitNum={0} bind:num={breakTime}/>
-                        </div>
-                    </div>
-                        <div class="stack">
-                            <h7 class="header">Repetitions</h7>
-                            <NumberInput label="times" roundtoNearest={1} increment={1} upperLimitNum={30} lowerLimitNum={0} bind:num={repetitions}/>
-                        </div>
-                    <div>
-                        <Button onclick={startTimer}>Start Studying</Button>
-                    </div>
+                    <Button flavor="primary" onclick={startTimer}>Start Studying</Button>
                 </div>
-            {/if}
-        </div>
-    </Card>
+            </div>
+        {/if}
+    </div>
 </div>
 
 <style>

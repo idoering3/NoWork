@@ -109,6 +109,7 @@
         transition: 0.15s ease-in-out;
         box-shadow: 0px 0px 5px -2px var(--border-color);
         color: var(--primary-dark);
+        background-color: var(--primary-light);
     }
     .dropdown:hover {
         background-color: var(--secondary-color);

@@ -9,17 +9,13 @@
 
     let pageHref = $derived(page.url.pathname);
 
-    let sidebarExpanded = getContext("sidebarExpanded");
 </script>
 
 <div class="container">
     {#if pageHref === href}
         <div transition:slide={{ duration: 300, easing: quartInOut }} class="selected-bar"></div>
     {/if}
-    <Button flavor="ghost" {href} {...props} expanded={sidebarExpanded.state}>
-        {#if sidebarExpanded.state}
-            {name}
-        {/if}
+    <Button flavor="ghost" {href} {...props}>
     </Button>
 </div>
 

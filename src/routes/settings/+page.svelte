@@ -38,7 +38,6 @@
             const store = await load(".settings.json");
             await store.set("theme", { value: themes[newThemeName] });
             await store.save();
-            setColors(document.documentElement, themes[newThemeName]);
         }
     }
 

@@ -5,5 +5,9 @@ export interface Task {
   createdAt: string;
   completed: boolean;
   completedAt?: string | null;
-  tags?: string[] | null;
+  tags?: Tag[] | null;
+}
+export interface Tag {
+  name: string;
+  color: 'default' | 'outline' | 'danger' | 'blue'
 }

@@ -9,24 +9,42 @@
     import { timerStore } from '$lib/types/timerStore.svelte';
     import { load } from '@tauri-apps/plugin-store';
     import { setColors, type Theme } from '$lib/theme';
-    import { onMount } from 'svelte';
+    import { onDestroy, onMount } from 'svelte';
     import { theme, themes } from "$lib/stores.svelte";
+    import { cssVarToRGBArray, ShaderRenderer } from '$lib/shaders/shader';
 
     let { children } = $props();
     
     const root = document.documentElement;
+    let renderer: ShaderRenderer | null = $state(null);
+    let canvas: HTMLCanvasElement;
 
     onMount(async () => {
+        // shader shennanigans
+
+        const innerColor = cssVarToRGBArray("--accent-color");
+        const outerColor = cssVarToRGBArray("--primary-color");
+
+        renderer = new ShaderRenderer(canvas, innerColor, outerColor);
+        await renderer.startUpdatingSun(60000);
+        renderer.start();
 
         const store = await load(".settings.json");
         const value = await store.get<{ value: Theme }>("theme");
 
         if (value?.value) {
             theme.theme = value.value;
-            setColors(root, theme.theme);
-        } else {
-            theme.theme = themes["Pink Light"];
+            setColors(root, theme.theme, renderer);
         }
+    });
+
+    $effect(() => {
+        if (theme.theme && renderer)
+            setColors(root, theme.theme, renderer);
+    });
+
+    onDestroy(() => {
+        renderer?.stop();
     });
 
 </script>
@@ -36,6 +54,7 @@
 {/if}
 
 <div class="grid">
+    <canvas bind:this={canvas} id="gl-canvas" style="position:absolute; width:100vw; height:100vh; z-index:-1;"></canvas>
     <Header />
     <main>
         <Sidebar />
@@ -53,7 +72,6 @@
     .grid {
         display: flex;
         flex-wrap: wrap;
-        background-color: var(--secondary-color);
         height: 100vh;
         width: 100vw;
     }
@@ -61,7 +79,6 @@
     .main {
         width: 100%;
         height: calc(100vh - 3rem);
-        background-color: var(--primary-color);
         border-radius: 7px 0 0 0;
         border-top: 1px solid var(--border-color);
         border-left: 1px solid var(--border-color);

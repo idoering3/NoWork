@@ -1,8 +1,10 @@
 use chrono::{DateTime, Local, TimeZone, Utc};
-use rusqlite::{Connection, Result};
+use rusqlite::{params, Connection, Result};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use tauri::Manager;
+
+// this atrocity should be split into separate files at some point
 
 pub fn get_db_path(app: tauri::AppHandle) -> PathBuf {
     let base_dir = app
@@ -16,6 +18,7 @@ pub fn get_db_path(app: tauri::AppHandle) -> PathBuf {
 pub fn init_db(app: tauri::AppHandle) -> Result<()> {
     let conn = Connection::open(get_db_path(app))?;
 
+    
     // tasks table
     conn.execute(
         "CREATE TABLE IF NOT EXISTS tasks (
@@ -25,18 +28,22 @@ pub fn init_db(app: tauri::AppHandle) -> Result<()> {
             created_at TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
             completed BOOLEAN DEFAULT 0,
             completed_at TEXT
-        )",
-        [],
-    )?;
+            )",
+            [],
+        )?;
 
     // Tags table (unique names)
     conn.execute(
         "CREATE TABLE IF NOT EXISTS tags (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL UNIQUE
+            name TEXT NOT NULL UNIQUE,
+            color TEXT DEFAULT 'default'
         )",
         [],
     )?;
+
+    // Attempt to add color column if it doesn't exist. Ignore the error if it already exists.
+    let _ = conn.execute("ALTER TABLE tags ADD COLUMN color TEXT DEFAULT 'default'", []);
 
     // Many-to-many relationship
     conn.execute(
@@ -58,7 +65,7 @@ pub fn add_database_task(
     app: tauri::AppHandle,
     name: String,
     due_date: Option<DateTime<Utc>>,
-    tags: Option<Vec<String>>,
+    tags: Option<Vec<NewTag>>,
 ) -> Result<(), String> {
     let mut conn = Connection::open(get_db_path(app)).map_err(|e| e.to_string())?;
     let tx = conn.transaction().map_err(|e| e.to_string())?;
@@ -67,18 +74,20 @@ pub fn add_database_task(
 
     tx.execute(
         "INSERT INTO tasks (name, due_date) VALUES (?1, ?2)",
-        rusqlite::params![name, due_date_str],
+        params![name, due_date_str],
     )
     .map_err(|e| e.to_string())?;
 
     let task_id = tx.last_insert_rowid();
 
     if let Some(tags_vec) = tags {
-        for tag_name in tags_vec {
-            // Insert tag if it doesn't exist
+        for tag in tags_vec {
+            // Insert tag if it doesn't exist, or update color if it does.
+            // We use ON CONFLICT(name) DO UPDATE to keep color in sync with what the frontend sent.
             tx.execute(
-                "INSERT OR IGNORE INTO tags (name) VALUES (?1)",
-                rusqlite::params![tag_name],
+                "INSERT INTO tags (name, color) VALUES (?1, ?2)
+                 ON CONFLICT(name) DO UPDATE SET color = excluded.color",
+                params![tag.name, tag.color],
             )
             .map_err(|e| e.to_string())?;
 
@@ -86,15 +95,15 @@ pub fn add_database_task(
             let tag_id: i64 = tx
                 .query_row(
                     "SELECT id FROM tags WHERE name = ?1",
-                    rusqlite::params![tag_name],
+                    params![tag.name],
                     |row| row.get(0),
                 )
                 .map_err(|e| e.to_string())?;
 
-            // Link task and tag
+            // Link task and tag, ignore duplicates
             tx.execute(
-                "INSERT INTO task_tags (task_id, tag_id) VALUES (?1, ?2)",
-                rusqlite::params![task_id, tag_id],
+                "INSERT OR IGNORE INTO task_tags (task_id, tag_id) VALUES (?1, ?2)",
+                params![task_id, tag_id],
             )
             .map_err(|e| e.to_string())?;
         }
@@ -107,13 +116,21 @@ pub fn add_database_task(
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Task {
-    id: i32,
-    name: String,
-    due_date: Option<DateTime<Utc>>,
-    created_at: DateTime<Utc>,
-    completed: bool,
-    completed_at: Option<DateTime<Utc>>,
-    tags: Option<Vec<String>>,
+    pub id: i32,
+    pub name: String,
+    pub due_date: Option<DateTime<Utc>>,
+    pub created_at: DateTime<Utc>,
+    pub completed: bool,
+    pub completed_at: Option<DateTime<Utc>>,
+    pub tags: Option<Vec<Tag>>,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Tag {
+    pub id: i64,
+    pub name: String,
+    pub color: String,
 }
 
 #[tauri::command]
@@ -153,7 +170,6 @@ pub fn get_all_tasks(app: tauri::AppHandle) -> Result<Vec<Task>, String> {
         };
 
         let created_at = if created_at_str.trim().is_empty() {
-            // Handle empty created_at: either error or provide a fallback datetime
             return Err("Empty created_at field in DB".to_string());
         } else {
             DateTime::parse_from_rfc3339(&created_at_str)
@@ -172,17 +188,23 @@ pub fn get_all_tasks(app: tauri::AppHandle) -> Result<Vec<Task>, String> {
 
         let completed = completed_int != 0;
 
-        // Fetch tags for this task
+        // Fetch tags for this task and construct Tag structs
         let mut tag_stmt = conn
             .prepare(
-                "SELECT tags.name FROM tags
-             JOIN task_tags ON tags.id = task_tags.tag_id
-             WHERE task_tags.task_id = ?1",
+                "SELECT tags.id, tags.name, tags.color FROM tags
+                 JOIN task_tags ON tags.id = task_tags.tag_id
+                 WHERE task_tags.task_id = ?1",
             )
             .map_err(|e| e.to_string())?;
 
         let tag_iter = tag_stmt
-            .query_map([id], |row| row.get::<_, String>(0))
+            .query_map(params![id], |row| {
+                Ok(Tag {
+                    id: row.get(0)?,
+                    name: row.get(1)?,
+                    color: row.get(2)?,
+                })
+            })
             .map_err(|e| e.to_string())?;
 
         let mut tags = Vec::new();
@@ -263,17 +285,23 @@ pub fn get_incomplete_tasks(app: tauri::AppHandle) -> Result<Vec<Task>, String> 
 
         let completed = completed_int != 0;
 
-        // Get tags for this task
+        // Get tags for this task as Tag structs
         let mut tag_stmt = conn
             .prepare(
-                "SELECT tags.name FROM tags
-             JOIN task_tags ON tags.id = task_tags.tag_id
-             WHERE task_tags.task_id = ?1",
+                "SELECT tags.id, tags.name, tags.color FROM tags
+                 JOIN task_tags ON tags.id = task_tags.tag_id
+                 WHERE task_tags.task_id = ?1",
             )
             .map_err(|e| e.to_string())?;
 
         let tag_iter = tag_stmt
-            .query_map([id], |row| row.get::<_, String>(0))
+            .query_map(params![id], |row| {
+                Ok(Tag {
+                    id: row.get(0)?,
+                    name: row.get(1)?,
+                    color: row.get(2)?,
+                })
+            })
             .map_err(|e| e.to_string())?;
 
         let mut tags = Vec::new();
@@ -339,7 +367,7 @@ pub fn get_tasks_due_today(app: tauri::AppHandle) -> Result<Vec<Task>, String> {
 
     let task_rows = stmt
         .query_map(
-            rusqlite::params![start_utc.to_rfc3339(), end_utc.to_rfc3339()],
+            params![start_utc.to_rfc3339(), end_utc.to_rfc3339()],
             |row| {
                 Ok((
                     row.get::<_, i32>(0)?,            // id
@@ -383,17 +411,23 @@ pub fn get_tasks_due_today(app: tauri::AppHandle) -> Result<Vec<Task>, String> {
 
         let completed = completed_int != 0;
 
-        // Fetch tags
+        // Fetch tags as Tag structs
         let mut tag_stmt = conn
             .prepare(
-                "SELECT tags.name FROM tags
+                "SELECT tags.id, tags.name, tags.color FROM tags
                  JOIN task_tags ON tags.id = task_tags.tag_id
                  WHERE task_tags.task_id = ?1",
             )
             .map_err(|e| e.to_string())?;
 
         let tag_iter = tag_stmt
-            .query_map([id], |row| row.get::<_, String>(0))
+            .query_map(params![id], |row| {
+                Ok(Tag {
+                    id: row.get(0)?,
+                    name: row.get(1)?,
+                    color: row.get(2)?,
+                })
+            })
             .map_err(|e| e.to_string())?;
 
         let mut tags = Vec::new();
@@ -430,7 +464,7 @@ pub fn complete_task(app: tauri::AppHandle, task_id: i32) -> Result<(), String> 
     let conn = Connection::open(get_db_path(app)).map_err(|e| e.to_string())?;
     conn.execute(
         "UPDATE tasks SET completed = 1, completed_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now') WHERE id = ?1",
-        rusqlite::params![task_id],
+        params![task_id],
     ).map_err(|e| e.to_string())?;
     Ok(())
 }
@@ -440,31 +474,25 @@ pub fn delete_task(app: tauri::AppHandle, task_id: i32) -> Result<(), String> {
     let conn = Connection::open(get_db_path(app)).map_err(|e| e.to_string())?;
     conn.execute(
         "DELETE FROM tasks WHERE id = ?1",
-        rusqlite::params![task_id],
+        params![task_id],
     )
     .map_err(|e| e.to_string())?;
     Ok(())
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct Tag {
-    id: i32,
-    name: String,
-}
-
 #[tauri::command]
-pub fn get_all_tags(app: tauri::AppHandle) -> Result<Vec<Tag>, String> {
+pub fn get_all_tags(app: tauri::AppHandle) -> Result<Vec<NewTag>, String> {
     let conn = Connection::open(get_db_path(app)).map_err(|e| e.to_string())?;
 
     let mut stmt = conn
-        .prepare("SELECT id, name FROM tags ORDER BY name")
+        .prepare("SELECT id, name, color FROM tags ORDER BY name")
         .map_err(|e| e.to_string())?;
 
     let tags_iter = stmt
         .query_map([], |row| {
-            Ok(Tag {
-                id: row.get(0)?,
+            Ok(NewTag {
                 name: row.get(1)?,
+                color: row.get(2)?,
             })
         })
         .map_err(|e| e.to_string())?;
@@ -477,33 +505,35 @@ pub fn get_all_tags(app: tauri::AppHandle) -> Result<Vec<Tag>, String> {
     Ok(tags)
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct NewTag {
+    pub name: String,
+    pub color: String,
+}
+
 #[tauri::command]
-pub fn add_tag(app: tauri::AppHandle, tag_name: String) -> Result<Tag, String> {
+pub fn add_tag(app: tauri::AppHandle, new_tag: NewTag) -> Result<Tag, String> {
+    use rusqlite::Connection;
+
+    // Open a new connection for this command
     let conn = Connection::open(get_db_path(app)).map_err(|e| e.to_string())?;
 
-    // Insert tag if new
+    // Insert into the database
     conn.execute(
-        "INSERT INTO tags (name) VALUES (?) ON CONFLICT(name) DO NOTHING",
-        &[&tag_name],
-    )
-    .map_err(|e| e.to_string())?;
+        "INSERT INTO tags (name, color) VALUES (?1, ?2)",
+        (&new_tag.name, &new_tag.color),
+    ).map_err(|e| e.to_string())?;
 
-    // Get the tag ID
-    let mut stmt = conn
-        .prepare("SELECT id, name FROM tags WHERE name = ?")
-        .map_err(|e| e.to_string())?;
+    let new_id = conn.last_insert_rowid();
 
-    let tag = stmt
-        .query_row([&tag_name], |row| {
-            Ok(Tag {
-                id: row.get(0)?,
-                name: row.get(1)?,
-            })
-        })
-        .map_err(|e| e.to_string())?;
-
-    Ok(tag)
+    // Return the newly created tag so the frontend can update its state
+    Ok(Tag {
+        id: new_id,
+        name: new_tag.name,
+        color: new_tag.color,
+    })
 }
+
 
 #[tauri::command]
 pub fn remove_tag(app: tauri::AppHandle, tag_name: String) -> Result<(), String> {
@@ -511,17 +541,17 @@ pub fn remove_tag(app: tauri::AppHandle, tag_name: String) -> Result<(), String>
 
     // Query the tag ID by name
     let tag_id: i64 = conn
-        .query_row("SELECT id FROM tags WHERE name = ?1", &[&tag_name], |row| {
+        .query_row("SELECT id FROM tags WHERE name = ?1", params![tag_name], |row| {
             row.get(0)
         })
         .map_err(|e| e.to_string())?;
 
     // Delete all links from task_tags with this tag_id
-    conn.execute("DELETE FROM task_tags WHERE tag_id = ?1", &[&tag_id])
+    conn.execute("DELETE FROM task_tags WHERE tag_id = ?1", params![tag_id])
         .map_err(|e| e.to_string())?;
 
     // Delete the tag itself
-    conn.execute("DELETE FROM tags WHERE id = ?1", &[&tag_id])
+    conn.execute("DELETE FROM tags WHERE id = ?1", params![tag_id])
         .map_err(|e| e.to_string())?;
 
     Ok(())
@@ -533,8 +563,8 @@ pub fn add_tag_to_task(app: tauri::AppHandle, task_id: i32, tag_id: i32) -> Resu
 
     // Insert link, ignore if it already exists to avoid duplicates
     conn.execute(
-        "INSERT INTO task_tags (task_id, tag_id) VALUES (?, ?) ON CONFLICT DO NOTHING",
-        &[&task_id, &tag_id],
+        "INSERT OR IGNORE INTO task_tags (task_id, tag_id) VALUES (?, ?)",
+        params![task_id, tag_id],
     )
     .map_err(|e| e.to_string())?;
 
@@ -551,9 +581,19 @@ pub fn remove_tag_from_task(
 
     conn.execute(
         "DELETE FROM task_tags WHERE task_id = ? AND tag_id = ?",
-        &[&task_id, &tag_id],
+        params![task_id, tag_id],
     )
     .map_err(|e| e.to_string())?;
 
+    Ok(())
+}
+
+#[tauri::command]
+pub fn update_tag_color(app: tauri::AppHandle, tag_id: i32, color: String) -> Result<(), String> {
+    let conn = Connection::open(get_db_path(app)).map_err(|e| e.to_string())?;
+    conn.execute(
+        "UPDATE tags SET color = ?1 WHERE id = ?2",
+        params![color, tag_id],
+    ).map_err(|e| e.to_string())?;
     Ok(())
 }

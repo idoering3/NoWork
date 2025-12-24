@@ -10,7 +10,8 @@ export let themes: Record<string, Theme> = {
         scolor: "#f8dae0",
         hcolor: "#946363ff",
         bcolor: "#b8b8b8",
-        hovercolor: "#ecc7ca"
+        hovercolor: "#ecc7ca",
+        accentcolor: "#fc8d9c"
     },
     "Pink Dark": {
         name: "Pink Dark",
@@ -21,7 +22,8 @@ export let themes: Record<string, Theme> = {
         scolor: "#312529",      // secondary accent pink
         hcolor: "#e6b7c6",      // heading / brighter pink
         bcolor: "#967373",      // body text (light gray)
-        hovercolor: "#60484f"   // hover accent (softer pink)
+        hovercolor: "#60484f",   // hover accent (softer pink)
+        accentcolor: "#fc8d9c"
     },
     "Catpuccin'": {
         name: "Catpuccin'",
@@ -32,7 +34,8 @@ export let themes: Record<string, Theme> = {
         scolor: "#1e1e2e",      // secondary accent pink
         hcolor: "#f5c2e7",      // heading / brighter pink
         bcolor: "#f5c2e7",      // border color (light gray)
-        hovercolor: "#313244"   // hover accent (softer pink)
+        hovercolor: "#313244",   // hover accent (softer pink)
+        accentcolor: "#7d89b3ff"
     },
 };
 
@@ -43,3 +46,32 @@ export const theme = $state({
 export const username = $state({
     name: "Person"
 })
+
+interface Flavor {
+  name: string;
+  bgcolor: string;
+  color: string;
+}
+
+export const flavorMap = {
+  default: {
+    name: "default",
+    bgcolor: "#e6e6e6",
+    color: "black"
+  },
+  danger: {
+    name: "danger",
+    bgcolor: "#ffb4b4",
+    color: "#86231c"
+  },
+  outline: {
+    name: "outline",
+    bgcolor: "transparent",
+    color: "var(--primary-dark)"
+  },
+  blue: {
+    name: "blue",
+    bgcolor: "#749cdc",
+    color: "#363cda"
+  },
+} as const satisfies Record<string, Flavor>;

@@ -2,7 +2,7 @@
     import { invoke } from "@tauri-apps/api/core";
     import Card from "$lib/Card.svelte";
     import Badge from "$lib/Badge.svelte";
-    import type { Task } from "$lib/types/task";
+    import type { Task, Tag } from "$lib/types/task";
     import TaskCard from "$lib/TaskCard.svelte";
     import Textbox from "$lib/Textbox.svelte";
     import Button from "$lib/Button.svelte";
@@ -16,11 +16,17 @@
     import { load, Store } from "@tauri-apps/plugin-store";
 
     let tasks: Task[] = $state([]);
+    let show = $state(false);
+
 
     function handleKeydown(event: KeyboardEvent) {
         if (event.key === 'Enter') {
             submitTask();
         }
+    }
+
+    async function getAllTags() {
+        tags = await invoke<Tag[]>('get_all_tags'); 
     }
 
     async function getIncompleteTasks() {
@@ -59,7 +65,9 @@
         'streak through the streets, shouting Eureka!',
         'write a strongly worded email',
         'impersonate a drunk Lyndon B. Johnson looking for his car keys',
-        'delete those incriminating Watergate tapes'
+        'delete those incriminating Watergate tapes',
+        'go for a run',
+        'pretend to do your work'
     ]
 
     let taskName = $state("");
@@ -89,17 +97,17 @@
     }
 
     function removeTagFromTask(tag: string) {
-        selectedTags = selectedTags.filter(t => t !== tag);
+        selectedTags = selectedTags.filter(t => t.name !== tag);
     }
 
-    let selectedTags: string[] = $state([]);
+    let selectedTags: Tag[] = $state([]);
     let selectedDate: Date | null = $state(null);
 
 
 
 	let taskContainer: HTMLDivElement;
 	let header: HTMLHeadingElement;
-	let taskBar: HTMLDivElement;
+	let taskBar: HTMLDivElement | undefined = $state();
 
     function getOuterHeight(el: HTMLElement) {
         const style = getComputedStyle(el);
@@ -126,10 +134,13 @@
 	onMount(() => {
 		requestAnimationFrame(resize);
 		window.addEventListener("resize", resize);
+        window.addEventListener("keydown", handleKeydown);
+        show = true;
 	});
 
 	onDestroy(() => {
 		window.removeEventListener("resize", resize);
+		window.removeEventListener("keydown", handleKeydown);
 	});
 
     interface SortOption {
@@ -151,7 +162,7 @@
         }
     }
 
-    let tags = $state([]);
+    let tags: Tag[] = $state([]);
 
     function dueToday(task: Task) {
         const dueDate: Date | null = task.dueDate ? new Date(task.dueDate) : null;
@@ -162,13 +173,13 @@
         return false;
     }
 
-    let selectedTag = $state("all");
+    let selectedTag: Tag | undefined = $state();
 
     $effect(() => {
         (async () => {
             if (selectedTag) {
-                if (selectedTag !== "all") {
-                    if (!selectedTags.includes(selectedTag)) {
+                if (selectedTag) {
+                    if (!Object.values(selectedTags).includes(selectedTag)) {
                         selectedTags = [selectedTag];
                     }
                 } else {
@@ -182,11 +193,13 @@
 
     onMount (async () => {
         getIncompleteTasks();
+        getAllTags();
+        $inspect(tags);
         const store = await load(".temp.json");
-        const tag = await store.get<{ value: string }>("selectedTag");
-        if (tag?.value) {
-            selectedTag = tag.value;
-            console.log(tag.value);
+        const tag = await store.get<{ name: string, color: 'default' | 'outline' | 'danger' | 'blue' }>("selectedTag");
+        if (tag?.color, tag?.name) {
+            selectedTag = tag;
+            console.log(tag);
         }
     });
 
@@ -195,9 +208,13 @@
 <div style="overflow: hidden; display: flex; height: calc(100vh - 3rem);">
     <div class='sidebar'>
         <p style="padding: 1rem; display:flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--border-color)">Tasks</p>
-        <Button flavor="ghost" onclick={() => selectedTag = "all"}><span style={"all" === selectedTag ? "color:var(--highlight-color)" : ""}>all tasks</span></Button>
+        <div style={selectedTag?.name === "all" ? "background-color:var(--secondary-color)" : ""}>
+            <Button flavor="ghost" onclick={() => selectedTag = { name: "all", color: "default" }}><span style={"all" === selectedTag?.name ? "color:var(--highlight-color)" : ""}>all tasks</span></Button>
+        </div>
         {#each tags as tag}
-            <Button flavor="ghost" onclick={() => selectedTag = tag}><span style={tag === selectedTag ? "color:var(--highlight-color)" : ""}>{tag}</span></Button>
+            <div style={tag === selectedTag ? "background-color:var(--secondary-color)" : ""}>
+                <Button flavor="ghost" onclick={() => selectedTag = tag}><span style={tag === selectedTag ? "color:var(--highlight-color)" : ""}>{tag?.name}</span></Button>
+            </div>
         {/each}
         <Button flavor="ghost" Icon={Plus}></Button>
     </div>
@@ -241,8 +258,8 @@
                 {#key selectedTag}
                     <div style="position: absolute;" in:fly={{ duration: 300, y: 50, easing: circInOut}} out:fade={{ duration: 150, easing: quartInOut}}>
                         {#each sortTasksByDueDate(tasks) as task (task.id)}
-                            {#if selectedTag !== "all"}
-                                {#if task.tags?.some(tag => tag === selectedTag)}
+                            {#if selectedTag?.name !== "all"}
+                                {#if task.tags?.some(tag => tag.name === selectedTag?.name)}
                                     <TaskCard {task} onComplete={completeTask} onDelete={deleteTask}/>
                                 {/if}
                             {:else}
@@ -253,38 +270,43 @@
                 {/key}
             </div>
         </div>
-        
-        <div class="task-bar" bind:this={taskBar}>
-            <Card expanded class="short">
-                <Textbox bind:value={taskName} onkeydown={(event: KeyboardEvent) => handleKeydown(event)} {placeholders} />
-                {#snippet tagsn(name: string)}
-                    <Badge flavor="outline" noPadding>
-                        <span style="padding-left: 0.5rem">
-                            {name}
-                        </span>
-                        <Button flavor="ghost" class="square xsmall circular" Icon={X}
-                            onclick={() => {
-                                removeTagFromTask(name);
-                            }}
-                        />
-                    </Badge>
-                {/snippet}
-                {#if selectedTag !== "all"}
-                    {@render tagsn(selectedTag)}
-                {/if}
-                {#each selectedTags as tag}
-                    {#if selectedTag !== tag}
-                        {@render tagsn(tag)}
+        {#if show}
+            <div class="task-bar" bind:this={taskBar} transition:fly={{ duration: 500, y:25, easing: circInOut }}>
+                <Card expanded class="short">
+                    <Textbox bind:value={taskName} {placeholders} />
+                    {#snippet tagsn(name: string, color: 'default' | 'outline' | 'danger' | 'blue')}
+                        <Badge flavor={color} noPadding>
+                            <span style="padding-left: 0.5rem">
+                                {name}
+                            </span>
+                            <Button flavor="ghost" class="square xsmall circular" Icon={X}
+                                onclick={() => {
+                                    removeTagFromTask(name);
+                                }}
+                            />
+                        </Badge>
+                    {/snippet}
+                    {#key selectedTag?.name}
+                    <div transition:scale={{ duration: 150, easing: quartInOut, start: 0.75, opacity: 0 }} style="">
+                        {#if selectedTag?.name !== "all" && selectedTag?.name}
+                            {@render tagsn(selectedTag?.name, selectedTag?.color)}
+                        {/if}
+                        {#each selectedTags as tag}
+                            {#if selectedTag?.name !== tag.name}
+                                {@render tagsn(tag.name, tag?.color)}
+                            {/if}
+                        {/each}
+                    </div>
+                    {/key}
+                    {#if selectedDate}
+                        {selectedDate.toLocaleDateString()}
                     {/if}
-                {/each}
-                {#if selectedDate}
-                    {selectedDate.toLocaleDateString()}
-                {/if}
-                <TagSelector bind:selectedTags={selectedTags} refreshTags={getIncompleteTasks()} bind:allTags={tags} />
-                <Datepicker bind:selectedDate={selectedDate}/>
-                <Button onclick={submitTask} class="square" flavor="primary" Icon={ArrowUp} />
-            </Card>
-        </div>
+                    <TagSelector bind:selectedTags={selectedTags} refreshTags={getAllTags} bind:allTags={tags} />
+                    <Datepicker bind:selectedDate={selectedDate}/>
+                    <Button onclick={submitTask} class="square" flavor="primary" Icon={ArrowUp} />
+                </Card>
+            </div>
+        {/if}
     </div>
 </div>
 

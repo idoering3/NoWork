@@ -25,6 +25,8 @@
         -webkit-text-fill-color: transparent;
         animation: move-gradient 6s ease infinite;
         background-clip: text;
+        position:relative;
+        left: calc(50% + 1rem) 
     }
 
     @keyframes move-gradient {

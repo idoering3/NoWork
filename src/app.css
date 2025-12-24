@@ -22,6 +22,7 @@
     --highlight-color: var(--highlight-color);
     --border-color: #b8b8b8;
     --hover-color: #ecc7ca;
+    --accent-color: #fc8d9c;
 }
 
 ::selection {

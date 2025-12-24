@@ -183,6 +183,7 @@
     .input {
         display:flex;
         flex-direction: column;
+        background-color: var(--primary-light);
     }
     
     .buttons {
@@ -215,6 +216,7 @@
     }
     
     .countdown-display {
+        background-color: var(--primary-light);
         box-shadow: 0px 0px 5px -2px var(--border-color);
         border: 1px solid var(--border-color);
         margin: 1rem auto;

@@ -2,24 +2,22 @@
     import type { Snippet } from "svelte";
     import { quartInOut } from "svelte/easing";
     import { scale } from "svelte/transition";
-
+    import { flavorMap } from "./stores.svelte";
 
     interface Props {
-        flavor?: 'default' | 'outline' | 'danger',
+        flavor?: 'default' | 'outline' | 'danger' | 'blue',
         children: Snippet,
-        noPadding?: boolean;
+        noPadding?: boolean,
     }
 
-    let { flavor ='default', children, noPadding = false }: Props = $props();
-
-    const flavorMap = {
-        default: 'default',
-        danger: 'danger',
-        outline: 'outline',
-    }
+    let { 
+        flavor = 'default', 
+        children, 
+        noPadding = false
+    }: Props = $props();
 </script>
 
-<div transition:scale={{ duration: 150, easing: quartInOut, start: 0.75, opacity: 0 }} class={[`${flavorMap[flavor] ?? ''}`, 'badge', noPadding ? 'no-padding' : '']}>
+<div transition:scale={{ duration: 150, easing: quartInOut, start: 0.75, opacity: 0 }} class={[`${flavorMap[flavor].name ?? ''}`, 'badge', noPadding ? 'no-padding' : '']}>
     {@render children?.()}
 </div>
 
@@ -50,6 +48,11 @@
     .badge.danger {
         background-color: #ffb4b4;
         color: #86231c;
+    }
+
+    .badge.blue {
+        background-color: #749cdc;
+        color: #363cda;
     }
     
     .badge.outline {
