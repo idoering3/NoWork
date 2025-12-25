@@ -10,7 +10,7 @@
     interface Props {
         task: Task;
         onComplete: (id: number) => void;
-        onDelete: (id: number) => void;
+        onDelete?: (id: number) => void;
     }
 
     let { task = $bindable(), onComplete = $bindable(), onDelete = $bindable() }: Props = $props();
@@ -20,7 +20,7 @@
     }
 
     function deleted() {
-        onDelete(task.id);
+        onDelete!(task.id);
     }
 
     const dueDate: Date | null = task.dueDate ? new Date(task.dueDate) : null;
@@ -65,7 +65,9 @@
             {/if}
         </div>
     </div>
-    <Button onclick={deleted} Icon={Trash} flavor="outline" class="square small" />
+    {#if onDelete}
+        <Button onclick={deleted} Icon={Trash} flavor="outline" class="square small" />
+    {/if}
 </div>
 
 <style>

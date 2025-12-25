@@ -13,6 +13,10 @@ export class ShaderRenderer {
     outerColor: [number, number, number]
     mouseX: number = 0;
     mouseY: number = 0;
+    private mouseHandler!: (e: MouseEvent) => void;
+    private sunIntervalId: number | null = null;
+    private posLoc: number;
+
 
     // Interpolation
     currentCenter: [number, number] = [0.5, 0.2]
@@ -26,11 +30,15 @@ export class ShaderRenderer {
     ) {
         this.canvas = canvas;
 
-        window.addEventListener("mousemove", (e) => {
+        this.mouseHandler = (e: MouseEvent) => {
             const rect = this.canvas.getBoundingClientRect();
             this.mouseX = (e.clientX - rect.left) / rect.width;
             this.mouseY = (e.clientY - rect.top) / rect.height;
-        });
+        }
+
+        window.addEventListener("mousemove", this.mouseHandler);
+        
+
 
         const gl = canvas.getContext("webgl2")!;
         this.gl = gl;
@@ -48,7 +56,7 @@ export class ShaderRenderer {
 
         // Fragment shader
         const fragmentSrc = `
-            precision highp float;
+            precision lowp float;
             uniform vec2 u_resolution;
             uniform float u_time;
             uniform vec3 u_innerColor;
@@ -94,6 +102,8 @@ export class ShaderRenderer {
             throw new Error("Failed to link program: " + gl.getProgramInfoLog(program));
         }
         this.program = program;
+
+        this.posLoc = gl.getAttribLocation(program, "a_position");
 
         this.buffer = gl.createBuffer()!;
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
@@ -165,10 +175,10 @@ export class ShaderRenderer {
         gl.uniform3fv(this.uniforms.u_innerColor, this.innerColor)
         gl.uniform3fv(this.uniforms.u_outerColor, this.outerColor)
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer)
-        const posLoc = gl.getAttribLocation(this.program, "a_position")
-        gl.enableVertexAttribArray(posLoc)
-        gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0)
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+        gl.enableVertexAttribArray(this.posLoc);
+        gl.vertexAttribPointer(this.posLoc, 2, gl.FLOAT, false, 0, 0);
+
 
         gl.drawArrays(gl.TRIANGLES, 0, 6)
     }
@@ -187,11 +197,17 @@ export class ShaderRenderer {
     }
 
     startUpdatingSun(intervalMs: number = 60_000, radiusX = 0.3, radiusY = 0.125) {
-        this.updateSunTarget(radiusX, radiusY); // initial update
-        setInterval(() => {
+        this.updateSunTarget(radiusX, radiusY);
+
+        if (this.sunIntervalId !== null) {
+            clearInterval(this.sunIntervalId);
+        }
+
+        this.sunIntervalId = window.setInterval(() => {
             this.updateSunTarget(radiusX, radiusY);
-        }, intervalMs);
+        }, intervalMs)
     }
+
 
     async updateSunTarget(radiusX = 0.4, radiusY = 0.2) {
         try {
@@ -200,6 +216,21 @@ export class ShaderRenderer {
         } catch (err) {
             console.warn("Could not get sun position:", err)
         }
+    }
+
+
+    destroy() {
+        this.stop()
+
+        if (this.sunIntervalId !== null) {
+            clearInterval(this.sunIntervalId)
+            this.sunIntervalId = null
+        }
+
+        window.removeEventListener("mousemove", this.mouseHandler)
+
+        this.gl.deleteBuffer(this.buffer)
+        this.gl.deleteProgram(this.program)
     }
 }
 
@@ -249,6 +280,5 @@ export async function getUserSunPosition(
     const x = 0.5 - radiusX * Math.sin(sunPos.azimuth);
     const y = 0.09 - radiusY * Math.sin(sunPos.altitude);
 
-    console.log(x, y);
     return { x, y };
 }
