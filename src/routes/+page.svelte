@@ -17,12 +17,9 @@
     let currentDate: Date = $state(new Date());
 
     onMount (async () => {
-        startClock(date => currentDate = date);
-
-        timeOfDay = await getSimpleTimeOfDay(new Date());
-
+        
         message = await invoke( 'greet' );
-
+        
         const store = await load(".settings.json");
         const name = await store.get<{ value: string}>("username");
         if (name?.value) {
@@ -30,8 +27,12 @@
         } else {
             username.name = "User";
         }
-
+        
         await refreshTasks();
+
+        startClock(date => currentDate = date);
+
+        timeOfDay = await getSimpleTimeOfDay(new Date());
     });
 
     async function completeTask (taskId: number) {
