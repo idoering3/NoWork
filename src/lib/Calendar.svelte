@@ -7,7 +7,7 @@
     function getWeekDays(date: Date, weekStartsOn: 0 | 1 = 0): Date[] {
         const d = new Date(date);
         const day = d.getDay();
-        const diff = (day - weekStartsOn + 8) % 7;
+        const diff = (day - weekStartsOn + 7) % 7;
         d.setDate(d.getDate() - diff);
 
         return Array.from({ length: 7 }, (_, i) => {
