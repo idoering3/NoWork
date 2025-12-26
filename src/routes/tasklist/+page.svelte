@@ -12,7 +12,7 @@
     import { onDestroy, onMount } from "svelte";
     import Datepicker from "$lib/DatePicker.svelte";
     import { fade, fly, scale, slide } from "svelte/transition";
-    import { circInOut, quartInOut } from "svelte/easing";
+    import { circInOut, quartIn, quartInOut, quartOut } from "svelte/easing";
     import { load, Store } from "@tauri-apps/plugin-store";
 
     let tasks: Task[] = $state([]);
@@ -143,25 +143,6 @@
 		window.removeEventListener("keydown", handleKeydown);
 	});
 
-    interface SortOption {
-        value: string,
-        label: string
-    }
-
-    let sortOptions: SortOption[] = [
-        { value:"due", label: "due date"},
-        { value:"tag", label: "tag"}
-    ]
-    let sortIndex = $state(0);
-
-    function changeSort() {
-        if (sortIndex < sortOptions.length - 1) {
-            sortIndex += 1; 
-        } else {
-            sortIndex = 0;
-        }
-    }
-
     let tags: Tag[] = $state([]);
 
     function dueToday(task: Task) {
@@ -178,28 +159,24 @@
     $effect(() => {
         (async () => {
             if (selectedTag) {
-                if (selectedTag) {
-                    if (!Object.values(selectedTags).includes(selectedTag)) {
-                        selectedTags = [selectedTag];
-                    }
-                } else {
-                    selectedTags = [];
+                if (!Object.values(selectedTags).includes(selectedTag)) {
+                    selectedTags = [selectedTag];
                 }
-                const store = await load(".settings.json");
-                await store.set("selectedTag", selectedTag);
+            } else {
+                selectedTags = [];
             }
+            const store = await load(".settings.json");
+            await store.set("selectedTag", selectedTag);
         })();
     });
 
     onMount (async () => {
         getIncompleteTasks();
         getAllTags();
-        $inspect(tags);
-        const store = await load(".temp.json");
+        const store = await load(".settings.json");
         const tag = await store.get<{ name: string, color: 'default' | 'outline' | 'danger' | 'blue' }>("selectedTag");
-        if (tag?.color, tag?.name) {
+        if (tag?.color && tag?.name) {
             selectedTag = tag;
-            console.log(tag);
         }
     });
 
@@ -208,19 +185,19 @@
 <div style="overflow: hidden; display: flex; height: calc(100vh - 3rem);">
     <div class='sidebar'>
         <p style="padding: 1rem; display:flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--border-color)">Tasks</p>
-        <div style={selectedTag?.name === "all" ? "background-color:var(--secondary-color)" : ""}>
+        <div style={selectedTag?.name === "all" ? "background-color:var(--secondary-color)" : ""} transition:fly={{ y: 30, delay: 300, duration: 1500, easing: quartOut}}>
             <Button flavor="ghost" onclick={() => selectedTag = { name: "all", color: "default" }}><span style={"all" === selectedTag?.name ? "color:var(--highlight-color)" : ""}>all tasks</span></Button>
         </div>
-        {#each tags as tag}
-            <div style={tag === selectedTag ? "background-color:var(--secondary-color)" : ""}>
-                <Button flavor="ghost" onclick={() => selectedTag = tag}><span style={tag === selectedTag ? "color:var(--highlight-color)" : ""}>{tag?.name}</span></Button>
+        {#each tags as tag, i}
+            <div style={tag.name === selectedTag?.name ? "background-color:var(--primary-color)" : ""} transition:fly={{ y: 30, delay: 300 + (i + 1) * 300, duration: 1500, easing: quartOut}}>
+                <Button flavor="ghost" onclick={() => selectedTag = tag}><span style={tag.name === selectedTag?.name ? "color:var(--highlight-color)" : ""}>{tag?.name}</span></Button>
             </div>
         {/each}
         <Button flavor="ghost" Icon={Plus}></Button>
     </div>
     <div class='container'>
         <div class='header'>
-            <h1 bind:this={header}>
+            <h1 bind:this={header} transition:fly={{ y: 30, delay: 150, duration: 1500, easing: quartOut}}>
                 Task List
             </h1>
             <div style="display: flex; flex-direction: column; gap: 0.5rem;">
@@ -237,41 +214,30 @@
                 </h6>
             </div>
         </div>
-        <div class='task-container' bind:this={taskContainer}>
-            <div class='task-utilities'>
-                <div class="sort">
-                    <Button class="square small" flavor="primary" Icon={ArrowDownUp} onclick={changeSort} />
-                    <p>
-                        Sorting: 
-                        {#key sortIndex}
-                            <span style="position: absolute; padding-left: 0.25rem" 
-                                in:fly={{ y:10, duration: 150, easing: quartInOut }} 
-                                out:fly={{ y:-10, duration: 150, easing: quartInOut }}
-                            >
-                                {sortOptions[sortIndex].label}
-                            </span>
-                        {/key}
-                    </p>
-                </div>
-            </div>
+        <div class='task-container' bind:this={taskContainer} transition:fly={{ duration: 1500, delay:600, y:30, easing: quartOut }}>
             <div style="position: relative;">
                 {#key selectedTag}
-                    <div style="position: absolute;" in:fly={{ duration: 300, y: 50, easing: circInOut}} out:fade={{ duration: 150, easing: quartInOut}}>
-                        {#each sortTasksByDueDate(tasks) as task (task.id)}
-                            {#if selectedTag?.name !== "all"}
-                                {#if task.tags?.some(tag => tag.name === selectedTag?.name)}
-                                    <TaskCard {task} onComplete={completeTask} onDelete={deleteTask}/>
+                    <div style="position: absolute;">
+                        {#each sortTasksByDueDate(tasks) as task, i (task.id)}
+                            <div
+                                in:fly|global={{ duration: 1000, delay: 150 + 75 * (i + 1), y: 15, easing: quartOut }}
+                                out:fly|global={{ duration: 150, y: -15, easing: quartIn }}
+                            >
+                                {#if selectedTag?.name !== "all"}
+                                    {#if task.tags?.some(tag => tag.name === selectedTag?.name)}
+                                        <TaskCard {task} onComplete={completeTask} onDelete={deleteTask}/>
+                                    {/if}
+                                    {:else}
+                                        <TaskCard {task} onComplete={completeTask} onDelete={deleteTask}/>
                                 {/if}
-                            {:else}
-                                <TaskCard {task} onComplete={completeTask} onDelete={deleteTask}/>
-                            {/if}
+                            </div>
                         {/each}
                     </div>
                 {/key}
             </div>
         </div>
         {#if show}
-            <div class="task-bar" bind:this={taskBar} transition:fly={{ duration: 500, y:25, easing: circInOut }}>
+            <div class="task-bar" bind:this={taskBar} transition:fly={{ duration: 1500, delay:900, y:30, easing: quartOut }}>
                 <Card expanded class="short">
                     <Textbox bind:value={taskName} {placeholders} />
                     {#snippet tagsn(name: string, color: 'default' | 'outline' | 'danger' | 'blue')}
@@ -330,19 +296,6 @@
         display: flex;
         align-items: center;
         gap: 1rem;
-    }
-
-    .sort {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-    }
-
-    .task-utilities {
-        display: flex;
-        gap: 0.5rem;
-        width: 100%;
     }
 
     .container {

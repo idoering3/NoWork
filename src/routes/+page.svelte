@@ -4,7 +4,7 @@
     import { invoke } from "@tauri-apps/api/core";
     import { load } from '@tauri-apps/plugin-store';
     import { onMount } from "svelte";
-    import { quadInOut, quartOut, sineInOut } from "svelte/easing";
+    import { quadInOut, quartIn, quartOut, sineInOut } from "svelte/easing";
     import { fly } from "svelte/transition";
     import type { Task } from "$lib/types/task";
     import TaskCard from "$lib/TaskCard.svelte";
@@ -73,7 +73,10 @@
     <div class="cardholder">
         <div class="taskview">
             {#each tasks?.slice(0, 3) as task, i}
-                <div transition:fly={{ y: 30, delay: 300 + (i + 1) * 300, duration: 1500, easing: quartOut}} style="margin: 0.5rem;">
+                <div style="margin: 0.5rem;"
+                    in:fly|global={{ duration: 1500, delay: 300 + 300 * (i + 1), y: 30, easing: quartOut }}
+                    out:fly|global={{ duration: 150, y: -30, easing: quartIn }}
+                >
                     <Card class="expanded">
                         <TaskCard {task} onComplete={completeTask}/>
                     </Card>

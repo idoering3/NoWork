@@ -4,8 +4,8 @@
     import { Trash } from "@lucide/svelte";
     import Button from "./Button.svelte";
     import Badge from "./Badge.svelte";
-    import { scale } from "svelte/transition";
-    import { quartInOut } from "svelte/easing";
+    import { fly, scale } from "svelte/transition";
+    import { quartInOut, quartOut } from "svelte/easing";
 
     interface Props {
         task: Task;
@@ -47,7 +47,7 @@
 
 <div
     class="task-container"
-    transition:scale={{ duration: 150, easing: quartInOut, start: 0.75, opacity: 0 }}
+    transition:fly={{ duration: 1500, delay: 300, y:30, easing: quartOut }}
 >
     <div class="task-card" class:overdue={overdue} class:due-today={dueToday}>
         <Button onclick={complete} Icon={Check} flavor="outline" class="square small" />
