@@ -40,12 +40,12 @@
     let CurrentIcon = $derived(Icons[timeOfDay]);
 </script>
 
-<div class="container" transition:fly={{ y: 30, delay: 600, duration: 1500, easing: quartOut}}>
+<div class="container" transition:fly|global={{ y: 30, delay: 600, duration: 1500, easing: quartOut}}>
     <h4 transition:fly={{ y: 15, delay: 600, duration: 1500, easing: quartOut}}>
         {currentDate.getHours().toString().padStart(2, "0")}:{currentDate.getMinutes().toString().padStart(2, "0")} | 
     </h4>
     <h4 transition:fly={{ y: 15, delay: 900, duration: 1500, easing: quartOut}}>
-        {months[currentDate.getMonth()]} {currentDate.getDay()} |
+        {months[currentDate.getMonth()]} {currentDate.getDate()} |
     </h4>
     <h4 style="padding-top:0.2rem;" transition:fly={{ y: 15, delay: 1200, duration: 1500, easing: quartOut}}>
         <CurrentIcon />

@@ -9,21 +9,25 @@
     import ArrowUp from "@lucide/svelte/icons/arrow-up";
     import TagSelector from "$lib/TagSelector.svelte";
     import { ArrowDownUp, Network, Plus, Search, X } from "@lucide/svelte";
-    import { onDestroy, onMount } from "svelte";
+    import { onDestroy, onMount, tick } from "svelte";
     import Datepicker from "$lib/DatePicker.svelte";
     import { fade, fly, scale, slide } from "svelte/transition";
     import { circInOut, quartIn, quartInOut, quartOut } from "svelte/easing";
     import { load, Store } from "@tauri-apps/plugin-store";
+    import { flip } from "svelte/animate";
 
     let tasks: Task[] = $state([]);
     let show = $state(false);
 
 
     function handleKeydown(event: KeyboardEvent) {
-        if (event.key === 'Enter') {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            event.stopPropagation();
             submitTask();
         }
     }
+
 
     async function getAllTags() {
         tags = await invoke<Tag[]>('get_all_tags'); 
@@ -31,6 +35,7 @@
 
     async function getIncompleteTasks() {
         tasks = await invoke('get_incomplete_tasks');
+        completedTasks = await getCompletedTaskCount();
     }
 
     function sortTasksByDueDate(tasks: Task[]): Task[] {
@@ -76,7 +81,6 @@
         if (taskName) {
             await invoke('add_database_task', {name: taskName, dueDate: selectedDate?.toISOString(), tags: selectedTags});
             getIncompleteTasks();
-            selectedTags = [];
             selectedDate = null;
             taskName = '';
         }
@@ -84,12 +88,12 @@
 
     async function completeTask (taskId: number) {
         await invoke('complete_task', { taskId: taskId });
-        getIncompleteTasks();
+        await getIncompleteTasks();
     }
 
     async function deleteTask (taskId: number) {
         await invoke("delete_task", {taskId: taskId});
-        getIncompleteTasks();
+        await getIncompleteTasks();
     }
 
     async function getCompletedTaskCount (): Promise<number> {
@@ -131,6 +135,8 @@
         }
     }
 
+    let runCollapse = $state(true);
+
 	onMount(() => {
 		requestAnimationFrame(resize);
 		window.addEventListener("resize", resize);
@@ -154,46 +160,80 @@
         return false;
     }
 
-    let selectedTag: Tag | undefined = $state();
+    //TODO better filterMode
+    let filterMode: "all" | "tag" = $state("tag");
+    let selectedTag: Tag | null = $state(null);
 
     $effect(() => {
-        (async () => {
-            if (selectedTag) {
-                if (!Object.values(selectedTags).includes(selectedTag)) {
-                    selectedTags = [selectedTag];
-                }
-            } else {
-                selectedTags = [];
-            }
-            const store = await load(".settings.json");
-            await store.set("selectedTag", selectedTag);
-        })();
+        if (filterMode === "tag" && selectedTag) {
+            selectedTags = [selectedTag];
+        } else {
+            selectedTags = [];
+        }
     });
 
     onMount (async () => {
         getIncompleteTasks();
         getAllTags();
         const store = await load(".settings.json");
+
+        let filterModeVar = await store.get<"all" | "tag">("filterMode");
+        if (filterModeVar) {
+            filterMode = filterModeVar;
+        } else {
+            filterMode = "all";
+        }
         const tag = await store.get<{ name: string, color: 'default' | 'outline' | 'danger' | 'blue' }>("selectedTag");
-        if (tag?.color && tag?.name) {
+        if (tag) {
             selectedTag = tag;
         }
+        completedTasks = await getCompletedTaskCount();
     });
 
+    let completedTasks = $state();
+
+    async function selectTag(tag: Tag) {
+        runCollapse = true;
+        filterMode = "tag";
+        selectedTag = tag;
+
+        const store = await load(".settings.json");
+        await store.set("filterMode", "tag");
+        await store.set("selectedTag", tag);
+    }
+
+    async function selectAllTasks() {
+        runCollapse = true;
+        filterMode = "all";
+        selectedTag = null;
+
+        const store = await load(".settings.json");
+        await store.set("filterMode", "all");
+        await store.delete("selectedTag");
+    }
+
+    let visibleTasks = $derived(tasks
+    .filter(task => filterMode === 'all' || task.tags?.some(tag => tag.name === selectedTag?.name))
+    .sort((a, b) => {
+        if (!a.dueDate && !b.dueDate) return 0;
+        if (!a.dueDate) return 1;
+        if (!b.dueDate) return -1;
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+    }));
 </script>
 
 <div style="overflow: hidden; display: flex; height: calc(100vh - 3rem);">
     <div class='sidebar'>
         <p style="padding: 1rem; display:flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--border-color)">Tasks</p>
-        <div style={selectedTag?.name === "all" ? "background-color:var(--secondary-color)" : ""} transition:fly={{ y: 30, delay: 300, duration: 1500, easing: quartOut}}>
-            <Button flavor="ghost" onclick={() => selectedTag = { name: "all", color: "default" }}><span style={"all" === selectedTag?.name ? "color:var(--highlight-color)" : ""}>all tasks</span></Button>
+        <div style={selectedTag?.name === "all" ? "" : ""} transition:fly={{ y: 30, delay: 300, duration: 1500, easing: quartOut}}>
+            <Button flavor="ghost" onclick={async () => await selectAllTasks()}><span style={filterMode === "all" ? "color:var(--highlight-color)" : ""}>all tasks</span></Button>
         </div>
         {#each tags as tag, i}
-            <div style={tag.name === selectedTag?.name ? "background-color:var(--primary-color)" : ""} transition:fly={{ y: 30, delay: 300 + (i + 1) * 300, duration: 1500, easing: quartOut}}>
-                <Button flavor="ghost" onclick={() => selectedTag = tag}><span style={tag.name === selectedTag?.name ? "color:var(--highlight-color)" : ""}>{tag?.name}</span></Button>
+            <div style={tag.name === selectedTag?.name ? "" : ""} transition:fly={{ y: 30, delay: 300 + (i + 1) * 300, duration: 1500, easing: quartOut}}>
+                <Button flavor="ghost" onclick={async () => await selectTag(tag)}><span style={tag.name === selectedTag?.name ? "color:var(--highlight-color)" : ""}>{tag?.name}</span></Button>
             </div>
         {/each}
-        <Button flavor="ghost" Icon={Plus}></Button>
+        <!-- <Button flavor="ghost" Icon={Plus}></Button> -->
     </div>
     <div class='container'>
         <div class='header'>
@@ -205,31 +245,24 @@
                     {tasks.filter(task => dueToday(task)).length} task{tasks.filter(task => dueToday(task)).length !== 1 ? "s" : ''} due today
                 </h6>
                 <h6>
-                    {#key tasks}
-                        {#await getCompletedTaskCount() then completedTasks}
-                            {completedTasks}
-                            total tasks completed
-                        {/await}
-                    {/key}
+                    {completedTasks} total tasks completed
                 </h6>
             </div>
         </div>
-        <div class='task-container' bind:this={taskContainer} transition:fly={{ duration: 1500, delay:600, y:30, easing: quartOut }}>
+        <div class='task-container' bind:this={taskContainer} transition:fly|global={{ duration: 1500, delay:300, y:30, easing: quartOut }}>
             <div style="position: relative;">
                 {#key selectedTag}
-                    <div style="position: absolute;">
-                        {#each sortTasksByDueDate(tasks) as task, i (task.id)}
-                            <div
-                                in:fly|global={{ duration: 1000, delay: 150 + 75 * (i + 1), y: 15, easing: quartOut }}
-                                out:fly|global={{ duration: 150, y: -15, easing: quartIn }}
-                            >
-                                {#if selectedTag?.name !== "all"}
-                                    {#if task.tags?.some(tag => tag.name === selectedTag?.name)}
-                                        <TaskCard {task} onComplete={completeTask} onDelete={deleteTask}/>
-                                    {/if}
-                                    {:else}
-                                        <TaskCard {task} onComplete={completeTask} onDelete={deleteTask}/>
-                                {/if}
+                    <div style="">
+                        {#each visibleTasks as task, i (task.id)}
+                        <!-- No effing clue why, but the animate and transitions MUST be separated. It breaks otherwise -->
+                            <div animate:flip|global={{ duration: 300, easing: quartInOut }}>
+                                <div
+                                    in:fly|global={{ duration: 1000, y: 15, easing: quartOut, delay: runCollapse ? 150 + 75 * (i + 1) : 0 }}
+                                    out:fly|global={{ duration: 150, y: -15, easing: quartIn }}
+                                    onintroend={() => runCollapse ? runCollapse = false : ""}
+                                >
+                                    <TaskCard {task} onComplete={completeTask} onDelete={deleteTask}/>
+                                </div>
                             </div>
                         {/each}
                     </div>
@@ -237,7 +270,7 @@
             </div>
         </div>
         {#if show}
-            <div class="task-bar" bind:this={taskBar} transition:fly={{ duration: 1500, delay:900, y:30, easing: quartOut }}>
+            <div class="task-bar" bind:this={taskBar} transition:fly|global={{ duration: 1500, delay:600, y:30, easing: quartOut }}>
                 <Card expanded class="short">
                     <Textbox bind:value={taskName} {placeholders} />
                     {#snippet tagsn(name: string, color: 'default' | 'outline' | 'danger' | 'blue')}
@@ -253,10 +286,10 @@
                         </Badge>
                     {/snippet}
                     {#key selectedTag?.name}
-                    <div transition:scale={{ duration: 150, easing: quartInOut, start: 0.75, opacity: 0 }} style="">
-                        {#if selectedTag?.name !== "all" && selectedTag?.name}
-                            {@render tagsn(selectedTag?.name, selectedTag?.color)}
-                        {/if}
+                    <div 
+                        transition:scale={{ duration: 150, easing: quartInOut, start: 0.75, opacity: 0 }} 
+                        style="display: flex; gap: 0.25rem;"
+                    >
                         {#each selectedTags as tag}
                             {#if selectedTag?.name !== tag.name}
                                 {@render tagsn(tag.name, tag?.color)}

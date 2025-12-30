@@ -70,6 +70,11 @@
 {/if}
 
 <style>
+
+    button:focus-visible {
+       outline: none;
+    }
+
     span {
         display: flex;
         justify-content: center;

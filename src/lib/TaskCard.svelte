@@ -47,7 +47,6 @@
 
 <div
     class="task-container"
-    transition:fly={{ duration: 1500, delay: 300, y:30, easing: quartOut }}
 >
     <div class="task-card" class:overdue={overdue} class:due-today={dueToday}>
         <Button onclick={complete} Icon={Check} flavor="outline" class="square small" />

@@ -34,10 +34,10 @@
     startClock(date => currentDate = date);
 </script>
 
-<div class="container" transition:fly={{ y: 30, delay: 600, duration: 1500, easing: quartOut}}>
+<div class="container" transition:fly|global={{ y: 30, delay: 600, duration: 1500, easing: quartOut}}>
     {#key currentDate.getDay()}
         {#each days as day, i}
-            <div class="day" transition:fly={{ y: 30, delay: 300 + (i + 1) * 300, duration: 1500, easing: quartOut}}>
+            <div class="day" transition:fly|global={{ y: 10, delay: 600 + (i + 1) * 75, duration: 1500, easing: quartOut}}>
                 <div class="day" class:current={day.getDay() === currentDate.getDay()}>
                     <p>
                         {dayNames[day.getDay()]}
