@@ -241,10 +241,10 @@
                 Task List
             </h1>
             <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                <h6>
+                <h6 transition:fly={{ x: -15, delay: 600, duration: 1500, easing: quartOut}}>
                     {tasks.filter(task => dueToday(task)).length} task{tasks.filter(task => dueToday(task)).length !== 1 ? "s" : ''} due today
                 </h6>
-                <h6>
+                <h6 transition:fly={{ x: -15, delay: 1200, duration: 1500, easing: quartOut}}>
                     {completedTasks} total tasks completed
                 </h6>
             </div>
@@ -286,16 +286,18 @@
                         </Badge>
                     {/snippet}
                     {#key selectedTag?.name}
-                    <div 
-                        transition:scale={{ duration: 150, easing: quartInOut, start: 0.75, opacity: 0 }} 
-                        style="display: flex; gap: 0.25rem;"
-                    >
-                        {#each selectedTags as tag}
-                            {#if selectedTag?.name !== tag.name}
-                                {@render tagsn(tag.name, tag?.color)}
-                            {/if}
-                        {/each}
-                    </div>
+                        <div
+                            transition:scale={{ duration: 300, start: 0.75, opacity: 0 }}
+                        >
+                            {#each selectedTags as tag (tag.name)}
+                                <div
+                                >
+                                    {#if selectedTag?.name === tag.name}
+                                        {@render tagsn(tag.name, tag?.color)}
+                                    {/if}
+                                </div>
+                            {/each}
+                        </div>
                     {/key}
                     {#if selectedDate}
                         {selectedDate.toLocaleDateString()}

@@ -17,9 +17,7 @@
     }: Props = $props();
 </script>
 
-<div 
-    in:scale={{ duration: 150, delay: 1000, easing: quartOut, start: 0.75, opacity: 1}}
-    out:scale={{ duration: 150, easing: quartOut, start: 0.75, opacity: 1}}
+<div
     class={[`${flavorMap[flavor].name ?? ''}`, 'badge', noPadding ? 'no-padding' : '']}>
     {@render children?.()}
 </div>
