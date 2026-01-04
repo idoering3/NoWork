@@ -18,6 +18,7 @@
 </script>
 
 <div
+    transition:scale={{ delay: 50, duration: 300, start: 0.75, opacity: 0, easing: quartOut }}
     class={[`${flavorMap[flavor].name ?? ''}`, 'badge', noPadding ? 'no-padding' : '']}>
     {@render children?.()}
 </div>
@@ -28,6 +29,7 @@
     }
 
     .badge {
+        box-sizing: border-box;
         gap: 0.25rem;
         display: flex;
         font-size: 0.8rem;

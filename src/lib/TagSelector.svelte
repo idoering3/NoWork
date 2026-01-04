@@ -1,6 +1,6 @@
 <script lang='ts'>
 	import { fade, fly, slide } from "svelte/transition";
-	import { quartInOut } from "svelte/easing";
+	import { quartInOut, quartOut } from "svelte/easing";
 	import { onMount } from "svelte";
 	import { invoke } from "@tauri-apps/api/core";
 	import { Tags, ArrowUp, Plus, X } from "@lucide/svelte";
@@ -118,7 +118,7 @@
 	];
 </script>
 
-<div class="container">
+<div class="container" transition:fly|global={{ duration: 1500, delay:600, y:7, easing: quartOut }}>
 	<div class="dropdown-container" bind:this={dropdownEl}>
 		<Button class="square" flavor="outline" Icon={Tags} onclick={() => (dropdownOpen = !dropdownOpen)}>
 		</Button>

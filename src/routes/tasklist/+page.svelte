@@ -83,6 +83,7 @@
             getIncompleteTasks();
             selectedDate = null;
             taskName = '';
+            selectedTags = [selectedTag!];
         }
     }
 
@@ -224,12 +225,17 @@
 
 <div style="overflow: hidden; display: flex; height: calc(100vh - 3rem);">
     <div class='sidebar'>
-        <p style="padding: 1rem; display:flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--border-color)">Tasks</p>
-        <div style={selectedTag?.name === "all" ? "" : ""} transition:fly={{ y: 30, delay: 300, duration: 1500, easing: quartOut}}>
+        <p 
+            style="padding: 1rem; display:flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--border-color)"
+            transition:fly={{ y: 30, delay: 300, duration: 1500, easing: quartOut}}
+        >
+            Tasks
+        </p>
+        <div style={selectedTag?.name === "all" ? "" : ""} transition:fly={{ y: 30, delay: 600, duration: 1500, easing: quartOut}}>
             <Button flavor="ghost" onclick={async () => await selectAllTasks()}><span style={filterMode === "all" ? "color:var(--highlight-color)" : ""}>all tasks</span></Button>
         </div>
         {#each tags as tag, i}
-            <div style={tag.name === selectedTag?.name ? "" : ""} transition:fly={{ y: 30, delay: 300 + (i + 1) * 300, duration: 1500, easing: quartOut}}>
+            <div style={tag.name === selectedTag?.name ? "" : ""} transition:fly={{ y: 30, delay: 600 + (i + 1) * 300, duration: 1500, easing: quartOut}}>
                 <Button flavor="ghost" onclick={async () => await selectTag(tag)}><span style={tag.name === selectedTag?.name ? "color:var(--highlight-color)" : ""}>{tag?.name}</span></Button>
             </div>
         {/each}
@@ -287,16 +293,16 @@
                     {/snippet}
                     {#key selectedTag?.name}
                         <div
-                            transition:scale={{ duration: 300, start: 0.75, opacity: 0 }}
+                            style="display: flex;"
                         >
-                            {#each selectedTags as tag (tag.name)}
-                                <div
+                        {#each selectedTags as tag (tag.name)}
+                            <div animate:flip|global={{ duration: 300, easing: quartInOut }} style="padding: 0.25rem;">
+                                <div style=""
                                 >
-                                    {#if selectedTag?.name === tag.name}
-                                        {@render tagsn(tag.name, tag?.color)}
-                                    {/if}
+                                    {@render tagsn(tag.name, tag?.color)}
                                 </div>
-                            {/each}
+                            </div>
+                        {/each}
                         </div>
                     {/key}
                     {#if selectedDate}
@@ -304,7 +310,9 @@
                     {/if}
                     <TagSelector bind:selectedTags={selectedTags} refreshTags={getAllTags} bind:allTags={tags} />
                     <Datepicker bind:selectedDate={selectedDate}/>
-                    <Button onclick={submitTask} class="square" flavor="primary" Icon={ArrowUp} />
+                    <div transition:fly|global={{ duration: 1500, delay:1200, y:7, easing: quartOut }}>
+                        <Button onclick={submitTask} class="square" flavor="primary" Icon={ArrowUp} />
+                    </div>
                 </Card>
             </div>
         {/if}

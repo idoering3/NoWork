@@ -4,7 +4,7 @@
     import Calendar from "@lucide/svelte/icons/calendar";
     import { onMount } from "svelte";
     import { ChevronLeft, ChevronRight } from "@lucide/svelte";
-    import { quartInOut } from "svelte/easing";
+    import { quartInOut, quartOut } from "svelte/easing";
 
     let dropdownOpen = $state(false);
 
@@ -157,7 +157,7 @@
     let { selectedDate = $bindable() }: Props = $props();
 </script>
 
-<div class='container' bind:this={dropdownEl}>
+<div class='container' bind:this={dropdownEl} transition:fly|global={{ duration: 1500, delay:900, y:7, easing: quartOut }}>
     <Button class="square" flavor="outline" Icon={Calendar} onclick={() => dropdownOpen = !dropdownOpen}/>
     {#if dropdownOpen}
         <div class='context-menu' transition:fly={{ y: 15, duration: 150, easing: quartInOut }}>

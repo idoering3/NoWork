@@ -5,16 +5,14 @@
     import { quartInOut } from "svelte/easing";
     import { getContext } from "svelte";
 
-    let { href, name = 'test', ...props} = $props();
+    let { children = null, href, name = 'test', ...props} = $props();
 
     let pageHref = $derived(page.url.pathname);
 
 </script>
 
 <div class="container">
-    {#if pageHref === href}
-        <div transition:slide={{ duration: 300, easing: quartInOut }} class="selected-bar"></div>
-    {/if}
+    {@render children?.()}
     <Button flavor="ghost" {href} {...props}>
     </Button>
 </div>
@@ -24,14 +22,5 @@
         position:relative;
         display: flex;
         align-items: center;
-    }
-    .selected-bar {
-        position: absolute;
-        z-index: 1;
-        background-color: var(--highlight-color);
-        height: 1.75rem;
-        width: 3px;
-        margin-left: 4px;
-        border-radius: 7px;
     }
 </style>
