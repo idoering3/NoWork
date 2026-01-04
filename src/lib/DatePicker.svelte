@@ -4,7 +4,7 @@
     import Calendar from "@lucide/svelte/icons/calendar";
     import { onMount } from "svelte";
     import { ChevronLeft, ChevronRight } from "@lucide/svelte";
-    import { quartInOut } from "svelte/easing";
+    import { quartInOut, quartOut } from "svelte/easing";
 
     let dropdownOpen = $state(false);
 
@@ -116,23 +116,34 @@
 
     const getMonthName = (monthIndex: number): string => {
         const date = new Date();
+        date.setDate(2);
         date.setMonth(monthIndex);
         return new Intl.DateTimeFormat('en-US', { month: 'long' }).format(date);
     };
 
     let currentDate = new Date();
-    let year = currentDate.getFullYear();
+    let year = $state(currentDate.getFullYear());
     let month = $state(currentDate.getMonth());
     let monthText = $derived(getMonthName(month));
 
     let days = $derived(generateCalendarDays(year, month));
 
     function increaseMonth() {
-        month += 1;
+        if (month === 11) {
+            year += 1;
+            month = 0;
+        } else {
+            month += 1;
+        }
     }
 
     function decreaseMonth() {
-        month -= 1;
+        if (month === 0) {
+            year -= 1;
+            month = 11;
+        } else {
+            month -= 1;
+        }
     }
 
     function selectDate (date: CalendarDay) {
@@ -146,16 +157,16 @@
     let { selectedDate = $bindable() }: Props = $props();
 </script>
 
-<div class='container' bind:this={dropdownEl}>
+<div class='container' bind:this={dropdownEl} transition:fly|global={{ duration: 1500, delay:900, y:7, easing: quartOut }}>
     <Button class="square" flavor="outline" Icon={Calendar} onclick={() => dropdownOpen = !dropdownOpen}/>
     {#if dropdownOpen}
         <div class='context-menu' transition:fly={{ y: 15, duration: 150, easing: quartInOut }}>
             <div class="top">
-                <Button flavor="ghost" class="square small rounded" Icon={ ChevronLeft } onclick={increaseMonth} />
+                <Button flavor="ghost" class="square small rounded" Icon={ ChevronLeft } onclick={decreaseMonth} />
                 <h8>
                     {monthText} {year}
                 </h8>
-                <Button flavor="ghost" class="square small rounded" Icon={ ChevronRight } onclick={decreaseMonth} />
+                <Button flavor="ghost" class="square small rounded" Icon={ ChevronRight } onclick={increaseMonth} />
             </div>
             <div class="calendar">
                 {#each dayLabels as day}
@@ -163,22 +174,24 @@
                         {day}
                     </div>
                 {/each}
-                {#each days as day}
-                    <div class="calendar-obj">
-                        <Button class="square small rounded" flavor={
-                            (
-                                currentDate.getFullYear() === day.year &&
-                                currentDate.getMonth() === day.month &&
-                                currentDate.getDate() === day.day
-                            ) ? "default" :"ghost"}
-                            onclick={() => selectDate(day)}
-                        >
-                            <span class:faded={!day.inCurrentMonth}>
-                                {day.day}
-                            </span>
-                        </Button>
-                    </div>
-                {/each}
+                {#key month}
+                    {#each days as day}
+                        <div class="calendar-obj">
+                            <Button class="square small rounded" flavor={
+                                (
+                                    currentDate.getFullYear() === day.year &&
+                                    currentDate.getMonth() === day.month &&
+                                    currentDate.getDate() === day.day
+                                ) ? "default" :"ghost"}
+                                onclick={() => selectDate(day)}
+                            >
+                                <span class:faded={!day.inCurrentMonth}>
+                                    {day.day}
+                                </span>
+                            </Button>
+                        </div>
+                    {/each}
+                {/key}
             </div>
         </div>
     {/if}

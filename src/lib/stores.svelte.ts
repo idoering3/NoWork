@@ -75,3 +75,14 @@ export const flavorMap = {
     color: "#363cda"
   },
 } as const satisfies Record<string, Flavor>;
+
+
+export function startClock(update: (date: Date) => void) {
+  function tick() {
+    const now = new Date();
+    update(now);
+  }
+
+  tick(); // run immediately
+  setInterval(tick, 1000);
+}

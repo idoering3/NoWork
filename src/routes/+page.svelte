@@ -1,25 +1,25 @@
 <script lang='ts'>
     import Card from "$lib/Card.svelte";
-    import { username } from "$lib/stores.svelte";
+    import { startClock, username } from "$lib/stores.svelte";
     import { invoke } from "@tauri-apps/api/core";
     import { load } from '@tauri-apps/plugin-store';
     import { onMount } from "svelte";
-    import { sineInOut } from "svelte/easing";
+    import { quadInOut, quartIn, quartOut, sineInOut } from "svelte/easing";
     import { fly } from "svelte/transition";
     import type { Task } from "$lib/types/task";
     import TaskCard from "$lib/TaskCard.svelte";
-    import Skeleton from "$lib/Skeleton.svelte";
+    import Calendar from "$lib/Calendar.svelte";
+    import { getSimpleTimeOfDay } from "$lib/misc/timeofday";
+    import TimeCard from "$lib/TimeCard.svelte";
 
     let message = $state();
     let tasks: Task[] | null = $state(null);
-    let tasksDueToday = $state(false);
-    let gifPath: string | null = $state(null);
-    let error: string | null = $state(null);
+    let currentDate: Date = $state(new Date());
 
     onMount (async () => {
+        
         message = await invoke( 'greet' );
-
-
+        
         const store = await load(".settings.json");
         const name = await store.get<{ value: string}>("username");
         if (name?.value) {
@@ -27,9 +27,12 @@
         } else {
             username.name = "User";
         }
-
+        
         await refreshTasks();
-        await fetchGif();
+
+        startClock(date => currentDate = date);
+
+        timeOfDay = await getSimpleTimeOfDay(new Date());
     });
 
     async function completeTask (taskId: number) {
@@ -43,100 +46,48 @@
     }
 
     async function refreshTasks() {
-        await getTasksDueToday();
-        tasksDueToday = true;
-        if (tasks?.length === 0) {
-            getIncompleteTasks();
-            tasksDueToday = false;
-        }
-    }
-
-    async function getTasksDueToday() {
-        tasks = []
-        let tasklist = await invoke<Task[]>("get_tasks_due_today");
-        if (tasklist) {
-            for (let task of tasklist) {
-                if (!task.completed) {
-                    tasks.push(task)   
-                }
-            }
-        }
+        getIncompleteTasks();
     }
 
     async function getIncompleteTasks() {
         tasks = await invoke('get_incomplete_tasks');
     }
 
-    let oldUrl: string | null = $state(null);
 
-    async function fetchGif() {
-        try {
-            // Revoke previous blob URL
-            if (oldUrl) {
-            URL.revokeObjectURL(oldUrl);
-            oldUrl = null;
-            }
-
-            const bytesLike = await invoke<Uint8Array>('random_gif');
-
-            // Ensure proper ArrayBuffer backing
-            const bytes = new Uint8Array(bytesLike);
-
-            const blob = new Blob([bytes], { type: 'image/gif' });
-            oldUrl = URL.createObjectURL(blob);
-
-            gifPath = oldUrl;
-            console.log(gifPath);
-            error = null;
-        } catch (e) {
-            error = String(e);
-            gifPath = null;
-        }
-    }
-
-    let chief_messages = [
-        "There won't be a homework if we don't stop the banished.",
+    const dayNames = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursay",
+        "Friday",
+        "Saturday"
     ];
 
-    let chief_message = $state(chief_messages[Math.floor(Math.random() * chief_messages.length)]);
+    let timeOfDay = $state("");
 </script>
 
 <div class="container">
-
-    <h1>Welcome, {username.name}!</h1>
-    <h5 transition:fly={{ y: 10, delay: 150, duration: 1000, easing: sineInOut }}>{message}</h5>
+    <h1 transition:fly={{ y: 30, delay: 150, duration: 1500, easing: quartOut}}>Hello, {username.name}.</h1>
+    <h6 transition:fly={{ y: 10, delay: 1200, duration: 2500, easing: quartOut}}>{message}</h6>
     <div class="cardholder">
         <div class="taskview">
-            <Card class="expanded">
-                <div style="margin: 1rem; overflow: hidden;">
-                    {#if tasks}
-                        {#if tasksDueToday}
-                            <h6>There's stuff due today!</h6>
-                        {:else}
-                            <h6>Task Summary</h6>
-                        {/if}
-                        {#each tasks as task (task.id)}
-                            <TaskCard {task} onComplete={completeTask} onDelete={deleteTask}/>
-                        {/each}
-                    {:else}
-                        <h6>Wow, you're so boring...</h6>
-                    {/if}
+            {#each tasks?.slice(0, 3) as task, i}
+                <div style="margin: 0.5rem;"
+                    in:fly|global={{ duration: 1500, delay: 300 + 300 * (i + 1), y: 30, easing: quartOut }}
+                    out:fly|global={{ duration: 150, y: -30, easing: quartIn }}
+                >
+                    <Card class="expanded">
+                        <TaskCard {task} onComplete={completeTask}/>
+                    </Card>
                 </div>
-            </Card>
+            {/each}
         </div>
-        <div>
-            <Card class="expanded no-padding">
-                <div style="display:flex; justify-content:center; position: relative; overflow:hidden; height: 25rem; width: 35rem">
-                    {#if error}
-                        <p style="color: red;">Error: {error}</p>
-                    {:else if gifPath}
-                        <img class="chief" src={gifPath} alt="Random Chief GIF" />
-                        <p style="position:absolute; bottom: 1rem; color:white;">{chief_message}</p>
-                    {:else}
-                        <Skeleton/>
-                    {/if}
-                </div>
-            </Card>
+        <div class="calendar">
+            <Calendar></Calendar>
+        </div>
+        <div class="timecard">
+            <TimeCard />
         </div>
     </div>
 </div>
@@ -145,19 +96,22 @@
     .container {
         overflow: hidden;
         padding: 3rem;
+        margin-right: 3rem;
     }
-
-    img.chief {
-        border-radius: 15px;
-        object-fit: cover;
-        width: 100%;
-        height: 100%;
+    .calendar {
+        flex: 1;
+    }
+    .timecard {
+        flex: 1;
     }
     .taskview {
-        height: 25rem;
-        width: 100%;
+        height: 13rem;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
     }
     .cardholder {
+        display: flex;
         margin-top: 2rem;
         display: flex;
         gap: 2rem;

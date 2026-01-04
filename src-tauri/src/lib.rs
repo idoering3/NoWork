@@ -30,8 +30,7 @@ pub fn run() {
             commands::database::get_incomplete_tasks,
             commands::database::get_completed_task_count,
             commands::database::get_tasks_due_today,
-            commands::database::update_tag_color,
-            commands::chief::random_gif
+            commands::database::update_tag_color
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

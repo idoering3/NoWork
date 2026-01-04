@@ -4,13 +4,13 @@
     import { Trash } from "@lucide/svelte";
     import Button from "./Button.svelte";
     import Badge from "./Badge.svelte";
-    import { scale } from "svelte/transition";
-    import { quartInOut } from "svelte/easing";
+    import { fly, scale } from "svelte/transition";
+    import { quartInOut, quartOut } from "svelte/easing";
 
     interface Props {
         task: Task;
         onComplete: (id: number) => void;
-        onDelete: (id: number) => void;
+        onDelete?: (id: number) => void;
     }
 
     let { task = $bindable(), onComplete = $bindable(), onDelete = $bindable() }: Props = $props();
@@ -20,7 +20,7 @@
     }
 
     function deleted() {
-        onDelete(task.id);
+        onDelete!(task.id);
     }
 
     const dueDate: Date | null = task.dueDate ? new Date(task.dueDate) : null;
@@ -47,7 +47,6 @@
 
 <div
     class="task-container"
-    transition:scale={{ duration: 150, easing: quartInOut, start: 0.75, opacity: 0 }}
 >
     <div class="task-card" class:overdue={overdue} class:due-today={dueToday}>
         <Button onclick={complete} Icon={Check} flavor="outline" class="square small" />
@@ -65,7 +64,9 @@
             {/if}
         </div>
     </div>
-    <Button onclick={deleted} Icon={Trash} flavor="outline" class="square small" />
+    {#if onDelete}
+        <Button onclick={deleted} Icon={Trash} flavor="outline" class="square small" />
+    {/if}
 </div>
 
 <style>

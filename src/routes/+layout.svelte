@@ -45,6 +45,7 @@
 
     onDestroy(() => {
         renderer?.stop();
+        renderer?.destroy();
     });
 
 </script>

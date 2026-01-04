@@ -1,6 +1,6 @@
 <script lang='ts'>
     import type { Snippet } from "svelte";
-    import { quartInOut } from "svelte/easing";
+    import { quartInOut, quartOut } from "svelte/easing";
     import { scale } from "svelte/transition";
     import { flavorMap } from "./stores.svelte";
 
@@ -17,7 +17,9 @@
     }: Props = $props();
 </script>
 
-<div transition:scale={{ duration: 150, easing: quartInOut, start: 0.75, opacity: 0 }} class={[`${flavorMap[flavor].name ?? ''}`, 'badge', noPadding ? 'no-padding' : '']}>
+<div
+    transition:scale={{ delay: 50, duration: 300, start: 0.75, opacity: 0, easing: quartOut }}
+    class={[`${flavorMap[flavor].name ?? ''}`, 'badge', noPadding ? 'no-padding' : '']}>
     {@render children?.()}
 </div>
 
@@ -27,6 +29,7 @@
     }
 
     .badge {
+        box-sizing: border-box;
         gap: 0.25rem;
         display: flex;
         font-size: 0.8rem;
