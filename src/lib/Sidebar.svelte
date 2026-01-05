@@ -78,7 +78,7 @@
 
             return `
                 transform: translateY(${params.dir * distance * progress}px)
-                        scaleY(${0.8 + 0.2 * t});
+                        scaleY(${0.4 + 0.6 * t});
                 filter: blur(${blur}px);
                 opacity: ${t * o};
             `;
