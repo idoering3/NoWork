@@ -129,7 +129,7 @@
 					{#each allTags as tag (tag.name)}
 						<Badge noPadding flavor={tag.color ?? "default"}>
 							<Button
-								flavor="ghost"
+								flavor="badge"
 								class="square xsmall circular"
 								Icon={X}
 								onclick={(event) => {
@@ -139,7 +139,7 @@
 							/>
 							{tag.name}
 							<Button
-								flavor="ghost"
+								flavor="badge"
 								class="square xsmall circular"
 								Icon={Plus}
 								onclick={(event) => {

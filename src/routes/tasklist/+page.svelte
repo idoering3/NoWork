@@ -243,7 +243,7 @@
     </div>
     <div class='container'>
         <div class='header'>
-            <h1 bind:this={header} transition:fly={{ y: 30, delay: 150, duration: 1500, easing: quartOut}}>
+            <h1 bind:this={header} in:fly|global={{ y: 30, delay: 150, duration: 1500, easing: quartOut}}>
                 Task List
             </h1>
             <div style="display: flex; flex-direction: column; gap: 0.5rem;">
@@ -284,7 +284,7 @@
                             <span style="padding-left: 0.5rem">
                                 {name}
                             </span>
-                            <Button flavor="ghost" class="square xsmall circular" Icon={X}
+                            <Button flavor="badge" class="square xsmall circular" Icon={X}
                                 onclick={() => {
                                     removeTagFromTask(name);
                                 }}

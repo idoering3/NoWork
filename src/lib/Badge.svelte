@@ -37,28 +37,31 @@
         height: 1.5rem;
         align-items: center;
         border-radius: 15px;
+        background-color: var(--badge-bg);
     }
     .badge.default {
         color: black;
-        background-color: #e6e6e6;
+        --badge-bg: #e6e6e6;
     }
 
     .badge.secondary {
         color: black;
-        background-color: var(--secondary-color);
+        --badge-bg: var(--secondary-color);
     }
 
     .badge.danger {
-        background-color: #ffb4b4;
+        --badge-bg: #ffb4b4;
         color: #86231c;
     }
 
     .badge.blue {
-        background-color: #749cdc;
+        --badge-bg: #749cdc;
         color: #363cda;
     }
     
     .badge.outline {
-        border: 1.5px solid var(--border-color);
+        border: 1px solid var(--border-color);
+        --badge-bg: var(--primary-light);
+        overflow: hidden;
     }
 </style>

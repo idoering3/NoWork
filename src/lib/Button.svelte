@@ -5,7 +5,7 @@
         Icon?: Component | null;
         iconSize?: number;
         iconStroke?: number;
-        flavor?: 'ghost' | 'danger' | 'default' | 'disabled' | 'outline' | 'primary';
+        flavor?: 'ghost' | 'danger' | 'default' | 'disabled' | 'outline' | 'primary' | 'badge';
         href?: string | undefined;
         expanded?: boolean;
         onclick?: (event: MouseEvent) => void;
@@ -38,7 +38,8 @@
         outline: 'outline',
         disabled: 'disabled',
         default: 'default',
-        primary: 'primary'
+        primary: 'primary',
+        badge: 'badge'
     }
 
     const flavorName = `${flavorMap[flavor] ?? ''} ${extraClass}`.trim();
@@ -114,6 +115,7 @@
         font-size: 1rem;
         background-color: var(--secondary-color);
         border: 1px solid var(--secondary-color);
+        color: inherit;
     }
     button:hover, a:hover {
         background-color: var(--hover-color);
@@ -167,6 +169,23 @@
     }
     button.ghost:active, a.ghost:active {
         color: var(--highlight-color);
+    }
+
+    /* Badge variant */
+    button.badge, a.badge {
+        box-shadow: none;
+        background-color: var(--badge-bg);
+        color: inherit;
+        border: none;
+        aspect-ratio: 1 / 1;
+    }
+    button.badge:hover, a.badge:hover {
+        background-color: color-mix(
+            in srgb,
+            var(--badge-bg) 75%,
+            currentColor 25%
+        ) !important;
+        cursor: pointer;
     }
 
     /* Red variant */

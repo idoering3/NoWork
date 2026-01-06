@@ -40,7 +40,7 @@
             <div style="position:relative; display: flex; width:100%; align-items: center;">
                 {#if selected}
                     {#key selected}
-                        <span class="selected-ob" transition:fade={{ duration: 300, easing: quartInOut}}>{selected}</span>
+                        <span class="selected-ob" transition:fade|global={{ duration: 300, easing: quartInOut}}>{selected}</span>
                     {/key}
                 {/if}
                 <span class="right-align"><ChevronDown size={20} strokeWidth={1}/></span>
