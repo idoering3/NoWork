@@ -43,9 +43,12 @@ function createTimer() {
             } else {
                 audio.play();
                 pause(); // Pause to switch states
-                if (!isStudying && sessionNum >= config.repetitions) {
-                    pause(); // Final study session finished
+                
+                if (isStudying && sessionNum >= config.repetitions) {
+                    // Final study session finished, don’t start a break
+                    audio.play();
                     timerFinished = true;
+                    pause();
                     return;
                 }
                 
