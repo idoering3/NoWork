@@ -11,6 +11,7 @@
     import Textbox from "./Textbox.svelte";
     import { invoke } from "@tauri-apps/api/core";
     import DatePicker from "./DatePicker.svelte";
+    import { fly } from "svelte/transition";
 
     interface Props {
         task: Task;
@@ -204,11 +205,16 @@
                 <Textbox preamble={false} placeholders={["Enter task name"]} bind:value={name} />
             </div>
             {#if dueDate}
-                {dueDate.toLocaleDateString()}
-                <Button class="square xsmall" Icon={X} flavor='outline' onclick={removeDate}/>
+                <div 
+                    style="display: flex; gap: 0.5rem; align-items: center;"
+                    in:fly|global={{ duration: 300, y:7, easing: quartOut }}
+                >
+                    {dueDate.toLocaleDateString()}
+                    <Button class="square xsmall" Icon={X} flavor='outline' onclick={removeDate}/>
+                </div>
             {/if}
             <div>
-                <DatePicker size="small" slowAnimation={false} posRight bind:selectedDate={dueDate}/>
+                <DatePicker size="small" slowAnimation={false} bind:selectedDate={dueDate}/>
             </div>
             {#key task}
                 {#await getAllTags() then tags}
@@ -226,7 +232,9 @@
                 {/await}
             {/key}
             {#if onDelete}
-                <Button onclick={deleted} Icon={Trash} flavor="outline" class="square small" />
+                <div in:fly|global={{ duration: 300, y:7, easing: quartOut }}>
+                    <Button onclick={deleted} Icon={Trash} flavor="outline" class="square small" />
+                </div>
             {/if}
         {/if}
     </div>
@@ -262,8 +270,7 @@
         justify-content: space-between;
         padding: 0rem 0.5rem;
         width: 100%;
-        min-height: 3rem;
-        max-height: 9rem;
+        height: auto;
         border-radius: 0.5rem;
         transition: background-color 0.3s ease, color 0.3s ease;
     }

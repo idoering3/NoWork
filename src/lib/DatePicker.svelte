@@ -153,28 +153,32 @@
     interface Props {
         selectedDate: Date | null,
         size?: 'xsmall' | 'small' | '',
-        slowAnimation?: boolean,
-        posRight?: boolean,
+        slowAnimation?: boolean
     }
 
-    let { selectedDate = $bindable(), size = '', slowAnimation = true, posRight = false }: Props = $props();
+    let { selectedDate = $bindable(), size = '', slowAnimation = true }: Props = $props();
 
     let dropsUp = $state(false);
+    let posRight = $state(false);
 
-    function updateDropDirection(inputEl: HTMLElement, dropdownHeight: number) {
+    function updateDropDirection(inputEl: HTMLElement, dropdownHeight: number, dropdownWidth: number) {
         const rect = inputEl.getBoundingClientRect();
         const spaceBelow = window.innerHeight - rect.bottom; // space from input bottom to viewport bottom
         const spaceAbove = rect.top; // space from input top to viewport top
+        const spaceRight = window.innerWidth - rect.left;
+        const spaceLeft = rect.right;
 
         // flip dropsUp if there's not enough space below
         const dropsUp = spaceBelow < dropdownHeight && spaceAbove > dropdownHeight;
-        return dropsUp;
+        const posRight = spaceRight > dropdownWidth && spaceLeft > dropdownWidth;
+        return [dropsUp, posRight];
     }
 
     $effect(() => {
         if (dropdownOpen && calendarElement) {
             const calendarHeight = calendarElement.offsetHeight;
-            dropsUp = updateDropDirection(dropdownEl, calendarHeight);
+            const calendarWidth = calendarElement.offsetWidth;
+            [dropsUp, posRight] = updateDropDirection(dropdownEl, calendarHeight, calendarWidth);
         }
     });
 
