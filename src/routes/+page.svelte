@@ -78,7 +78,7 @@
                     out:fly|global={{ duration: 150, y: -30, easing: quartIn }}
                 >
                     <Card class="expanded">
-                        <TaskCard {task} onComplete={completeTask}/>
+                        <TaskCard {task} onComplete={completeTask} allowsEdit={false}/>
                     </Card>
                 </div>
             {/each}
@@ -94,7 +94,6 @@
 
 <style>
     .container {
-        overflow: hidden;
         padding: 3rem;
         margin-right: 3rem;
     }

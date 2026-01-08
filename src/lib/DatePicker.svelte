@@ -151,21 +151,54 @@
     }
 
     interface Props {
-        selectedDate: Date | null
+        selectedDate: Date | null,
+        size?: 'xsmall' | 'small' | '',
+        slowAnimation?: boolean,
+        posRight?: boolean,
     }
 
-    let { selectedDate = $bindable() }: Props = $props();
+    let { selectedDate = $bindable(), size = '', slowAnimation = true, posRight = false }: Props = $props();
+
+    let dropsUp = $state(false);
+
+    function updateDropDirection(inputEl: HTMLElement, dropdownHeight: number) {
+        const rect = inputEl.getBoundingClientRect();
+        const spaceBelow = window.innerHeight - rect.bottom; // space from input bottom to viewport bottom
+        const spaceAbove = rect.top; // space from input top to viewport top
+
+        // flip dropsUp if there's not enough space below
+        const dropsUp = spaceBelow < dropdownHeight && spaceAbove > dropdownHeight;
+        return dropsUp;
+    }
+
+    $effect(() => {
+        if (dropdownOpen && calendarElement) {
+            const calendarHeight = calendarElement.offsetHeight;
+            dropsUp = updateDropDirection(dropdownEl, calendarHeight);
+        }
+    });
+
+    let calendarElement: HTMLElement | undefined = $state();
+
 </script>
 
-<div class='container' bind:this={dropdownEl} transition:fly|global={{ duration: 1500, delay:900, y:7, easing: quartOut }}>
-    <Button class="square" flavor="outline" Icon={Calendar} onclick={() => dropdownOpen = !dropdownOpen}/>
+<div class='container' bind:this={dropdownEl} 
+    in:fly|global={{ duration: slowAnimation ? 1500 : 300, delay: slowAnimation? 900 : 0, y:7, easing: quartOut }}
+    style={posRight ? 'justify-content: start' : 'justify-content:end'}
+    >
+    <Button class="square {size}" flavor="outline" Icon={Calendar} onclick={() => dropdownOpen = !dropdownOpen}/>
     {#if dropdownOpen}
-        <div class='context-menu' transition:fly={{ y: 15, duration: 300, easing: quartOut }}>
+        <div 
+            bind:this={calendarElement}
+            class='context-menu' 
+            transition:fly={{ y: dropsUp ? 15 : -15, duration: 300, easing: quartOut }}
+            style={dropsUp ? 'bottom: 3.25rem;' : 'top: 3.25rem;'}  
+        >
             <div class="top">
                 <Button flavor="ghost" class="square small rounded" Icon={ ChevronLeft } onclick={decreaseMonth} />
-                <h8>
-                    {monthText} {year}
-                </h8>
+                    <h8>
+                        {monthText} {year}
+                    </h8>
                 <Button flavor="ghost" class="square small rounded" Icon={ ChevronRight } onclick={increaseMonth} />
             </div>
             <div class="calendar">
@@ -177,6 +210,7 @@
                 {#key month}
                     {#each days as day}
                         <div class="calendar-obj">
+
                             <Button class="square small rounded" flavor={
                                 (
                                     currentDate.getFullYear() === day.year &&
@@ -230,6 +264,7 @@
         align-items:flex-start;
         justify-content: end;
         position: relative;
+        z-index: 100;
     }
 
     .context-menu {
@@ -246,7 +281,6 @@
         justify-content: space-between;
         min-width: 15rem;
         min-height: 15rem;
-        bottom: 3.25rem;
         gap: 1rem;
     }
 </style>

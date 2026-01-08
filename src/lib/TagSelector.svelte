@@ -131,20 +131,20 @@
 							<Button
 								flavor="badge"
 								class="square xsmall circular"
-								Icon={X}
+								Icon={Plus}
 								onclick={(event) => {
 									event.stopPropagation();
-									removeTag(tag);
+									addTagToTask(tag);
 								}}
 							/>
 							{tag.name}
 							<Button
 								flavor="badge"
 								class="square xsmall circular"
-								Icon={Plus}
+								Icon={X}
 								onclick={(event) => {
 									event.stopPropagation();
-									addTagToTask(tag);
+									removeTag(tag);
 								}}
 							/>
 						</Badge>

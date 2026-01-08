@@ -281,3 +281,53 @@ pub fn get_task_by_id(app: AppHandle, task_id: i32) -> Result<Task, String> {
         tags: fetch_tags(&conn, id)?,
     })
 }
+
+#[tauri::command]
+pub fn update_task_name_by_id(
+    app: AppHandle,
+    task_id: i32,
+    new_name: String,
+) -> Result<Task, String> {
+    let conn = database::open_conn(&app).map_err(|e| e.to_string())?;
+
+    let rows = conn
+        .execute(
+            "UPDATE tasks SET name = ?1 WHERE id = ?2",
+            params![new_name, task_id],
+        )
+        .map_err(|e| e.to_string())?;
+
+    if rows == 0 {
+        return Err("No task found with given id".to_string());
+    }
+
+    // Reuse your existing logic instead of duplicating it
+    get_task_by_id(app, task_id)
+}
+
+#[tauri::command]
+pub fn update_task_due_date_by_id(
+    app: AppHandle,
+    task_id: i32,
+    new_due_date: Option<DateTime<Utc>>,
+) -> Result<Task, String> {
+    let conn = database::open_conn(&app).map_err(|e| e.to_string())?;
+
+    // Emulate your existing date handling:
+    // Option<DateTime<Utc>> -> Option<String> (RFC3339)
+    let due_date_str = new_due_date.map(|dt| dt.to_rfc3339());
+
+    let rows = conn
+        .execute(
+            "UPDATE tasks SET due_date = ?1 WHERE id = ?2",
+            params![due_date_str, task_id],
+        )
+        .map_err(|e| e.to_string())?;
+
+    if rows == 0 {
+        return Err("No task found with given id".to_string());
+    }
+
+    // Reuse the canonical fetch logic
+    get_task_by_id(app, task_id)
+}

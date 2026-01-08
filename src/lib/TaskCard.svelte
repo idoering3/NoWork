@@ -10,14 +10,16 @@
     import { flip } from "svelte/animate";
     import Textbox from "./Textbox.svelte";
     import { invoke } from "@tauri-apps/api/core";
+    import DatePicker from "./DatePicker.svelte";
 
     interface Props {
         task: Task;
+        allowsEdit?: boolean;
         onComplete: (id: number) => void;
         onDelete?: (id: number) => void;
     }
 
-    let { task = $bindable(), onComplete = $bindable(), onDelete = $bindable() }: Props = $props();
+    let { task = $bindable(), allowsEdit = true, onComplete = $bindable(), onDelete = $bindable() }: Props = $props();
 
     function complete() {
         onComplete(task.id);
@@ -27,7 +29,7 @@
         onDelete!(task.id);
     }
 
-    const dueDate: Date | null = task.dueDate ? new Date(task.dueDate) : null;
+    let dueDate: Date | null = $state(task.dueDate ? new Date(task.dueDate) : null);
 
     // Local date comparison helpers
     function isSameLocalDate(a: Date, b: Date): boolean {
@@ -45,17 +47,16 @@
     }
 
     const now = new Date();
-    const dueToday = dueDate && isSameLocalDate(dueDate, now);
-    const overdue = dueDate && isPastDue(dueDate, now);
+    const dueToday = $derived(dueDate && isSameLocalDate(dueDate, now));
+    const overdue = $derived(dueDate && isPastDue(dueDate, now));
     let editing = $state(false);
 
     let container: HTMLDivElement; // reference to the task container
 
-    function startEditing() {
-        editing = true;
+    $effect(() => {
+        if (!editing) return;
 
         function onClickOutside(event: MouseEvent) {
-            // Check if click is outside the container
             if (!container.contains(event.target as Node)) {
                 commitAndCleanup();
             }
@@ -69,32 +70,35 @@
         document.addEventListener("mousedown", onClickOutside);
         document.addEventListener("keydown", onKeyDown);
 
-        function cleanup() {
+        return () => {
             document.removeEventListener("mousedown", onClickOutside);
             document.removeEventListener("keydown", onKeyDown);
-        }
+        };
+    });
 
-        function commitAndCleanup() {
-            commit();
-            cleanup();
-        }
-
-        function cancelAndCleanup() {
-            cancel();
-            cleanup();
-        }
-
-        onDestroy(cleanup); // remove listeners if component unmounts
+    function commitAndCleanup() {
+        commit();
+        refreshTask();
     }
+
+    function cancelAndCleanup() {
+        cancel();
+        refreshTask();
+    }
+
+
+    function startEditing() {
+        if (allowsEdit)
+            editing = true;
+    }
+
 
     function commit() {
         editing = false;
-        console.log("committed!");
     }
 
     function cancel() {
         editing = false;
-        console.log("canceled!");
     }
 
     function onRightClick(event: MouseEvent) {
@@ -114,6 +118,31 @@
     async function removeTagFromTask(id: number) {
         await invoke('remove_tag_from_task', { 'taskId':task.id , 'tagId': id });
         await refreshTask();
+    }
+
+    let name = $state(task.name);
+
+    // probably unnecessary
+    $effect(() => {
+        let cancelled = false;
+
+        (async () => {
+            await invoke('update_task_name_by_id', { 'taskId': task.id, 'newName': name });
+        })();
+
+        return () => {
+            cancelled = true;
+        };
+    });
+
+    $effect(() => {
+        (async () => {
+            await invoke('update_task_due_date_by_id', { 'taskId': task.id, 'newDueDate': dueDate });
+        })();
+    });
+
+    async function removeDate() {
+        dueDate = null;
     }
 </script>
 
@@ -155,55 +184,69 @@
     <div class="task-card" class:overdue={overdue} class:due-today={dueToday}>
         <Button onclick={complete} Icon={Check} flavor="outline" class="square small" />
         {#if !editing}
-            <div class="stacked">
-                <p style="font-size: 1rem">{task.name}</p>
+        <div class="stacked">
+            <p style="font-size: 1rem">{task.name}</p>
+            {#key task}
                 <p class="date">
                     {dueDate ? dueDate.toLocaleDateString(undefined, { month: 'long', day: 'numeric' }) : ''}
                 </p>
-            </div>
-            <div class="tags">
-                {#if task.tags}
-                    {#each task.tags as tag}
-                        <Badge flavor={tag.color}>{tag.name}</Badge>
-                    {/each}
-                {/if}
-            </div>
+            {/key}
+        </div>
+        <div class="tags">
+            {#if task.tags}
+                {#each task.tags as tag}
+                    <Badge flavor={tag.color}>{tag.name}</Badge>
+                {/each}
+            {/if}
+        </div>
         {:else}
             <div style="width: fit-content;">
-                <Textbox preamble={false} placeholders={["Enter task name"]} value={task.name} />
+                <Textbox preamble={false} placeholders={["Enter task name"]} bind:value={name} />
+            </div>
+            {#if dueDate}
+                {dueDate.toLocaleDateString()}
+                <Button class="square xsmall" Icon={X} flavor='outline' onclick={removeDate}/>
+            {/if}
+            <div>
+                <DatePicker size="small" slowAnimation={false} posRight bind:selectedDate={dueDate}/>
             </div>
             {#key task}
                 {#await getAllTags() then tags}
-                    {#each tags as tag (tag.name)}
-                        <div animate:flip={{ duration: 300, easing: quartInOut }}>
-                            <div>
-                                {@render tagsn(tag.name, tag.id, tag?.color)}
+                    <div style="display: flex; justify-content:flex-start; gap: 0.5rem;">
+                        {#each tags as tag (tag.name)}
+                            <div 
+                                animate:flip={{ duration: 300, easing: quartInOut }}
+                            >
+                                <div>
+                                    {@render tagsn(tag.name, tag.id, tag?.color)}
+                                </div>
                             </div>
-                        </div>
-                    {/each}
+                        {/each}
+                    </div>
                 {/await}
             {/key}
+            {#if onDelete}
+                <Button onclick={deleted} Icon={Trash} flavor="outline" class="square small" />
+            {/if}
         {/if}
     </div>
-    {#if onDelete}
-        <Button onclick={deleted} Icon={Trash} flavor="outline" class="square small" />
-    {/if}
 </div>
 
 <style>
     .task-container {
         gap: 1rem;
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
         justify-content: space-between;
         width: fit-content;
         padding: 0rem 0.5rem;
-        height: 3rem;
-        min-height: 0;
+        min-height: 3rem;
+        max-height: 9rem;
+        max-width: 100%;
         box-sizing: border-box;
         border-radius: 15px;
         border: 1px solid transparent;
-        overflow:hidden;
         transition: 300ms ease-in-out;
     }
 
@@ -214,12 +257,13 @@
     .task-card {
         gap: 1rem;
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
         justify-content: space-between;
-        width: fit-content;
         padding: 0rem 0.5rem;
-        height: 3rem;
-        min-height: 0;
+        width: 100%;
+        min-height: 3rem;
+        max-height: 9rem;
         border-radius: 0.5rem;
         transition: background-color 0.3s ease, color 0.3s ease;
     }

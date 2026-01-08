@@ -225,6 +225,10 @@
         if (!b.dueDate) return -1;
         return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
     }));
+
+    async function removeDate() {
+        selectedDate = null;
+    }
 </script>
 
 <div style="overflow: hidden; display: flex; height: calc(100vh - 3rem);">
@@ -262,7 +266,7 @@
         <div class='task-container' bind:this={taskContainer} transition:fly|global={{ duration: 1500, delay:300, y:30, easing: quartOut }}>
             <div style="position: relative;">
                 {#key selectedTag}
-                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <div style="display: flex; flex-direction: column; gap: 0.25rem;">
                         {#each visibleTasks as task, i (task.id)}
                         <!-- No effing clue why, but the animate and transitions MUST be separated. It breaks otherwise -->
                             <div animate:flip|global={{ duration: 300, easing: quartInOut }}>
@@ -311,6 +315,7 @@
                     {/key}
                     {#if selectedDate}
                         {selectedDate.toLocaleDateString()}
+                        <Button class="square xsmall" Icon={X} flavor='outline' onclick={removeDate}/>
                     {/if}
                     <TagSelector bind:selectedTags={selectedTags} refreshTags={getAllTags} bind:allTags={tags} />
                     <Datepicker bind:selectedDate={selectedDate}/>
@@ -353,9 +358,9 @@
     }
 
     .task-container {
+        overflow-y:auto;
         position: relative;
         min-height: 0;
-        overflow-y: auto;
         box-shadow: 0px 0px 5px -2px var(--border-color);
         border: 1px solid var(--border-color);
         background-color: var(--primary-light);
