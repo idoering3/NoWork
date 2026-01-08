@@ -80,7 +80,7 @@
     .main {
         width: 100%;
         height: calc(100vh - 3rem);
-        border-radius: 7px 0 0 0;
+        border-radius: 15px 0 0 0;
         border-top: 1px solid var(--border-color);
         border-left: 1px solid var(--border-color);
         display: grid;

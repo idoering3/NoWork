@@ -1,4 +1,6 @@
+import { invoke } from "@tauri-apps/api/core";
 import type { Theme } from "./theme";
+import type { Tag } from "./types/task";
 
 export let themes: Record<string, Theme> = {
     "Pink Light": {
@@ -85,4 +87,8 @@ export function startClock(update: (date: Date) => void) {
 
   tick(); // run immediately
   setInterval(tick, 1000);
+}
+
+export async function getAllTags() {
+  return await invoke<Tag[]>('get_all_tags'); 
 }

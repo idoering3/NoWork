@@ -149,6 +149,6 @@
         height: 1.75rem;
         width: 3px;
         margin-left: 4px;
-        border-radius: 7px;
+        border-radius: 15px;
     }
 </style>

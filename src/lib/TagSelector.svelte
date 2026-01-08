@@ -8,7 +8,7 @@
 	import Textbox from "./Textbox.svelte";
 	import Badge from "./Badge.svelte";
 	import { flavorMap } from "./stores.svelte";
-	import type { Tag } from "$lib/types/task";
+	import type { NewTag, Tag } from "$lib/types/task";
 
 	// State
 	let dropdownOpen = $state(false);
@@ -74,7 +74,7 @@
 		const tagExists = allTags.some((t) => t.name === name);
 
 		if (!tagExists) {
-			let newTag: Tag = {
+			let newTag: NewTag = {
 				name: name,
 				color: tagColor
 			};
@@ -157,7 +157,7 @@
 						{placeholders}
 					/>
 					<div style="display: flex;">
-						<div style="border-radius: 7px; display: flex; border: 1px solid var(--border-color); overflow: hidden; margin-right:1rem;">
+						<div style="border-radius: 15px; display: flex; border: 1px solid var(--border-color); overflow: hidden; margin-right:1rem;">
 							{#each Object.values(flavorMap) as color}
 								<button
 									style="background-color: {color.bgcolor};
@@ -197,7 +197,7 @@
 	}
 
 	.task-creator {
-		border-radius: 7px;
+		border-radius: 15px;
 		align-items: center;
 		padding: 0 0.5rem;
 		display: flex;
@@ -218,7 +218,7 @@
 		align-items: center;
 		overflow: hidden;
 		position: absolute;
-		border-radius: 7px;
+		border-radius: 15px;
 		background-color: var(--primary-light);
 		border: 1px solid var(--border-color);
 		box-shadow: 0px 0px 5px -2px #b8b8b8;

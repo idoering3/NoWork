@@ -12,25 +12,26 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             let handle = app.handle();
-            init_db(handle.clone())?;
+            init_db(&handle)?;
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
             commands::greet::greet,
-            commands::database::add_database_task,
-            commands::database::get_all_tasks,
-            commands::database::complete_task,
-            commands::database::delete_task,
-            commands::database::get_all_tags,
-            commands::database::add_tag,
-            commands::database::remove_tag,
-            commands::database::add_tag_to_task,
-            commands::database::remove_tag_from_task,
+            commands::tasks::add_database_task,
+            commands::tasks::get_all_tasks,
+            commands::tasks::complete_task,
+            commands::tasks::delete_task,
+            commands::tags::get_all_tags,
+            commands::tags::add_tag,
+            commands::tags::remove_tag,
+            commands::tags::add_tag_to_task,
+            commands::tags::remove_tag_from_task,
             commands::database::reset_database,
-            commands::database::get_incomplete_tasks,
-            commands::database::get_completed_task_count,
-            commands::database::get_tasks_due_today,
-            commands::database::update_tag_color
+            commands::tasks::get_incomplete_tasks,
+            commands::tasks::get_completed_task_count,
+            commands::tasks::get_tasks_due_today,
+            commands::tasks::get_task_by_id,
+            commands::tags::update_tag_color
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -207,7 +207,7 @@
         outline: none;
     }
     .timer-container {
-        border-radius: 7px;
+        border-radius: 15px;
         text-align: center;
         font-family: sans-serif;
         display: flex;
@@ -220,7 +220,7 @@
         box-shadow: 0px 0px 5px -2px var(--border-color);
         border: 1px solid var(--border-color);
         margin: 1rem auto;
-        border-radius: 7px;
+        border-radius: 15px;
         display:flex;
         justify-content: center;
         overflow: hidden;

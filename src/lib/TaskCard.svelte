@@ -1,11 +1,15 @@
 <script lang="ts">
     import type { Task } from "$lib/types/task";
     import Check from "@lucide/svelte/icons/check";
-    import { Trash } from "@lucide/svelte";
+    import { Plus, Trash, X } from "@lucide/svelte";
     import Button from "./Button.svelte";
     import Badge from "./Badge.svelte";
-    import { fly, scale } from "svelte/transition";
     import { quartInOut, quartOut } from "svelte/easing";
+    import { onDestroy } from "svelte";
+    import { getAllTags } from "./stores.svelte";
+    import { flip } from "svelte/animate";
+    import Textbox from "./Textbox.svelte";
+    import { invoke } from "@tauri-apps/api/core";
 
     interface Props {
         task: Task;
@@ -43,26 +47,143 @@
     const now = new Date();
     const dueToday = dueDate && isSameLocalDate(dueDate, now);
     const overdue = dueDate && isPastDue(dueDate, now);
+    let editing = $state(false);
+
+    let container: HTMLDivElement; // reference to the task container
+
+    function startEditing() {
+        editing = true;
+
+        function onClickOutside(event: MouseEvent) {
+            // Check if click is outside the container
+            if (!container.contains(event.target as Node)) {
+                commitAndCleanup();
+            }
+        }
+
+        function onKeyDown(event: KeyboardEvent) {
+            if (event.key === "Enter") commitAndCleanup();
+            if (event.key === "Escape") cancelAndCleanup();
+        }
+
+        document.addEventListener("mousedown", onClickOutside);
+        document.addEventListener("keydown", onKeyDown);
+
+        function cleanup() {
+            document.removeEventListener("mousedown", onClickOutside);
+            document.removeEventListener("keydown", onKeyDown);
+        }
+
+        function commitAndCleanup() {
+            commit();
+            cleanup();
+        }
+
+        function cancelAndCleanup() {
+            cancel();
+            cleanup();
+        }
+
+        onDestroy(cleanup); // remove listeners if component unmounts
+    }
+
+    function commit() {
+        editing = false;
+        console.log("committed!");
+    }
+
+    function cancel() {
+        editing = false;
+        console.log("canceled!");
+    }
+
+    function onRightClick(event: MouseEvent) {
+        event.preventDefault();
+        startEditing();
+    }
+
+    async function refreshTask() {
+        task = await invoke<Task>('get_task_by_id', { 'taskId':task.id });
+    }
+
+    async function addTagToTask(id: number) {
+        await invoke('add_tag_to_task', { 'taskId':task.id , 'tagId': id });
+        await refreshTask();
+    }
+    
+    async function removeTagFromTask(id: number) {
+        await invoke('remove_tag_from_task', { 'taskId':task.id , 'tagId': id });
+        await refreshTask();
+    }
 </script>
+
+{#snippet tagsn(name: string, id: number, color: 'default' | 'outline' | 'danger' | 'blue')}
+    <Badge flavor={color} noPadding>
+        {#if task.tags?.some(tag => tag.name === name)}
+            <span style="padding-left: 0.5rem;">
+                {name}
+            </span>
+            <Button flavor="badge" class="square xsmall circular" Icon={X}
+                onclick={() => {
+                    removeTagFromTask(id);
+                }}
+            />
+        {:else}
+            <Button
+                flavor="badge"
+                class="square xsmall circular"
+                Icon={Plus}
+                onclick={(event) => {
+                    event.stopPropagation();
+                    addTagToTask(id);
+                }}
+            />
+            <span style="padding-right: 0.5rem;">
+                {name}
+            </span>
+        {/if}
+    </Badge>
+{/snippet}
 
 <div
     class="task-container"
+    bind:this={container}
+    class:edit={editing}
+    oncontextmenu={onRightClick}
+    role="document"
 >
     <div class="task-card" class:overdue={overdue} class:due-today={dueToday}>
         <Button onclick={complete} Icon={Check} flavor="outline" class="square small" />
-        <div class="stacked">
-            <p style="font-size: 1rem">{task.name}</p>
-            <p class="date">
-                {dueDate ? dueDate.toLocaleDateString(undefined, { month: 'long', day: 'numeric' }) : ''}
-            </p>
-        </div>
-        <div class="tags">
-            {#if task.tags}
-                {#each task.tags as tag}
-                    <Badge flavor={tag.color}>{tag.name}</Badge>
-                {/each}
-            {/if}
-        </div>
+        {#if !editing}
+            <div class="stacked">
+                <p style="font-size: 1rem">{task.name}</p>
+                <p class="date">
+                    {dueDate ? dueDate.toLocaleDateString(undefined, { month: 'long', day: 'numeric' }) : ''}
+                </p>
+            </div>
+            <div class="tags">
+                {#if task.tags}
+                    {#each task.tags as tag}
+                        <Badge flavor={tag.color}>{tag.name}</Badge>
+                    {/each}
+                {/if}
+            </div>
+        {:else}
+            <div style="width: fit-content;">
+                <Textbox preamble={false} placeholders={["Enter task name"]} value={task.name} />
+            </div>
+            {#key task}
+                {#await getAllTags() then tags}
+                    {#each tags as tag (tag.name)}
+                        <div animate:flip={{ duration: 300, easing: quartInOut }}>
+                            <div>
+                                {@render tagsn(tag.name, tag.id, tag?.color)}
+                            </div>
+                        </div>
+                    {/each}
+                {/await}
+            {/key}
+        {/if}
     </div>
     {#if onDelete}
         <Button onclick={deleted} Icon={Trash} flavor="outline" class="square small" />
@@ -79,6 +200,15 @@
         padding: 0rem 0.5rem;
         height: 3rem;
         min-height: 0;
+        box-sizing: border-box;
+        border-radius: 15px;
+        border: 1px solid transparent;
+        overflow:hidden;
+        transition: 300ms ease-in-out;
+    }
+
+    .task-container.edit {
+        border: 1px solid var(--border-color);
     }
 
     .task-card {

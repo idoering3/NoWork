@@ -83,7 +83,9 @@
             getIncompleteTasks();
             selectedDate = null;
             taskName = '';
-            selectedTags = [selectedTag!];
+            if (selectedTag) {
+                selectedTags = [selectedTag];
+            }
         }
     }
 
@@ -184,7 +186,7 @@
         } else {
             filterMode = "all";
         }
-        const tag = await store.get<{ name: string, color: 'default' | 'outline' | 'danger' | 'blue' }>("selectedTag");
+        const tag = await store.get<{ id: number, name: string, color: 'default' | 'outline' | 'danger' | 'blue' }>("selectedTag");
         if (tag) {
             selectedTag = tag;
         }
@@ -194,6 +196,7 @@
     let completedTasks = $state();
 
     async function selectTag(tag: Tag) {
+        await getIncompleteTasks();
         runCollapse = true;
         filterMode = "tag";
         selectedTag = tag;
@@ -204,6 +207,7 @@
     }
 
     async function selectAllTasks() {
+        await getIncompleteTasks();
         runCollapse = true;
         filterMode = "all";
         selectedTag = null;
@@ -258,7 +262,7 @@
         <div class='task-container' bind:this={taskContainer} transition:fly|global={{ duration: 1500, delay:300, y:30, easing: quartOut }}>
             <div style="position: relative;">
                 {#key selectedTag}
-                    <div style="">
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
                         {#each visibleTasks as task, i (task.id)}
                         <!-- No effing clue why, but the animate and transitions MUST be separated. It breaks otherwise -->
                             <div animate:flip|global={{ duration: 300, easing: quartInOut }}>

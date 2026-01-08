@@ -8,6 +8,12 @@ export interface Task {
   tags?: Tag[] | null;
 }
 export interface Tag {
+  id: number;
+  name: string;
+  color: 'default' | 'outline' | 'danger' | 'blue'
+}
+
+export interface NewTag {
   name: string;
   color: 'default' | 'outline' | 'danger' | 'blue'
 }

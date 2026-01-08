@@ -104,7 +104,7 @@
         min-width: 15rem;
         gap: 1rem;
         padding: 1rem;
-        border-radius: 7px;
+        border-radius: 15px;
         border: 1px solid var(--border-color);
         transition: 0.15s ease-in-out;
         box-shadow: 0px 0px 5px -2px var(--border-color);
@@ -120,7 +120,7 @@
         overflow: hidden;
         top: 0.5rem;
         position: absolute;
-        border-radius: 7px;
+        border-radius: 15px;
         background-color: var(--primary-light);
         border: 1px solid var(--border-color);
         box-shadow: 0px 0px 5px -2px var(--border-color);

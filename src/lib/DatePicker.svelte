@@ -160,7 +160,7 @@
 <div class='container' bind:this={dropdownEl} transition:fly|global={{ duration: 1500, delay:900, y:7, easing: quartOut }}>
     <Button class="square" flavor="outline" Icon={Calendar} onclick={() => dropdownOpen = !dropdownOpen}/>
     {#if dropdownOpen}
-        <div class='context-menu' transition:fly={{ y: 15, duration: 150, easing: quartInOut }}>
+        <div class='context-menu' transition:fly={{ y: 15, duration: 300, easing: quartOut }}>
             <div class="top">
                 <Button flavor="ghost" class="square small rounded" Icon={ ChevronLeft } onclick={decreaseMonth} />
                 <h8>
@@ -237,7 +237,7 @@
         align-items: center;
         overflow: hidden;
         position: absolute;
-        border-radius: 7px;
+        border-radius: 15px;
         background-color: var(--primary-light);
         border: 1px solid var(--border-color);
         box-shadow: 0px 0px 5px -2px #b8b8b8;
