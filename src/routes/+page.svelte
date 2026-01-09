@@ -14,6 +14,7 @@
 
     let message = $state();
     let tasks: Task[] | null = $state(null);
+    let sortedTasks: Task[] | undefined = $state(undefined);
     let currentDate: Date = $state(new Date());
 
     onMount (async () => {
@@ -51,6 +52,13 @@
 
     async function getIncompleteTasks() {
         tasks = await invoke('get_incomplete_tasks');
+        sortedTasks = tasks?.slice().sort((a, b) => {
+            if (!a.dueDate && !b.dueDate) return 0;
+            if (!a.dueDate) return 1;
+            if (!b.dueDate) return -1;
+
+            return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+        });
     }
 
 
@@ -72,7 +80,7 @@
     <h6 transition:fly={{ y: 10, delay: 1200, duration: 2500, easing: quartOut}}>{message}</h6>
     <div class="cardholder">
         <div class="taskview">
-            {#each tasks?.slice(0, 3) as task, i}
+            {#each sortedTasks?.slice(0, 4) as task, i}
                 <div style="margin: 0.5rem;"
                     in:fly|global={{ duration: 1500, delay: 300 + 300 * (i + 1), y: 30, easing: quartOut }}
                     out:fly|global={{ duration: 150, y: -30, easing: quartIn }}
