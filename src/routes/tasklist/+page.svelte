@@ -239,11 +239,16 @@
         >
             Tasks
         </p>
-        <div style={selectedTag?.name === "all" ? "" : ""} transition:fly={{ y: 30, delay: 600, duration: 1500, easing: quartOut}}>
+        <div style={selectedTag?.name === "all" ? "" : ""} 
+            in:fly={{ y: 30, delay: 600, duration: 1500, easing: quartOut}}
+        >
             <Button flavor="ghost" onclick={async () => await selectAllTasks()}><span style={filterMode === "all" ? "color:var(--highlight-color)" : ""}>all tasks</span></Button>
         </div>
         {#each tags as tag, i}
-            <div style={tag.name === selectedTag?.name ? "" : ""} transition:fly={{ y: 30, delay: 600 + (i + 1) * 300, duration: 1500, easing: quartOut}}>
+            <div style={tag.name === selectedTag?.name ? "" : ""} 
+                in:fly={{ y: 30, delay: 600 + (i + 1) * 300, duration: 1500, easing: quartOut}}
+                out:fly={{ y: -15, duration: 300, easing: quartOut}}
+            >
                 <Button flavor="ghost" onclick={async () => await selectTag(tag)}><span style={tag.name === selectedTag?.name ? "color:var(--highlight-color)" : ""}>{tag?.name}</span></Button>
             </div>
         {/each}

@@ -3,9 +3,10 @@
     import { quartInOut, quartOut } from "svelte/easing";
     import { scale } from "svelte/transition";
     import { flavorMap } from "./stores.svelte";
+    import type { TagColor } from "./types/task";
 
     interface Props {
-        flavor?: 'default' | 'outline' | 'danger' | 'blue',
+        flavor?: TagColor,
         children: Snippet,
         noPadding?: boolean,
     }
@@ -45,8 +46,8 @@
     }
 
     .badge.secondary {
-        color: black;
-        --badge-bg: var(--secondary-color);
+        color: var(--primary-light);
+        --badge-bg: var(--highlight-color);
     }
 
     .badge.danger {
@@ -56,7 +57,12 @@
 
     .badge.blue {
         --badge-bg: #749cdc;
-        color: #363cda;
+        color: #2f33b0;
+    }
+
+    .badge.green {
+        --badge-bg: #86e28c;
+        color: #1a681a;
     }
     
     .badge.outline {

@@ -10,10 +10,12 @@ export interface Task {
 export interface Tag {
   id: number;
   name: string;
-  color: 'default' | 'outline' | 'danger' | 'blue'
+  color: TagColor
 }
 
 export interface NewTag {
   name: string;
-  color: 'default' | 'outline' | 'danger' | 'blue'
+  color: TagColor
 }
+
+export type TagColor = 'default' | 'secondary' | 'outline' | 'danger' | 'blue' | 'green';

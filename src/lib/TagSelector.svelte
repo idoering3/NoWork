@@ -8,11 +8,11 @@
 	import Textbox from "./Textbox.svelte";
 	import Badge from "./Badge.svelte";
 	import { flavorMap } from "./stores.svelte";
-	import type { NewTag, Tag } from "$lib/types/task";
+	import type { NewTag, Tag, TagColor } from "$lib/types/task";
 
 	// State
 	let dropdownOpen = $state(false);
-	let tagColor: 'default' | 'outline' | 'danger' | 'blue' = $state('default');
+	let tagColor: TagColor = $state('default');
 	let tagName = $state('');
 
 	// Props
@@ -104,7 +104,7 @@
 		}
 	}
 
-	function setTagColor(name: 'default' | 'outline' | 'danger' | 'blue') {
+	function setTagColor(name: TagColor) {
 		tagColor = name;
 	}
 
@@ -115,6 +115,8 @@
 		'help me!',
 		'car',
 		'bills',
+		'taxes',
+		'moon project',
 	];
 </script>
 
@@ -225,7 +227,7 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
-		min-width: 27rem;
+		min-width: 32rem;
 		min-height: 12rem;
 		bottom: 3.25rem;
 		gap: 1rem;

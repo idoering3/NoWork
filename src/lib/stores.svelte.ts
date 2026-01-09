@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import type { Theme } from "./theme";
-import type { Tag } from "./types/task";
+import type { Tag, TagColor } from "./types/task";
 
 export let themes: Record<string, Theme> = {
     "Pink Light": {
@@ -61,6 +61,11 @@ export const flavorMap = {
     bgcolor: "#e6e6e6",
     color: "black"
   },
+  secondary: {
+    name: "secondary",
+    bgcolor: "var(--highlight-color)",
+    color: "black"
+  },
   danger: {
     name: "danger",
     bgcolor: "#ffb4b4",
@@ -74,9 +79,14 @@ export const flavorMap = {
   blue: {
     name: "blue",
     bgcolor: "#749cdc",
-    color: "#363cda"
+    color: "#2f33b0"
   },
-} as const satisfies Record<string, Flavor>;
+  green: {
+    name: "green",
+    bgcolor: "#86e28c",
+    color: "#1a681a"
+  },
+} as const satisfies Record<TagColor, Flavor>;
 
 
 export function startClock(update: (date: Date) => void) {
