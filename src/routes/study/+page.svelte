@@ -52,6 +52,8 @@
         });
         timerStore.start();
     }
+
+    let dropdownAnimating = $state(false);
 </script>
 
 
@@ -76,8 +78,10 @@
                     <div 
                         in:fly|global={{ y: 30, delay: 300, duration: 1500, easing: quartOut}}
                         out:fly|global={{ y: -30, duration: 300 , easing: quartOut}}
+                        onintrostart={() => dropdownAnimating = true}
+                        onintroend={() => dropdownAnimating = false}
                     >
-                        <Dropdown options={["", ...Object.keys(studyTypes)]} bind:selected={selectedName}></Dropdown>
+                        <Dropdown dropDisabled={dropdownAnimating} options={["", ...Object.keys(studyTypes)]} bind:selected={selectedName}></Dropdown>
                     </div>
                     <div class="side-by-side">
                         <div class="stack" 

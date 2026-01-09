@@ -4,7 +4,7 @@
     import { onMount } from 'svelte';
     import { quartInOut } from 'svelte/easing';
 
-    let { options, selected=$bindable("")} = $props();
+    let { options, selected=$bindable(""), dropDisabled = false} = $props();
 
     let dropdownOpen = $state(false);
 
@@ -46,7 +46,7 @@
                 <span class="right-align"><ChevronDown size={20} strokeWidth={1}/></span>
             </div>
         </button>
-        {#if dropdownOpen}
+        {#if dropdownOpen && !dropDisabled}
             <div style='position:relative; display: flex; align-items: center; justify-content: center;'>
                 <div transition:fly={{y: -15, duration: 150, easing: quartInOut}} class="options">
                     {#each options as thing}
