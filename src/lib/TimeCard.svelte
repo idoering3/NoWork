@@ -62,13 +62,15 @@
             <CurrentIcon />
         </h4>
     </div>
-    <div>
-        <h4>
-            Study time
+</div>
+<div class="container" transition:fly|global={{ y: 30, delay: 900, duration: 1500, easing: quartOut}}>
+    <div style="display: flex; gap: 0.5rem;">
+        <h4 transition:fly={{ y: 15, delay: 900, duration: 1500, easing: quartOut}}>
+            Study time |
         </h4>
-        <h6>
+        <h4 transition:fly={{ y: 15, delay: 1200, duration: 1500, easing: quartOut}}>
            {Math.floor(minutesStudied / 60)}hr {minutesStudied % 60}min
-        </h6>
+        </h4>
     </div>
 </div>
 
