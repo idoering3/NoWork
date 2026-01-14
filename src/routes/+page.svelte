@@ -61,16 +61,15 @@
         });
     }
 
+    function hasDueDate(
+        task: Task
+    ): task is Task & { dueDate: string } {
+        return task.dueDate != null;
+    }
 
-    const dayNames = [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursay",
-        "Friday",
-        "Saturday"
-    ];
+    let tasksWithDueDates = $derived(
+        (tasks ?? []).filter(hasDueDate)
+    );
 
     let timeOfDay = $state("");
 </script>
@@ -92,7 +91,7 @@
             {/each}
         </div>
         <div class="calendar">
-            <Calendar></Calendar>
+            <Calendar tasks={tasksWithDueDates}></Calendar>
         </div>
         <div class="timecard">
             <TimeCard />
@@ -106,7 +105,7 @@
         margin-right: 3rem;
     }
     .calendar {
-        flex: 1;
+        flex: 0.75;
     }
     .timecard {
         flex: 1;

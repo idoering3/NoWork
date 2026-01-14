@@ -47,7 +47,7 @@ export const theme = $state({
 
 export const username = $state({
     name: "Person"
-})
+});
 
 interface Flavor {
   name: string;

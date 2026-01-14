@@ -1,6 +1,6 @@
 <script lang='ts'>
     import type { Snippet } from "svelte";
-    import { quartInOut, quartOut } from "svelte/easing";
+    import { quartOut } from "svelte/easing";
     import { scale } from "svelte/transition";
     import { flavorMap } from "./stores.svelte";
     import type { TagColor } from "./types/task";

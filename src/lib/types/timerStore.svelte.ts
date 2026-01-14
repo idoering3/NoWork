@@ -1,3 +1,5 @@
+import { load } from "@tauri-apps/plugin-store";
+
 function createTimer() {
     // --- Private state & config ---
     let config = {
@@ -26,7 +28,7 @@ function createTimer() {
         }
     }
 
-    function start() {
+    async function start() {
         if (isRunning) return;
         isRunning = true;
         isEnabled = true;
@@ -37,9 +39,31 @@ function createTimer() {
             timerFinished = false;
         }
 
-        timerInterval = setInterval(() => {
+        let studyMinuteCounter = 0;
+
+        timerInterval = setInterval(async () => {
             if (timeLeft > 100) {
                 timeLeft -= 100;
+
+                if (isStudying) {
+                    studyMinuteCounter += 100;
+
+                    if (studyMinuteCounter >= 60_000) {
+                        studyMinuteCounter = 0;
+
+                        const store = await load(".settings.json");
+                        let value = await store.get<{ value: number }>("totalStudyTime");
+                        let minutesStudied;
+                        if (value?.value) {
+                            minutesStudied = value.value;
+                        } else {
+                            minutesStudied = 0;
+                        }
+                        await store.set('totalStudyTime', {value: minutesStudied + 1});
+                        await store.save();
+                        console.log(minutesStudied);
+                    }
+                }
             } else {
                 audio.play();
                 pause(); // Pause to switch states
