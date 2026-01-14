@@ -100,8 +100,11 @@
     </h4>
     {#each weeks as week, i}
         <div class="week">
-            {#each week as day}
-                <div class="day" class:current={dayKey(day) === dayKey(currentDate)}>
+            {#each week as day, j}
+                <div 
+                    class="day" class:current={dayKey(day) === dayKey(currentDate)}
+                    transition:fly|global={{ y: 7, delay: 600 + (j * (i + 1) * 50), duration: 1500, easing: quartOut }}
+                >
                     {#if i == 0}
                         <p>{dayNames[day.getDay()]}</p>
                     {/if}

@@ -79,7 +79,7 @@
     <h6 transition:fly={{ y: 10, delay: 1200, duration: 2500, easing: quartOut}}>{message}</h6>
     <div class="cardholder">
         <div class="taskview">
-            {#each sortedTasks?.slice(0, 4) as task, i}
+            {#each sortedTasks?.slice(0, 4) as task, i (task.id)}
                 <div style="margin: 0.5rem;"
                     in:fly|global={{ duration: 1500, delay: 300 + 300 * (i + 1), y: 30, easing: quartOut }}
                     out:fly|global={{ duration: 150, y: -30, easing: quartIn }}
