@@ -36,7 +36,10 @@ pub fn init_db(app: &AppHandle) -> Result<()> {
     )?;
 
     // ignore error if column exists
-    let _ = conn.execute("ALTER TABLE tags ADD COLUMN color TEXT DEFAULT 'default'", []);
+    let _ = conn.execute(
+        "ALTER TABLE tags ADD COLUMN color TEXT DEFAULT 'default'",
+        [],
+    );
 
     conn.execute(
         "CREATE TABLE IF NOT EXISTS task_tags (

@@ -10,6 +10,8 @@
     import { theme, themes, username } from "$lib/stores.svelte";
     import { onMount } from "svelte";
     import Textbox from "$lib/Textbox.svelte";
+    import { fly } from "svelte/transition";
+    import { quartOut } from "svelte/easing";
 
     async function resetDatabase() {
         await invoke('reset_database');
@@ -75,15 +77,12 @@
 
 </script>
 <div style="padding: 3rem;">
-    <h1>
+    <h1 transition:fly={{ y: 30, delay: 150, duration: 1500, easing: quartOut}}>
         Settings
     </h1>
     <div class='stretch'>
         <div class="column">
-            <div>
-                <h5>
-                    General
-                </h5>
+            <div transition:fly={{ y: 30, delay: 150, duration: 1500, easing: quartOut}}>
                 <Card expanded>
                     <div style="padding: 1rem;">
                         <h6>
@@ -96,10 +95,7 @@
                     </div>
                 </Card>
             </div>
-            <div>
-                <h5>
-                    Theme
-                </h5>
+            <div transition:fly={{ y: 30, delay: 150, duration: 1500, easing: quartOut}}>
                 <Card expanded>
                     <div style="padding: 1rem;">
                         <h6>
@@ -126,10 +122,7 @@
                 </Card>
             </div>
         </div>
-        <div style="margin-top: 2rem;">
-            <h5>
-                Tasks
-            </h5>
+        <div style="margin-top: 2rem;" transition:fly={{ y: 30, delay: 900, duration: 1500, easing: quartOut}}>
             <Card expanded>
                 <div style="padding: 1rem;">
                     <div class='stretch'>
@@ -166,10 +159,6 @@
         display: flex;
         flex-direction: column;
         gap: 2rem;
-    }
-
-    h5 {
-        padding: 1rem 0;
     }
     h6 {
         padding-bottom: 0.5rem;

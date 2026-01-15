@@ -1,6 +1,6 @@
 <script lang="ts">
     import { fly } from "svelte/transition";
-    import { startClock } from "./stores.svelte";
+    import { dayKey, startClock } from "./stores.svelte";
     import { quartOut } from "svelte/easing";
     import type { Task } from "./types/task";
 
@@ -52,13 +52,6 @@
     let currentDate = $state(new Date());
 
     startClock(date => currentDate = date);
-
-    function dayKey(d: Date): string {
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, "0");
-        const day = String(d.getDate()).padStart(2, "0");
-        return `${y}-${m}-${day}`;
-    }
 
     function startOfDay(d: Date): Date {
         return new Date(d.getFullYear(), d.getMonth(), d.getDate());

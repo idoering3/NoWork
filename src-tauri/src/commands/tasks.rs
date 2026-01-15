@@ -1,4 +1,7 @@
-use crate::commands::{database, types::{Task, Tag, NewTag}};
+use crate::commands::{
+    database,
+    types::{NewTag, Tag, Task},
+};
 use chrono::{DateTime, Local, TimeZone, Utc};
 use rusqlite::params;
 use tauri::AppHandle;
@@ -34,9 +37,11 @@ fn fetch_tags(conn: &rusqlite::Connection, task_id: i32) -> Result<Option<Vec<Ta
 // Helper to parse optional RFC3339 date string
 fn parse_opt_date(s: Option<String>) -> Result<Option<DateTime<Utc>>, String> {
     match s {
-        Some(s) => Ok(Some(DateTime::parse_from_rfc3339(&s)
-            .map_err(|e| e.to_string())?
-            .with_timezone(&Utc))),
+        Some(s) => Ok(Some(
+            DateTime::parse_from_rfc3339(&s)
+                .map_err(|e| e.to_string())?
+                .with_timezone(&Utc),
+        )),
         None => Ok(None),
     }
 }
@@ -71,7 +76,11 @@ pub fn add_database_task(
             .map_err(|e| e.to_string())?;
 
             let tag_id: i64 = tx
-                .query_row("SELECT id FROM tags WHERE name = ?1", params![tag.name], |row| row.get(0))
+                .query_row(
+                    "SELECT id FROM tags WHERE name = ?1",
+                    params![tag.name],
+                    |row| row.get(0),
+                )
                 .map_err(|e| e.to_string())?;
 
             tx.execute(
@@ -94,16 +103,18 @@ pub fn get_all_tasks(app: AppHandle) -> Result<Vec<Task>, String> {
         .prepare("SELECT id, name, due_date, created_at, completed, completed_at FROM tasks")
         .map_err(|e| e.to_string())?;
 
-    let rows = stmt.query_map([], |row| {
-        Ok((
-            row.get::<_, i32>(0)?,
-            row.get::<_, String>(1)?,
-            row.get::<_, Option<String>>(2)?,
-            row.get::<_, String>(3)?,
-            row.get::<_, i32>(4)?,
-            row.get::<_, Option<String>>(5)?,
-        ))
-    }).map_err(|e| e.to_string())?;
+    let rows = stmt
+        .query_map([], |row| {
+            Ok((
+                row.get::<_, i32>(0)?,
+                row.get::<_, String>(1)?,
+                row.get::<_, Option<String>>(2)?,
+                row.get::<_, String>(3)?,
+                row.get::<_, i32>(4)?,
+                row.get::<_, Option<String>>(5)?,
+            ))
+        })
+        .map_err(|e| e.to_string())?;
 
     let mut tasks = Vec::new();
     for row in rows {
@@ -131,16 +142,18 @@ pub fn get_incomplete_tasks(app: AppHandle) -> Result<Vec<Task>, String> {
         .prepare("SELECT id, name, due_date, created_at, completed, completed_at FROM tasks WHERE completed = 0")
         .map_err(|e| e.to_string())?;
 
-    let rows = stmt.query_map([], |row| {
-        Ok((
-            row.get::<_, i32>(0)?,
-            row.get::<_, String>(1)?,
-            row.get::<_, Option<String>>(2)?,
-            row.get::<_, String>(3)?,
-            row.get::<_, i32>(4)?,
-            row.get::<_, Option<String>>(5)?,
-        ))
-    }).map_err(|e| e.to_string())?;
+    let rows = stmt
+        .query_map([], |row| {
+            Ok((
+                row.get::<_, i32>(0)?,
+                row.get::<_, String>(1)?,
+                row.get::<_, Option<String>>(2)?,
+                row.get::<_, String>(3)?,
+                row.get::<_, i32>(4)?,
+                row.get::<_, Option<String>>(5)?,
+            ))
+        })
+        .map_err(|e| e.to_string())?;
 
     let mut tasks = Vec::new();
     for row in rows {
@@ -175,10 +188,8 @@ pub fn complete_task(app: AppHandle, task_id: i32) -> Result<(), String> {
 #[tauri::command]
 pub fn delete_task(app: AppHandle, task_id: i32) -> Result<(), String> {
     let conn = database::open_conn(&app).map_err(|e| e.to_string())?;
-    conn.execute(
-        "DELETE FROM tasks WHERE id = ?1",
-        params![task_id],
-    ).map_err(|e| e.to_string())?;
+    conn.execute("DELETE FROM tasks WHERE id = ?1", params![task_id])
+        .map_err(|e| e.to_string())?;
     Ok(())
 }
 
@@ -191,25 +202,35 @@ pub fn get_tasks_due_today(app: AppHandle) -> Result<Vec<Task>, String> {
     let start = today.and_hms_opt(0, 0, 0).unwrap();
     let end = today.and_hms_opt(23, 59, 59).unwrap();
 
-    let start_utc = Local.from_local_datetime(&start).unwrap().with_timezone(&Utc);
+    let start_utc = Local
+        .from_local_datetime(&start)
+        .unwrap()
+        .with_timezone(&Utc);
     let end_utc = Local.from_local_datetime(&end).unwrap().with_timezone(&Utc);
 
-    let mut stmt = conn.prepare(
-        "SELECT id, name, due_date, created_at, completed, completed_at
+    let mut stmt = conn
+        .prepare(
+            "SELECT id, name, due_date, created_at, completed, completed_at
          FROM tasks
-         WHERE due_date IS NOT NULL AND due_date >= ?1 AND due_date <= ?2"
-    ).map_err(|e| e.to_string())?;
+         WHERE due_date IS NOT NULL AND due_date >= ?1 AND due_date <= ?2",
+        )
+        .map_err(|e| e.to_string())?;
 
-    let rows = stmt.query_map(params![start_utc.to_rfc3339(), end_utc.to_rfc3339()], |row| {
-        Ok((
-            row.get::<_, i32>(0)?,
-            row.get::<_, String>(1)?,
-            row.get::<_, Option<String>>(2)?,
-            row.get::<_, String>(3)?,
-            row.get::<_, i32>(4)?,
-            row.get::<_, Option<String>>(5)?,
-        ))
-    }).map_err(|e| e.to_string())?;
+    let rows = stmt
+        .query_map(
+            params![start_utc.to_rfc3339(), end_utc.to_rfc3339()],
+            |row| {
+                Ok((
+                    row.get::<_, i32>(0)?,
+                    row.get::<_, String>(1)?,
+                    row.get::<_, Option<String>>(2)?,
+                    row.get::<_, String>(3)?,
+                    row.get::<_, i32>(4)?,
+                    row.get::<_, Option<String>>(5)?,
+                ))
+            },
+        )
+        .map_err(|e| e.to_string())?;
 
     let mut tasks = Vec::new();
     for row in rows {

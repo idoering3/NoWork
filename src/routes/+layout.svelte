@@ -10,8 +10,12 @@
     import { load } from '@tauri-apps/plugin-store';
     import { setColors, type Theme } from '$lib/theme';
     import { onDestroy, onMount } from 'svelte';
-    import { theme, themes } from "$lib/stores.svelte";
+    import { dayKey, theme, themes } from "$lib/stores.svelte";
     import { cssVarToRGBArray, ShaderRenderer } from '$lib/shaders/shader';
+    import { sendNotif } from '$lib/misc/notifications';
+    import { invoke } from '@tauri-apps/api/core';
+    import { hasDueDate } from '$lib/types/taskStore.svelte';
+    import type { Task } from '$lib/types/task';
 
     let { children } = $props();
     
@@ -36,7 +40,30 @@
             theme.theme = value.value;
             setColors(root, theme.theme, renderer);
         }
+
+        const value1 = await store.get<{ date: string}>("hasNotifiedToday");
+
+
+        if (value1?.date !== dayKey(new Date())) {
+            await sendNotif();
+            await store.set('hasNotifiedToday', {date: dayKey(new Date())});
+        }
+
     });
+
+
+    async function isTaskDueToday() {
+        const tasks: Task[] = await invoke('get_incomplete_tasks');
+        const tasksWithDueDates: Task[] = (tasks ?? []).filter(hasDueDate);
+        if (tasksWithDueDates) {
+            for (let task of tasksWithDueDates) {
+                if (dayKey(new Date(task.dueDate!)) === dayKey(new Date())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     $effect(() => {
         if (theme.theme && renderer)

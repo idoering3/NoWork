@@ -11,6 +11,7 @@
     import Calendar from "$lib/Calendar.svelte";
     import { getSimpleTimeOfDay } from "$lib/misc/timeofday";
     import TimeCard from "$lib/TimeCard.svelte";
+    import { hasDueDate } from "$lib/types/taskStore.svelte";
 
     let message = $state();
     let tasks: Task[] | null = $state(null);
@@ -59,12 +60,6 @@
 
             return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
         });
-    }
-
-    function hasDueDate(
-        task: Task
-    ): task is Task & { dueDate: string } {
-        return task.dueDate != null;
     }
 
     let tasksWithDueDates = $derived(
