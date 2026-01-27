@@ -44,7 +44,7 @@
         const value1 = await store.get<{ date: string}>("hasNotifiedToday");
 
 
-        if (value1?.date !== dayKey(new Date())) {
+        if (await isTaskDueToday()) {
             await sendNotif();
             await store.set('hasNotifiedToday', {date: dayKey(new Date())});
         }
@@ -61,6 +61,7 @@
                     return true;
                 }
             }
+            return false;
         }
         return false;
     }
