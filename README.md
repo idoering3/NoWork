@@ -10,4 +10,5 @@ There are builds for the windows version of NoWork, in both .msi and .exe format
 For builds in other versions, you will need to download the project files and build everything yourself. For more information, see [Building in Tauri](https://tauri.app/distribute/)
 
 # Making Custom Versions
-You will need to have npm and tauri. Run ```npm install```. Then write ```npm run tauri dev```.
+You will need to have npm and tauri to run the dev version. Run ```npm install```. Then run ```npm run tauri dev```.
+To build, simply run ```npm run tauri build```.
