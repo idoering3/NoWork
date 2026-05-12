@@ -19,7 +19,6 @@
     let tasks: Task[] = $state([]);
     let show = $state(false);
 
-
     function handleKeydown(event: KeyboardEvent) {
         if (event.key === "Enter") {
             event.preventDefault();
@@ -233,12 +232,12 @@
 
 <div style="overflow: hidden; display: flex; height: calc(100vh - 3rem);">
     <div class='sidebar'>
-        <p 
-            style="padding: 1rem; display:flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--border-color)"
-            transition:fly={{ y: 30, delay: 300, duration: 1500, easing: quartOut}}
+        <h5 
+            style="padding: 1rem; display:flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--border-color); color: var(--highlight-color);"
+            in:fly={{ y: 30, delay: 300, duration: 1500, easing: quartOut}}
         >
             Tasks
-        </p>
+    </h5>
         <div style={selectedTag?.name === "all" ? "" : ""} 
             in:fly={{ y: 30, delay: 600, duration: 1500, easing: quartOut}}
         >
@@ -247,7 +246,7 @@
         {#each tags as tag, i}
             <div style={tag.name === selectedTag?.name ? "" : ""} 
                 in:fly={{ y: 30, delay: 600 + (i + 1) * 300, duration: 1500, easing: quartOut}}
-                out:fly={{ y: -15, duration: 300, easing: quartOut}}
+                // out:fly={{ y: -15, duration: 300, easing: quartOut}}
             >
                 <Button flavor="ghost" onclick={async () => await selectTag(tag)}><span style={tag.name === selectedTag?.name ? "color:var(--highlight-color)" : ""}>{tag?.name}</span></Button>
             </div>
@@ -260,15 +259,15 @@
                 Task List
             </h1>
             <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                <h6 transition:fly={{ x: -15, delay: 600, duration: 1500, easing: quartOut}}>
+                <h6 in:fly={{ x: -15, delay: 600, duration: 1500, easing: quartOut}}>
                     {tasks.filter(task => dueToday(task)).length} task{tasks.filter(task => dueToday(task)).length !== 1 ? "s" : ''} due today
                 </h6>
-                <h6 transition:fly={{ x: -15, delay: 1200, duration: 1500, easing: quartOut}}>
+                <h6 in:fly={{ x: -15, delay: 1200, duration: 1500, easing: quartOut}}>
                     {completedTasks} total tasks completed
                 </h6>
             </div>
         </div>
-        <div class='task-container' bind:this={taskContainer} transition:fly|global={{ duration: 1500, delay:300, y:30, easing: quartOut }}>
+        <div class='task-container' bind:this={taskContainer} in:fly|global={{ duration: 1500, delay:300, y:30, easing: quartOut }}>
             <div style="position: relative;">
                 {#key selectedTag}
                     <div style="display: flex; flex-direction: column; gap: 0.25rem;">
@@ -289,7 +288,7 @@
             </div>
         </div>
         {#if show}
-            <div class="task-bar" bind:this={taskBar} transition:fly|global={{ duration: 1500, delay:600, y:30, easing: quartOut }}>
+            <div class="task-bar" bind:this={taskBar} in:fly|global={{ duration: 1500, delay:600, y:30, easing: quartOut }}>
                 <Card expanded class="short">
                     <Textbox bind:value={taskName} {placeholders} />
                     {#snippet tagsn(name: string, color: 'default' | 'outline' | 'danger' | 'blue')}
@@ -324,7 +323,7 @@
                     {/if}
                     <TagSelector bind:selectedTags={selectedTags} refreshTags={getAllTags} bind:allTags={tags} />
                     <Datepicker bind:selectedDate={selectedDate}/>
-                    <div transition:fly|global={{ duration: 1500, delay:1200, y:7, easing: quartOut }}>
+                    <div in:fly|global={{ duration: 1500, delay:1200, y:7, easing: quartOut }}>
                         <Button onclick={submitTask} class="square" flavor="primary" Icon={ArrowUp} />
                     </div>
                 </Card>

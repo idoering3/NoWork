@@ -112,7 +112,7 @@
     </h5>
     <h1 in:fly={{ y: 30, delay: 200, duration: 1500, easing: quartOut}}>Hello, {username.name}.</h1>
     <h6 in:fly={{ y: 10, delay: 1200, duration: 2500, easing: quartOut}} style="font-style: italic;">{message}</h6>
-    <hr in:fly={{ y: 10, delay: 1600, duration: 2500, easing: quartOut}} style="margin-top: 2rem; margin-bottom: 2rem; border-color: var(--border-color); border-width: 0.5px;"/>
+    <hr in:fly={{ y: 10, delay: 1600, duration: 2500, easing: quartOut}} style="margin-top: 3rem; margin-bottom: 3rem; border-color: var(--border-color); border-width: 0.5px;"/>
     <div class="grid">
         {#each items as item (item.id)}
             {@const Component = registry[item.component]}

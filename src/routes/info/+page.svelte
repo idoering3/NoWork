@@ -4,10 +4,10 @@
 
 </script>
 <div style="padding: 3rem;">
-    <h1 id="gradient-text" transition:fly={{ y: 30, delay: 150, duration: 1500, easing: quartOut}}>
+    <h1 id="gradient-text" in:fly={{ y: 30, delay: 150, duration: 1500, easing: quartOut}}>
         NoWork
     </h1>
-    <p transition:fly={{ y: 30, delay: 600, duration: 1500, easing: quartOut}}>
+    <p in:fly={{ y: 30, delay: 600, duration: 1500, easing: quartOut}}>
         NoWork was made by Ian Doering. It follows the MIT License.
         <br><br>
         Copyright © {(new Date()).getFullYear()} Ian Doering
