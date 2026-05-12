@@ -102,12 +102,12 @@
 
 </script>
 <div style="padding: 3rem;">
-    <h1 transition:fly={{ y: 30, delay: 150, duration: 1500, easing: quartOut}}>
+    <h1 in:fly={{ y: 30, delay: 150, duration: 1500, easing: quartOut}}>
         Settings
     </h1>
     <div class='stretch'>
         <div class="column">
-            <div transition:fly={{ y: 30, delay: 150, duration: 1500, easing: quartOut}}>
+            <div in:fly={{ y: 30, delay: 300, duration: 1500, easing: quartOut}}>
                 <Card expanded>
                     <div style="padding: 1rem;">
                         <h5>
@@ -122,7 +122,7 @@
                     </div>
                 </Card>
             </div>
-            <div transition:fly={{ y: 30, delay: 150, duration: 1500, easing: quartOut}}>
+            <div in:fly={{ y: 30, delay: 300, duration: 1500, easing: quartOut}}>
                 <Card expanded>
                     <div style="padding: 1rem;">
                         <h5>
@@ -153,8 +153,22 @@
                     </div>
                 </Card>
             </div>
+                    <!-- homepage options -->
+            <div in:fly={{ y: 30, delay: 300, duration: 1500, easing: quartOut}}>
+                <Card>
+                    <div style="padding: 1rem;">
+                        <h5>Date Format</h5>
+                        <div style="padding-top: 1rem;">
+                                <Dropdown
+                                    options={dateFormatOptions}
+                                    bind:selected={selectedDateFormat.name}
+                                />
+                        </div>
+                    </div>
+                </Card>
+            </div>
         </div>
-        <div transition:fly={{ y: 30, delay: 900, duration: 1500, easing: quartOut}}>
+        <div in:fly={{ y: 30, delay: 900, duration: 1500, easing: quartOut}}>
             <Card>
                 <div style="padding-top: 1rem;">
                     <div class='stretch'>
@@ -179,18 +193,6 @@
                 </div>
             </Card>
         </div>
-        <!-- homepage options -->
-         <Card>
-            <div style="padding: 1rem;">
-                <h5>Date Format</h5>
-                <div style="padding-top: 1rem;">
-                        <Dropdown
-                            options={dateFormatOptions}
-                            bind:selected={selectedDateFormat.name}
-                        />
-                </div>
-            </div>
-         </Card>
     </div>
 </div>
 
@@ -203,9 +205,6 @@
         display: flex;
         flex-direction: column;
         gap: 2rem;
-    }
-    h6 {
-        padding-bottom: 0.5rem;
     }
     p {
         padding-bottom: 1rem;

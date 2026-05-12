@@ -8,140 +8,98 @@
         tasks?: Task[]
     }
 
-    let { tasks } : Props = $props();
-
-    let dueDates = $derived(tasks!.map(task => new Date(task.dueDate!)));
+    let { tasks }: Props = $props();
 
     function getWeekDays(date: Date, weekStartsOn: 0 | 1 = 0): Date[] {
         const d = new Date(date);
-        const day = d.getDay();
-        const diff = (day - weekStartsOn + 7) % 7;
+        const diff = (d.getDay() - weekStartsOn + 7) % 7;
         d.setDate(d.getDate() - diff);
-
         return Array.from({ length: 7 }, (_, i) => {
-            const dayDate = new Date(d);
-            dayDate.setDate(d.getDate() + i);
-            return dayDate;
+            const day = new Date(d);
+            day.setDate(d.getDate() + i);
+            return day;
         });
     }
 
     let tasksByDay = $derived.by(() => {
         const record: Record<string, Task[]> = {};
-
         for (const task of tasks ?? []) {
             const key = dayKey(new Date(task.dueDate!));
             (record[key] ??= []).push(task);
         }
-
         return record;
     });
 
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-    const dayNames = [
-        "Sun",
-        "Mon",
-        "Tue",
-        "Wed",
-        "Thu",
-        "Fri",
-        "Sat"
-    ];
-
-
-    let days = $state(getWeekDays(new Date()));
     let currentDate = $state(new Date());
-
     startClock(date => currentDate = date);
+
+    let days = $derived(getWeekDays(currentDate));
 
     function startOfDay(d: Date): Date {
         return new Date(d.getFullYear(), d.getMonth(), d.getDate());
     }
 
     function colorByDate(date: Date): string {
-        const today = startOfDay(currentDate);
-        const target = startOfDay(date);
-
-        const diffMs = target.getTime() - today.getTime();
-        const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
-
-        if (diffDays < 0) return "#f12618";        // past
-        if (diffDays === 0) return "#bd2c21";        // today
-        if (diffDays <= 3) return "#e08217";          // within 3 days
-        return "var(--primary-dark);";                           // chill, not urgent
+        const diffDays = Math.round(
+            (startOfDay(date).getTime() - startOfDay(currentDate).getTime())
+            / (1000 * 60 * 60 * 24)
+        );
+        if (diffDays < 0)  return "#f12618";
+        if (diffDays === 0) return "#bd2c21";
+        if (diffDays <= 3) return "#e08217";
+        return "var(--primary-dark)";   // ← removed stray semicolon
     }
-
-    let weeks = $derived.by(() => {
-        const start = startOfDay(currentDate);
-
-        return [
-            getWeekDays(start),
-            // getWeekDays(new Date(start.getTime() + 7 * 24 * 60 * 60 * 1000)),
-            // getWeekDays(new Date(start.getTime() + 14 * 24 * 60 * 60 * 1000)),
-        ];
-    });
-
 </script>
 
 {#snippet dueDot(task: Task)}
-    <span class="dot" style="background-color: {colorByDate(new Date(task.dueDate!))};">
-    </span>
+    <span class="dot" style="background-color: {colorByDate(new Date(task.dueDate!))};"></span>
 {/snippet}
 
 <div class="container" in:fly|global={{ y: 30, delay: 600, duration: 1500, easing: quartOut }}>
-    <h5 style="padding: 1rem; color: var(--hover-primary-dark);">
-        This Week
-    </h5>
-    {#each weeks as week, i}
-        <div class="week">
-            {#each week as day, j}
-            <!-- this is each day -->
-                <div 
-                    class="day" class:current={dayKey(day) === dayKey(currentDate)}
-                    in:fly|global={{ y: 7, delay: 1000 + (j * (i + 1) * 50), duration: 1500, easing: quartOut }}
-                >
-                    <div class="day-text">
-                        {#if i == 0}
-                            <h5 class="faded" style="padding-top: 1rem;">{dayNames[day.getDay()]}</h5>
-                        {/if}
-                        <h3 class:faded={day.getDate() === 1 || day.getDate() === 7}>{day.getDate()}</h3>
-                    </div>
+    <h5 style="padding: 2rem; color: var(--hover-primary-dark);">This Week</h5>
 
-                    <!-- <hr style="margin-top: 1rem; border-color: var(--border-color); border-width: 0.5px; width: 100%;"/> -->
+    <div class="week">
+        {#each days as day, j}
+            <div
+                class="day"
+                class:current={dayKey(day) === dayKey(currentDate)}
+                in:fly|global={{ y: 7, delay: 1000 + j * 50, duration: 1500, easing: quartOut }}
+            >
+                <div class="day-text">
+                    <h5 class="faded">{dayNames[day.getDay()]}</h5>
+                    <h3 
+                        class:faded={day.getDay() === 0 || day.getDay() === 6}
+                        class:current-day-color={dayKey(day) === dayKey(currentDate)}
+                    >
+                        {day.getDate()}
+                    </h3>
+                </div>
 
-                    <div>
-                        {#each {length: 10}}
-                            <div class="hour"></div>
+                <div class="hours">
+                    {#each { length: 9 }}
+                        <div class="hour"></div>
+                    {/each}
+                </div>
+
+                {#if tasksByDay[dayKey(day)]}
+                    <div class="dots">
+                        {#each tasksByDay[dayKey(day)] as task}
+                            {@render dueDot(task)}
                         {/each}
                     </div>
-
-                    {#if tasksByDay[dayKey(day)]} <!-- you now have the tasks for this day --> 
-                        <div style="position: absolute; width: 80%; left: 10%;"> 
-                            <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; overflow:"> 
-                                {#each tasksByDay[dayKey(day)] as task} 
-                                    {@render dueDot(task)} 
-                                {/each} 
-                            </div> 
-                        </div>
-                    {/if}
-                </div>
-            {/each}
-        </div>
-    {/each}
+                {/if}
+            </div>
+        {/each}
+    </div>
 </div>
 
 <style>
-    .dot {
-        margin: 0.05rem;
-        width: 0.3rem;
-        height: 0.3rem;
-        border-radius: 50%;
-        position: relative;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
     .container {
+        display: flex;    
+        flex-direction: column;
+        box-sizing: border-box;
         height: 100%;
         margin: 0.5rem;
         background-color: var(--primary-light);
@@ -155,36 +113,72 @@
         display: grid;
         grid-template-columns: repeat(7, 1fr);
         gap: 0.75rem;
-        margin: 0.5rem 1rem 1rem 1rem;
-        height: 100%;
+        margin: 0.5rem 1rem 1rem;
+        flex: 1;
+        min-height: 0;
     }
 
     .day {
-        display: grid;
-        grid-template-rows: repeat(10, 1fr);
-        gap: 0.25rem;
-        gap: 0rem;
-        height: 100%;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        min-height: 0;
     }
 
     .day-text {
         display: flex;
         flex-direction: column;
-        padding-bottom: 0.5rem;
         align-items: center;
+        padding-top: 1rem;
+        padding-bottom: 0.75rem;
     }
 
+    .current-day-color {
+        color: var(--highlight-color);
+    }
+
+    /* Hours container grows to fill available space */
+    .hours {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Each hour row grows equally, border-top gives the line */
     .hour {
+        flex: 1;
         border-top: 1px solid var(--border-color);
+        opacity: 0.5;
+    }
+
+    .hour:nth-child(even) {
+        border-top: 1px solid var(--border-color);
+        opacity: 0.2;
+    }
+
+    .dots {
+        position: absolute;
+        bottom: 0.25rem;
+        left: 10%;
+        width: 80%;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .dot {
+        width: 0.3rem;
+        height: 0.3rem;
+        border-radius: 50%;
+        margin: 0.05rem;
     }
 
     .current {
         background-color: var(--secondary-color);
         border-radius: 15px;
-        /* border: 1px solid var(--border-color); */
     }
 
     .faded {
-        color: rgb(112, 112, 112) !important;
+        color: rgb(112, 112, 112);
     }
 </style>
