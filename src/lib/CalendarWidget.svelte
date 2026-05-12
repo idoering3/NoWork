@@ -38,13 +38,13 @@
 
 
     const dayNames = [
-        "Su",
-        "Mo",
-        "Tu",
-        "We",
-        "Th",
-        "Fr",
-        "Sa"
+        "Sun",
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat"
     ];
 
 
@@ -75,8 +75,8 @@
 
         return [
             getWeekDays(start),
-            getWeekDays(new Date(start.getTime() + 7 * 24 * 60 * 60 * 1000)),
-            getWeekDays(new Date(start.getTime() + 14 * 24 * 60 * 60 * 1000)),
+            // getWeekDays(new Date(start.getTime() + 7 * 24 * 60 * 60 * 1000)),
+            // getWeekDays(new Date(start.getTime() + 14 * 24 * 60 * 60 * 1000)),
         ];
     });
 
@@ -87,32 +87,41 @@
     </span>
 {/snippet}
 
-<div class="container" transition:fly|global={{ y: 30, delay: 600, duration: 1500, easing: quartOut }}>
-    <h4 style="padding: 1rem;">
-        Calendar
-    </h4>
+<div class="container" in:fly|global={{ y: 30, delay: 600, duration: 1500, easing: quartOut }}>
+    <h5 style="padding: 1rem; color: var(--hover-primary-dark);">
+        This Week
+    </h5>
     {#each weeks as week, i}
         <div class="week">
             {#each week as day, j}
+            <!-- this is each day -->
                 <div 
                     class="day" class:current={dayKey(day) === dayKey(currentDate)}
-                    transition:fly|global={{ y: 7, delay: 600 + (j * (i + 1) * 50), duration: 1500, easing: quartOut }}
+                    in:fly|global={{ y: 7, delay: 1000 + (j * (i + 1) * 50), duration: 1500, easing: quartOut }}
                 >
-                    {#if i == 0}
-                        <p>{dayNames[day.getDay()]}</p>
-                    {/if}
-                    <p class="faded">{day.getDate()}</p>
+                    <div class="day-text">
+                        {#if i == 0}
+                            <h5 class="faded" style="padding-top: 1rem;">{dayNames[day.getDay()]}</h5>
+                        {/if}
+                        <h3 class:faded={day.getDate() === 1 || day.getDate() === 7}>{day.getDate()}</h3>
+                    </div>
+
+                    <!-- <hr style="margin-top: 1rem; border-color: var(--border-color); border-width: 0.5px; width: 100%;"/> -->
+
+                    <div>
+                        {#each {length: 10}}
+                            <div class="hour"></div>
+                        {/each}
+                    </div>
 
                     {#if tasksByDay[dayKey(day)]} <!-- you now have the tasks for this day --> 
-                        <div style="">
-                            <div style="position: absolute; width: 80%; left: 10%; bottom: 0.25rem;"> 
-                                <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; overflow:"> 
-                                    {#each tasksByDay[dayKey(day)] as task} 
-                                        {@render dueDot(task)} 
-                                    {/each} 
-                                </div> 
+                        <div style="position: absolute; width: 80%; left: 10%;"> 
+                            <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; overflow:"> 
+                                {#each tasksByDay[dayKey(day)] as task} 
+                                    {@render dueDot(task)} 
+                                {/each} 
                             </div> 
-                        </div> 
+                        </div>
                     {/if}
                 </div>
             {/each}
@@ -133,40 +142,49 @@
     }
 
     .container {
+        height: 100%;
         margin: 0.5rem;
-        display: flex;
-        flex-direction: column;
         background-color: var(--primary-light);
         border-radius: 15px;
         border: 1px solid var(--border-color);
+        padding-bottom: 1rem;
+        overflow: hidden;
     }
 
     .week {
-        display: flex;
-        justify-content: space-evenly;
-        align-items: center;
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 0.75rem;
+        margin: 0.5rem 1rem 1rem 1rem;
+        height: 100%;
     }
 
     .day {
-        position: relative;
-        display: flex;
-        padding-bottom: 0.5rem;
-        width: 2.5rem;
-        height: 3.25rem;
-        flex-direction: column;
-        align-items: baseline;
+        display: grid;
+        grid-template-rows: repeat(10, 1fr);
+        gap: 0.25rem;
         gap: 0rem;
+        height: 100%;
+    }
+
+    .day-text {
+        display: flex;
+        flex-direction: column;
+        padding-bottom: 0.5rem;
         align-items: center;
-        justify-content: center;
+    }
+
+    .hour {
+        border-top: 1px solid var(--border-color);
     }
 
     .current {
         background-color: var(--secondary-color);
         border-radius: 15px;
-        border: 1px solid var(--border-color);
+        /* border: 1px solid var(--border-color); */
     }
 
     .faded {
-        color: rgb(112, 112, 112);
+        color: rgb(112, 112, 112) !important;
     }
 </style>

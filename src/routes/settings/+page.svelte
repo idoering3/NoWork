@@ -7,11 +7,12 @@
     import { setColors, type Theme } from "$lib/theme";
     import { invoke } from "@tauri-apps/api/core";
     import { load } from "@tauri-apps/plugin-store";
-    import { theme, themes, username } from "$lib/stores.svelte";
+    import { selectedDateFormat, theme, themes, username } from "$lib/stores.svelte";
     import { onMount } from "svelte";
     import Textbox from "$lib/Textbox.svelte";
     import { fly } from "svelte/transition";
     import { quartOut } from "svelte/easing";
+    import { dateFormatOptions, dateFormats, type DateFormatName } from "$lib/misc/datePrints";
 
     async function resetDatabase() {
         await invoke('reset_database');
@@ -33,6 +34,11 @@
     let confirmDialog = $state();
     
     let selectedTheme: string = $derived("");
+    const themeOptions = Object.entries(themes).map(([key, theme]) => ({
+        value: key,
+        label: theme.name ?? key
+    }));
+    
      
     async function updateTheme(newThemeName: string) {
         if (newThemeName) {
@@ -43,9 +49,20 @@
         }
     }
 
+    async function updateDateFormat(newDateFormatFunctionName: DateFormatName) {
+        selectedDateFormat.name = newDateFormatFunctionName;
+        const store = await load(".settings.json");
+        await store.set("dateFormat", { value: newDateFormatFunctionName });
+        await store.save();
+    }
+
     $effect(() => {
         if (selectedTheme) {
             updateTheme(selectedTheme);
+        }
+
+        if (selectedDateFormat.name) {
+            updateDateFormat(selectedDateFormat.name);
         }
     });
 
@@ -61,6 +78,14 @@
                 selectedTheme = theme.theme.name;
             }
         }
+
+        const store = await load(".settings.json");
+
+        const dateFormat = await store.get<{ value: DateFormatName }>("dateFormat");
+
+        selectedDateFormat.name = dateFormat?.value ?? "dayOfWeekAndMonth";
+
+        console.log(selectedDateFormat.name);
     })
 
     $effect(() => {
@@ -85,12 +110,14 @@
             <div transition:fly={{ y: 30, delay: 150, duration: 1500, easing: quartOut}}>
                 <Card expanded>
                     <div style="padding: 1rem;">
-                        <h6>
+                        <h5>
                             Change Name
-                        </h6>
-                        <p>Change the homepage's display name!</p>
-                        <div style="border: 1px solid var(--border-color); border-radius: 15px;">
-                            <Textbox placeholders={["Enter your name"]} preamble={false} bind:value={username.name} />
+                        </h5>
+                        <div style="padding-top: 1rem;">
+                            <p>Change the homepage's display name!</p>
+                            <div style="border: 1px solid var(--border-color); border-radius: 15px;">
+                                <Textbox placeholders={["Enter your name"]} preamble={false} bind:value={username.name} />
+                            </div>
                         </div>
                     </div>
                 </Card>
@@ -98,33 +125,38 @@
             <div transition:fly={{ y: 30, delay: 150, duration: 1500, easing: quartOut}}>
                 <Card expanded>
                     <div style="padding: 1rem;">
-                        <h6>
+                        <h5>
                            Change Theme 
-                        </h6>
-                        <p>
-                            Choose between a preselected theme or make your own!
-                        </p>
-                        <Dropdown options={Object.keys(themes)} bind:selected={selectedTheme}/>
-                        <p>
-                            Theme colors
-                        </p>
-                        <div class='swatches'>
-                            <Swatch color={"var(--primary-light)"}/>
-                            <Swatch color={"var(--primary-dark)"}/>
-                            <Swatch color={"var(--hover-primary-dark)"}/>
-                            <Swatch color={"var(--primary-color)"}/>
-                            <Swatch color={"var(--secondary-color)"}/>
-                            <Swatch color={"var(--highlight-color)"}/>
-                            <Swatch color={"var(--border-color)"}/>
-                            <Swatch color={"var(--hover-color)"}/>
+                        </h5>
+                        <div style="padding-top: 1rem;">
+                            <p>
+                                Choose between a preselected theme or make your own!
+                            </p>
+                            <Dropdown
+                                options={themeOptions}
+                                bind:selected={selectedTheme}
+                            />
+                            <p>
+                                Theme colors
+                            </p>
+                            <div class='swatches'>
+                                <Swatch color={"var(--primary-light)"}/>
+                                <Swatch color={"var(--primary-dark)"}/>
+                                <Swatch color={"var(--hover-primary-dark)"}/>
+                                <Swatch color={"var(--primary-color)"}/>
+                                <Swatch color={"var(--secondary-color)"}/>
+                                <Swatch color={"var(--highlight-color)"}/>
+                                <Swatch color={"var(--border-color)"}/>
+                                <Swatch color={"var(--hover-color)"}/>
+                            </div>
                         </div>
                     </div>
                 </Card>
             </div>
         </div>
-        <div style="margin-top: 2rem;" transition:fly={{ y: 30, delay: 900, duration: 1500, easing: quartOut}}>
-            <Card expanded>
-                <div style="padding: 1rem;">
+        <div transition:fly={{ y: 30, delay: 900, duration: 1500, easing: quartOut}}>
+            <Card>
+                <div style="padding-top: 1rem;">
                     <div class='stretch'>
                         <AlertDialog 
                             bind:open={databaseConfirmDialogOpen}
@@ -132,9 +164,9 @@
                             title="Are you absolutely sure?"
                             message="This action cannot be undone. This will permanently delete both completed and incompleted tasks you've created, as well as any tags."
                         />
-                        <h6>
+                        <h5>
                             Reset Database
-                        </h6>
+                        </h5>
                         <p>
                             This removes <span class='red'>all</span> tasks, including completed and incompleted tasks as well as any created tags!
                         </p>
@@ -147,6 +179,18 @@
                 </div>
             </Card>
         </div>
+        <!-- homepage options -->
+         <Card>
+            <div style="padding: 1rem;">
+                <h5>Date Format</h5>
+                <div style="padding-top: 1rem;">
+                        <Dropdown
+                            options={dateFormatOptions}
+                            bind:selected={selectedDateFormat.name}
+                        />
+                </div>
+            </div>
+         </Card>
     </div>
 </div>
 

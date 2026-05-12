@@ -1,6 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import type { Theme } from "./theme";
 import type { Tag, TagColor } from "./types/task";
+import { dateFormats, type DateFormatName } from "./misc/datePrints";
 
 export let themes: Record<string, Theme> = {
     "Pink Light": {
@@ -109,3 +110,7 @@ export function dayKey(d: Date): string {
         const day = String(d.getDate()).padStart(2, "0");
         return `${y}-${m}-${day}`;
     }
+
+export const selectedDateFormat = $state({
+    name: "dayOfWeekAndMonth" as DateFormatName
+});

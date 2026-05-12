@@ -4,11 +4,28 @@
     import { onMount } from 'svelte';
     import { quartInOut } from 'svelte/easing';
 
-    let { options, selected=$bindable(""), dropDisabled = false} = $props();
+    type DropdownOption = {
+        label: string;
+        value: string;
+    }
+
+    let {
+        options,
+        selected = $bindable(""),
+        dropDisabled = false
+    }: {
+        options: DropdownOption[],
+        selected: string,
+        dropDisabled?: boolean
+    } = $props();
 
     let dropdownOpen = $state(false);
 
     let dropdownEl: HTMLElement;
+
+    let selectedLabel = $derived.by(() =>
+        options.find(o => o.value === selected)?.label ?? ""
+    );
 
     function handleClickOutside(event: MouseEvent) {
         if (dropdownEl && !dropdownEl.contains(event.target as Node)) {
@@ -16,9 +33,9 @@
         }
     }
 
-    function selectOption(text: string) 
+    function selectOption(option: DropdownOption) 
     {
-        selected = text;
+        selected = option.value;
         dropdownOpen = false;
     }
 
@@ -28,9 +45,9 @@
     });
 </script>
 
-{#snippet option(text: string)}
-    <button class="option" class:selected-bar={selected === text} onclick={() => selectOption(text)}>
-        {text}
+{#snippet optionSnippet(option: DropdownOption)}
+    <button class="option" class:selected-bar={selected === option.value} onclick={() => selectOption(option)}>
+        {option.label}
     </button>
 {/snippet}
 
@@ -40,7 +57,7 @@
             <div style="position:relative; display: flex; width:100%; align-items: center;">
                 {#if selected}
                     {#key selected}
-                        <span class="selected-ob" transition:fade|global={{ duration: 300, easing: quartInOut}}>{selected}</span>
+                        <span class="selected-ob" transition:fade|global={{ duration: 300, easing: quartInOut}}>{selectedLabel}</span>
                     {/key}
                 {/if}
                 <span class="right-align"><ChevronDown size={20} strokeWidth={1}/></span>
@@ -49,9 +66,9 @@
         {#if dropdownOpen && !dropDisabled}
             <div style='position:relative; display: flex; align-items: center; justify-content: center;'>
                 <div transition:fly={{y: -15, duration: 150, easing: quartInOut}} class="options">
-                    {#each options as thing}
-                        {#if thing}
-                            {@render option(thing)}
+                    {#each options as option}
+                        {#if option}
+                            {@render optionSnippet(option)}
                         {/if}
                     {/each}
                 </div>

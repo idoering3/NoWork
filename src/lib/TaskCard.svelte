@@ -147,7 +147,7 @@
     }
 </script>
 
-{#snippet tagsn(name: string, id: number, color: 'default' | 'outline' | 'danger' | 'blue')}
+{#snippet tagsn(name: string, id: number, color: 'default' | 'secondary' | 'outline' | 'danger' | 'blue' | 'green')}
     <Badge flavor={color} noPadding>
         {#if task.tags?.some(tag => tag.name === name)}
             <span style="padding-left: 0.5rem;">

@@ -81,7 +81,11 @@
                         onintrostart={() => dropdownAnimating = true}
                         onintroend={() => dropdownAnimating = false}
                     >
-                        <Dropdown dropDisabled={dropdownAnimating} options={["", ...Object.keys(studyTypes)]} bind:selected={selectedName}></Dropdown>
+                        <Dropdown
+                            dropDisabled={dropdownAnimating}
+                            options={Object.keys(studyTypes).map(key => ({ label: key, value: key }))}
+                            bind:selected={selectedName}
+                        />
                     </div>
                     <div class="side-by-side">
                         <div class="stack" 

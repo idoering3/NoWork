@@ -13,6 +13,11 @@
     src: url('/fonts/Inter/Inter-VariableFont_opsz,wght.ttf') format('truetype');
 }
 
+@font-face {
+    font-family: 'DM Sans';
+    src: url('/fonts/DM_Sans/DMSans-VariableFont_opszwght.ttf') format('truetype');
+}
+
 :root {
     --primary-light: #ffffff;
     --primary-dark: #383838;
@@ -68,7 +73,7 @@ h2 {
 }
 
 h3 {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
 }
 
 h4 {
@@ -76,13 +81,15 @@ h4 {
 }
 
 h5 {
-    font-size: 1.6rem;
-        font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+        font-family: 'DM Sans', sans-serif;
     font-weight: normal;
+    letter-spacing: 0.2rem;
+    text-transform: uppercase;
 }
 
 h6 {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     font-family: 'Inter', sans-serif;
     font-weight: normal;
 }
