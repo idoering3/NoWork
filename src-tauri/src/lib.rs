@@ -1,9 +1,12 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 mod commands;
-use crate::commands::database::init_db;
+mod calendar;
+use crate::{calendar::cal_credentials::init_keyring, commands::database::init_db};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    init_keyring();
+
     tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|_app, _args, _cwd| {
         // Write your code here...
@@ -36,7 +39,12 @@ pub fn run() {
             commands::tasks::get_task_by_id,
             commands::tasks::update_task_name_by_id,
             commands::tasks::update_task_due_date_by_id,
-            commands::tags::update_tag_color
+            commands::tags::update_tag_color,
+            calendar::authtest::test_auth,
+            calendar::cal_credentials::save_credentials,
+            calendar::cal_credentials::load_credentials,
+            calendar::cal_credentials::delete_credentials
+
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

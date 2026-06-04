@@ -13,6 +13,7 @@
     import { fly } from "svelte/transition";
     import { quartOut } from "svelte/easing";
     import { dateFormatOptions, dateFormats, type DateFormatName } from "$lib/misc/datePrints";
+    import NumberInput from "$lib/NumberInput.svelte";
 
     async function resetDatabase() {
         await invoke('reset_database');
@@ -32,6 +33,11 @@
 
     let databaseConfirmDialogOpen = $state(false);
     let confirmDialog = $state();
+    let calNumHours = $state(10);
+    let calStartTime = $state(7);
+    let loaded = $state(false);
+    let email = $state("yungro10@icloud.com");
+    let password = $state("kgoj-lvdb-kloo-pveq");
     
     let selectedTheme: string = $derived("");
     const themeOptions = Object.entries(themes).map(([key, theme]) => ({
@@ -83,9 +89,26 @@
 
         const dateFormat = await store.get<{ value: DateFormatName }>("dateFormat");
 
+        const calendarNumberHours = await store.get<{ value: number}>("calendarNumHours");
+        const calendarStartTime = await store.get<{ value: number}>("calendarStartTime");
+
+        if (calendarNumberHours?.value) {
+            calNumHours = calendarNumberHours.value;
+        } else {
+            calNumHours = 10;
+        }
+
+        if (calendarStartTime?.value) {
+            calStartTime = calendarStartTime.value;
+        } else {
+            calStartTime = 10;
+        }
+
         selectedDateFormat.name = dateFormat?.value ?? "dayOfWeekAndMonth";
 
-        console.log(selectedDateFormat.name);
+        await invoke("save_credentials", { email: email, password: password });
+
+        loaded = true;
     })
 
     $effect(() => {
@@ -97,6 +120,28 @@
     async function updateName(newName: string) {
         const store = await load(".settings.json");
         await store.set("username", { value: newName });
+        await store.save();
+    }
+
+    $effect(() => {
+        if (calNumHours && loaded) {
+            updateCalendarNumHours(calNumHours);
+        }
+
+        if (calStartTime && loaded) {
+            updateCalendarStartTime(calStartTime);
+        }
+    })
+
+    async function updateCalendarStartTime(startHour: number) {
+        const store = await load(".settings.json");
+        await store.set("calendarStartTime", { value: startHour });
+        await store.save();
+    }
+
+    async function updateCalendarNumHours(hours: number) {
+        const store = await load(".settings.json");
+        await store.set("calendarNumHours", { value: hours });
         await store.save();
     }
 
@@ -162,6 +207,31 @@
                                 <Dropdown
                                     options={dateFormatOptions}
                                     bind:selected={selectedDateFormat.name}
+                                />
+                        </div>
+                    </div>
+                </Card>
+            </div>
+            <div in:fly={{ y: 30, delay: 300, duration: 1500, easing: quartOut}}>
+                <Card>
+                    <div style="padding: 1rem;">
+                        <h5>Calendar</h5>
+                        <div style="padding-top: 1rem;">
+                            <p>Number of hours</p>
+                                <NumberInput
+                                    bind:num={calNumHours}
+                                    upperLimitNum={24}
+                                    lowerLimitNum={1}
+                                    increment={1}
+                                    label="hours"
+                                />
+                            <p>Starting hour</p>
+                                <NumberInput
+                                    bind:num={calStartTime}
+                                    upperLimitNum={14}
+                                    lowerLimitNum={0}
+                                    increment={0.25}
+                                    roundtoNearest={0.25}
                                 />
                         </div>
                     </div>

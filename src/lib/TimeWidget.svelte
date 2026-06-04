@@ -16,8 +16,6 @@
         startClock(date => currentDate = date);
         const store = await load(".settings.json");
         const value = await store.get<{ value: number }>("totalStudyTime");
-        console.log(value);
-
         if (value?.value) {
             minutesStudied = value.value;
         }

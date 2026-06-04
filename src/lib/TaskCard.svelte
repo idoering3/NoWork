@@ -4,14 +4,10 @@
     import { Plus, Trash, X } from "@lucide/svelte";
     import Button from "./Button.svelte";
     import Badge from "./Badge.svelte";
-    import { quartInOut, quartOut } from "svelte/easing";
-    import { onDestroy } from "svelte";
     import { getAllTags } from "./stores.svelte";
-    import { flip } from "svelte/animate";
     import Textbox from "./Textbox.svelte";
     import { invoke } from "@tauri-apps/api/core";
     import DatePicker from "./DatePicker.svelte";
-    import { fly } from "svelte/transition";
 
     interface Props {
         task: Task;
@@ -207,7 +203,6 @@
             {#if dueDate}
                 <div 
                     style="display: flex; gap: 0.5rem; align-items: center;"
-                    in:fly|global={{ duration: 300, y:7, easing: quartOut }}
                 >
                     {dueDate.toLocaleDateString()}
                     <Button class="square xsmall" Icon={X} flavor='outline' onclick={removeDate}/>
@@ -220,9 +215,7 @@
                 {#await getAllTags() then tags}
                     <div style="display: flex; justify-content:flex-start; gap: 0.5rem;">
                         {#each tags as tag (tag.name)}
-                            <div 
-                                animate:flip={{ duration: 300, easing: quartInOut }}
-                            >
+                            <div>
                                 <div>
                                     {@render tagsn(tag.name, tag.id, tag?.color)}
                                 </div>
@@ -232,7 +225,7 @@
                 {/await}
             {/key}
             {#if onDelete}
-                <div in:fly|global={{ duration: 300, y:7, easing: quartOut }}>
+                <div>
                     <Button onclick={deleted} Icon={Trash} flavor="outline" class="square small" />
                 </div>
             {/if}
