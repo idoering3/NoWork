@@ -212,31 +212,6 @@
                     </div>
                 </Card>
             </div>
-            <div in:fly={{ y: 30, delay: 300, duration: 1500, easing: quartOut}}>
-                <Card>
-                    <div style="padding: 1rem;">
-                        <h5>Calendar</h5>
-                        <div style="padding-top: 1rem;">
-                            <p>Number of hours</p>
-                                <NumberInput
-                                    bind:num={calNumHours}
-                                    upperLimitNum={24}
-                                    lowerLimitNum={1}
-                                    increment={1}
-                                    label="hours"
-                                />
-                            <p>Starting hour</p>
-                                <NumberInput
-                                    bind:num={calStartTime}
-                                    upperLimitNum={14}
-                                    lowerLimitNum={0}
-                                    increment={0.25}
-                                    roundtoNearest={0.25}
-                                />
-                        </div>
-                    </div>
-                </Card>
-            </div>
         </div>
         <div in:fly={{ y: 30, delay: 900, duration: 1500, easing: quartOut}}>
             <Card>

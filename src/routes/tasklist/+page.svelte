@@ -230,7 +230,7 @@
     <div class='sidebar'>
         <h5 
             style="padding: 1rem; display:flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--border-color); color: var(--highlight-color);"
-            in:fly|global={{ y: 30, delay: 150, duration: 1500, easing: quartOut}}
+            in:fly={{ y: 30, delay: 300, duration: 1500, easing: quartOut}}
         >
             Tasks
     </h5>
@@ -241,7 +241,8 @@
         </div>
         {#each tags as tag, i}
             <div style={tag.name === selectedTag?.name ? "" : ""} 
-                in:fly|global={{ y: 30, delay: 300 + (i + 1) * 50, duration: 1500, easing: quartOut}}
+                in:fly={{ y: 30, delay: 600 + (i + 1) * 300, duration: 1500, easing: quartOut}}
+                // out:fly={{ y: -15, duration: 300, easing: quartOut}}
             >
             <!-- The button for each tag -->
                 <Button flavor="ghost" onclick={async () => await selectTag(tag)}>
@@ -259,29 +260,27 @@
                 Task List
             </h1>
             <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                <h6 in:fly|global={{ x: -15, delay: 600, duration: 1500, easing: quartOut}}>
+                <h6 in:fly={{ x: -15, delay: 600, duration: 1500, easing: quartOut}}>
                     {tasks.filter(task => dueToday(task)).length} task{tasks.filter(task => dueToday(task)).length !== 1 ? "s" : ''} due today
                 </h6>
-                <h6 in:fly|global={{ x: -15, delay: 1200, duration: 1500, easing: quartOut}}>
+                <h6 in:fly={{ x: -15, delay: 1200, duration: 1500, easing: quartOut}}>
                     {completedTasks} total tasks completed
                 </h6>
             </div>
         </div>
         <div class='task-container' bind:this={taskContainer} in:fly|global={{ duration: 1500, delay:300, y:30, easing: quartOut }}>
-            <CustomScrollbar>
-                <div style="position: relative;">
-                    {#key selectedTag}
-                        <div style="display: flex; flex-direction: column; gap: 0.25rem;">
-                            {#each visibleTasks as task, i (task.id)}
-                            <!-- No effing clue why, but the animate and transitions MUST be separated. It breaks otherwise -->
-                                <div animate:flip|global={{ duration: 300, easing: quartInOut }}>
-                                    <div
-                                        in:fly|global={{ duration: 1000, y: 15, easing: quartOut, delay: runCollapse ? 150 + 75 * (i + 1) : 0 }}
-                                        out:fly|global={{ duration: 150, y: -15, easing: quartIn }}
-                                        onintroend={() => runCollapse ? runCollapse = false : ""}
-                                    >
-                                        <TaskCard {task} onComplete={completeTask} onDelete={deleteTask}/>
-                                    </div>
+            <div style="position: relative;">
+                {#key selectedTag}
+                    <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                        {#each visibleTasks as task, i (task.id)}
+                        <!-- No effing clue why, but the animate and transitions MUST be separated. It breaks otherwise -->
+                            <div animate:flip|global={{ duration: 300, easing: quartInOut }}>
+                                <div
+                                    in:fly|global={{ duration: 1000, y: 15, easing: quartOut, delay: runCollapse ? 150 + 75 * (i + 1) : 0 }}
+                                    out:fly|global={{ duration: 150, y: -15, easing: quartIn }}
+                                    onintroend={() => runCollapse ? runCollapse = false : ""}
+                                >
+                                    <TaskCard {task} onComplete={completeTask} onDelete={deleteTask}/>
                                 </div>
                             {/each}
                         </div>

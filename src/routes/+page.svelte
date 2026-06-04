@@ -105,42 +105,43 @@
 
 
 
-<div class="container">        <!-- username hello -->
-        <h5 in:fly={{ y: 30, delay: 50, duration: 1500, easing: quartOut}}
-            style="color: var(--hover-primary-dark);"
-        >
-            {dateFormatFunction(currentDate)}
-        </h5>
-        <h1 in:fly={{ y: 30, delay: 200, duration: 1500, easing: quartOut}}>Hello, {username.name}.</h1>
-        <h6 in:fly={{ y: 10, delay: 1200, duration: 2500, easing: quartOut}} style="font-style: italic;">{message}</h6>
-        <hr in:fly={{ y: 10, delay: 1600, duration: 2500, easing: quartOut}} style="margin-top: 3rem; margin-bottom: 3rem; border-color: var(--border-color); border-width: 0.5px;"/>
-        <div class="grid">
-            {#each items as item (item.id)}
-                {@const Component = registry[item.component]}
-    
-                <div
-                    class="widget"
-                    style="
-                        grid-column: {item.x + 1} / span {item.w};
-                        grid-row: {item.y + 1} / span {item.h};
-                    "
-                >
-                    {#if Component}
-                        <Component
-                            {sortedTasks}
-                            {tasksWithDueDates}
-                            {currentDate}
-                            {completeTask}
-                            {deleteTask}
-                        />
-                    {:else}
-                        <Card>
-                            <p>Component not found: {item.component}</p>
-                        </Card>
-                    {/if}
-                </div>
-            {/each}
-        </div>
+<div class="container">
+<!-- username hello -->
+    <h5 in:fly={{ y: 30, delay: 50, duration: 1500, easing: quartOut}}
+        style="color: var(--hover-primary-dark);"
+    >
+        {dateFormatFunction(currentDate)}
+    </h5>
+    <h1 in:fly={{ y: 30, delay: 200, duration: 1500, easing: quartOut}}>Hello, {username.name}.</h1>
+    <h6 in:fly={{ y: 10, delay: 1200, duration: 2500, easing: quartOut}} style="font-style: italic;">{message}</h6>
+    <hr in:fly={{ y: 10, delay: 1600, duration: 2500, easing: quartOut}} style="margin-top: 3rem; margin-bottom: 3rem; border-color: var(--border-color); border-width: 0.5px;"/>
+    <div class="grid">
+        {#each items as item (item.id)}
+            {@const Component = registry[item.component]}
+
+            <div
+                class="widget"
+                style="
+                    grid-column: {item.x + 1} / span {item.w};
+                    grid-row: {item.y + 1} / span {item.h};
+                "
+            >
+                {#if Component}
+                    <Component
+                        {sortedTasks}
+                        {tasksWithDueDates}
+                        {currentDate}
+                        {completeTask}
+                        {deleteTask}
+                    />
+                {:else}
+                    <Card>
+                        <p>Component not found: {item.component}</p>
+                    </Card>
+                {/if}
+            </div>
+        {/each}
+    </div>
 </div>
 
 <style>
