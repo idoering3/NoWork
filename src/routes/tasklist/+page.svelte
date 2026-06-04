@@ -15,6 +15,8 @@
     import { circInOut, quartIn, quartInOut, quartOut } from "svelte/easing";
     import { load, Store } from "@tauri-apps/plugin-store";
     import { flip } from "svelte/animate";
+    import { beforeNavigate } from "$app/navigation";
+    import CustomScrollbar from "$lib/misc/CustomScrollbar.svelte";
 
     let tasks: Task[] = $state([]);
     let show = $state(false);
@@ -27,7 +29,6 @@
         }
     }
 
-
     async function getAllTags() {
         tags = await invoke<Tag[]>('get_all_tags'); 
     }
@@ -35,17 +36,6 @@
     async function getIncompleteTasks() {
         tasks = await invoke('get_incomplete_tasks');
         completedTasks = await getCompletedTaskCount();
-    }
-
-    function sortTasksByDueDate(tasks: Task[]): Task[] {
-        return [...tasks].sort((a, b) => {
-            if (!a.dueDate && !b.dueDate) return 0; // both missing
-            if (!a.dueDate) return 1; // a goes last
-            if (!b.dueDate) return -1; // b goes last
-
-            // Compare dates
-            return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
-        });
     }
 
     let placeholders = [
@@ -174,7 +164,12 @@
         }
     });
 
+    let disableTransitions = $state(false);
+
     onMount (async () => {
+        beforeNavigate(() => {
+            disableTransitions = true;
+        });
         getIncompleteTasks();
         getAllTags();
         const store = await load(".settings.json");
@@ -190,6 +185,7 @@
             selectedTag = tag;
         }
         completedTasks = await getCompletedTaskCount();
+
     });
 
     let completedTasks = $state();
@@ -239,7 +235,7 @@
             Tasks
     </h5>
         <div style={selectedTag?.name === "all" ? "" : ""} 
-            in:fly={{ y: 30, delay: 600, duration: 1500, easing: quartOut}}
+            in:fly|global={{ y: 30, delay: 300, duration: 1500, easing: quartOut}}
         >
             <Button flavor="ghost" onclick={async () => await selectAllTasks()}><span style={filterMode === "all" ? "color:var(--highlight-color)" : ""}>all tasks</span></Button>
         </div>
@@ -248,7 +244,12 @@
                 in:fly={{ y: 30, delay: 600 + (i + 1) * 300, duration: 1500, easing: quartOut}}
                 // out:fly={{ y: -15, duration: 300, easing: quartOut}}
             >
-                <Button flavor="ghost" onclick={async () => await selectTag(tag)}><span style={tag.name === selectedTag?.name ? "color:var(--highlight-color)" : ""}>{tag?.name}</span></Button>
+            <!-- The button for each tag -->
+                <Button flavor="ghost" onclick={async () => await selectTag(tag)}>
+                    <span style={tag.name === selectedTag?.name ? "color:var(--highlight-color)" : ""}>
+                        {tag?.name}
+                    </span>
+                </Button>
             </div>
         {/each}
         <!-- <Button flavor="ghost" Icon={Plus}></Button> -->
@@ -281,11 +282,11 @@
                                 >
                                     <TaskCard {task} onComplete={completeTask} onDelete={deleteTask}/>
                                 </div>
-                            </div>
-                        {/each}
-                    </div>
-                {/key}
-            </div>
+                            {/each}
+                        </div>
+                    {/key}
+                </div>
+            </CustomScrollbar>
         </div>
         {#if show}
             <div class="task-bar" bind:this={taskBar} in:fly|global={{ duration: 1500, delay:600, y:30, easing: quartOut }}>

@@ -12,6 +12,8 @@
     import { getDayOfWeekAndTextStandardDateShort, dateFormats, type DateFormatName } from "$lib/misc/datePrints";
     import CalendarWidget from "$lib/CalendarWidget.svelte";
     import TimeWidget from "$lib/TimeWidget.svelte";
+    import type { CalendarEvent } from "$lib/cal/calendar";
+    import CustomScrollbar from "$lib/misc/CustomScrollbar.svelte";
 
     type WidgetType = "calendar" | "time";
 
@@ -41,8 +43,8 @@
     let dateFormatFunction = $state<(date: Date) => string>(
         getDayOfWeekAndTextStandardDateShort
     );
+
     onMount (async () => {
-        
         message = await invoke( 'greet' );
         
         const store = await load(".settings.json");
@@ -149,7 +151,7 @@
     .grid {
         display: grid;
         grid-template-columns: repeat(8, 1fr);
-        grid-auto-rows: 120px;
+        grid-auto-rows: 130px;
         gap: 2rem;
         margin-right: 3rem;
     }

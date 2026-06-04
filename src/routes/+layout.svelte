@@ -16,6 +16,7 @@
     import { invoke } from '@tauri-apps/api/core';
     import { hasDueDate } from '$lib/types/taskStore.svelte';
     import type { Task } from '$lib/types/task';
+    import CustomScrollbar from '$lib/misc/CustomScrollbar.svelte';
 
     let { children } = $props();
     
@@ -89,7 +90,9 @@
         <div class="main">
             {#key page.url.pathname}
                 <content in:fly={{ duration: 300, y: 150, easing: circInOut}} out:fade={{ duration: 150, easing: quartInOut}}>
-                    {@render children?.()}
+                    <CustomScrollbar>
+                        {@render children?.()}
+                    </CustomScrollbar>
                 </content>
             {/key}
         </div>
