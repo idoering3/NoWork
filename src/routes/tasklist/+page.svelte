@@ -269,23 +269,25 @@
             </div>
         </div>
         <div class='task-container' bind:this={taskContainer} in:fly|global={{ duration: 1500, delay:300, y:30, easing: quartOut }}>
-            <div style="position: relative;">
-                {#key selectedTag}
+            <CustomScrollbar>
+                <div style="position: relative;">
+                    {#key selectedTag}
                     <div style="display: flex; flex-direction: column; gap: 0.25rem;">
                         {#each visibleTasks as task, i (task.id)}
                         <!-- No effing clue why, but the animate and transitions MUST be separated. It breaks otherwise -->
-                            <div animate:flip|global={{ duration: 300, easing: quartInOut }}>
-                                <div
+                        <div animate:flip|global={{ duration: 300, easing: quartInOut }}>
+                            <div
                                     in:fly|global={{ duration: 1000, y: 15, easing: quartOut, delay: runCollapse ? 150 + 75 * (i + 1) : 0 }}
                                     out:fly|global={{ duration: 150, y: -15, easing: quartIn }}
                                     onintroend={() => runCollapse ? runCollapse = false : ""}
                                 >
                                     <TaskCard {task} onComplete={completeTask} onDelete={deleteTask}/>
                                 </div>
+                            </div>
                             {/each}
                         </div>
-                    {/key}
-                </div>
+                        {/key}
+                    </div>
             </CustomScrollbar>
         </div>
         {#if show}

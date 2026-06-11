@@ -153,90 +153,93 @@
     <div class='stretch'>
         <div class="column">
             <div in:fly={{ y: 30, delay: 300, duration: 1500, easing: quartOut}}>
-                <Card expanded>
-                    <div style="padding: 1rem;">
-                        <h5>
-                            Change Name
-                        </h5>
-                        <div style="padding-top: 1rem;">
-                            <p>Change the homepage's display name!</p>
-                            <div style="border: 1px solid var(--border-color); border-radius: 15px;">
-                                <Textbox placeholders={["Enter your name"]} preamble={false} bind:value={username.name} />
-                            </div>
-                        </div>
-                    </div>
-                </Card>
-            </div>
-            <div in:fly={{ y: 30, delay: 300, duration: 1500, easing: quartOut}}>
-                <Card expanded>
-                    <div style="padding: 1rem;">
-                        <h5>
-                           Change Theme 
-                        </h5>
-                        <div style="padding-top: 1rem;">
-                            <p>
-                                Choose between a preselected theme or make your own!
-                            </p>
-                            <Dropdown
-                                options={themeOptions}
-                                bind:selected={selectedTheme}
-                            />
-                            <p>
-                                Theme colors
-                            </p>
-                            <div class='swatches'>
-                                <Swatch color={"var(--primary-light)"}/>
-                                <Swatch color={"var(--primary-dark)"}/>
-                                <Swatch color={"var(--hover-primary-dark)"}/>
-                                <Swatch color={"var(--primary-color)"}/>
-                                <Swatch color={"var(--secondary-color)"}/>
-                                <Swatch color={"var(--highlight-color)"}/>
-                                <Swatch color={"var(--border-color)"}/>
-                                <Swatch color={"var(--hover-color)"}/>
-                            </div>
-                        </div>
-                    </div>
-                </Card>
-            </div>
-                    <!-- homepage options -->
-            <div in:fly={{ y: 30, delay: 300, duration: 1500, easing: quartOut}}>
-                <Card>
-                    <div style="padding: 1rem;">
-                        <h5>Date Format</h5>
-                        <div style="padding-top: 1rem;">
-                                <Dropdown
-                                    options={dateFormatOptions}
-                                    bind:selected={selectedDateFormat.name}
-                                />
-                        </div>
-                    </div>
-                </Card>
-            </div>
-        </div>
-        <div in:fly={{ y: 30, delay: 900, duration: 1500, easing: quartOut}}>
-            <Card>
-                <div style="padding-top: 1rem;">
-                    <div class='stretch'>
-                        <AlertDialog 
-                            bind:open={databaseConfirmDialogOpen}
-                            bind:result={confirmDialog}
-                            title="Are you absolutely sure?"
-                            message="This action cannot be undone. This will permanently delete both completed and incompleted tasks you've created, as well as any tags."
-                        />
-                        <h5>
-                            Reset Database
-                        </h5>
-                        <p>
-                            This removes <span class='red'>all</span> tasks, including completed and incompleted tasks as well as any created tags!
-                        </p>
-                        <div class='reset-database'>
-                            <Button flavor="danger" class='rounded border' onclick={confirmResetDatabase}>
-                                Reset Database
-                            </Button>
+                <div style="padding: 1rem;">
+                    <h5>
+                        Change Name
+                    </h5>
+                    <div style="padding-top: 1rem;">
+                        <p>Change the homepage's display name!</p>
+                        <div style="border: 1px solid var(--border-color); border-radius: 15px;">
+                            <Textbox placeholders={["Enter your name"]} preamble={false} bind:value={username.name} />
                         </div>
                     </div>
                 </div>
-            </Card>
+            </div>
+            <div in:fly={{ y: 30, delay: 300, duration: 1500, easing: quartOut}}>
+                <div style="padding: 1rem;">
+                    <h5>
+                        Change Theme 
+                    </h5>
+                    <div style="padding-top: 1rem;">
+                        <p>
+                            Choose between a preselected theme or make your own!
+                        </p>
+                        <Dropdown
+                            options={themeOptions}
+                            bind:selected={selectedTheme}
+                        />
+                        <p>
+                            Theme colors
+                        </p>
+                        <div class='swatches'>
+                            <Swatch color={"var(--primary-light)"}/>
+                            <Swatch color={"var(--primary-dark)"}/>
+                            <Swatch color={"var(--hover-primary-dark)"}/>
+                            <Swatch color={"var(--primary-color)"}/>
+                            <Swatch color={"var(--secondary-color)"}/>
+                            <Swatch color={"var(--highlight-color)"}/>
+                            <Swatch color={"var(--border-color)"}/>
+                            <Swatch color={"var(--hover-color)"}/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                    <!-- homepage options -->
+            <div in:fly={{ y: 30, delay: 300, duration: 1500, easing: quartOut}}>
+                <div style="padding: 1rem;">
+                    <h5>Date Format</h5>
+                    <div style="padding-top: 1rem;">
+                            <Dropdown
+                                options={dateFormatOptions}
+                                bind:selected={selectedDateFormat.name}
+                            />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='column'>
+            <div style="padding: 1rem;">
+                <h5 style="padding-bottom: 1rem; ">Calendar Widget</h5>
+                <div style="border: 1px solid var(--border-color); border-radius: 15px; margin-bottom: 1rem;">
+                    <Textbox placeholders={["Email"]} preamble={false}></Textbox>
+                </div>
+                <div style="border: 1px solid var(--border-color); border-radius: 15px;">
+                    <Textbox placeholders={["App-specific password"]} preamble={false}></Textbox>
+                </div>
+            </div>
+        </div>
+        <div in:fly={{ y: 30, delay: 900, duration: 1500, easing: quartOut}}>
+            <div style="padding-top: 1rem;">
+                <div class='stretch'>
+                    <AlertDialog 
+                        bind:open={databaseConfirmDialogOpen}
+                        bind:result={confirmDialog}
+                        title="Are you absolutely sure?"
+                        message="This action cannot be undone. This will permanently delete both completed and incompleted tasks you've created, as well as any tags."
+                    />
+                    <h5>
+                        Reset Database
+                    </h5>
+                    <p>
+                        This removes <span class='red'>all</span> tasks, including completed and incompleted tasks as well as any created tags!
+                    </p>
+                    <div class='reset-database'>
+                        <Button flavor="danger" class='rounded border' onclick={confirmResetDatabase}>
+                            Reset Database
+                        </Button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
