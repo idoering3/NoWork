@@ -1,9 +1,6 @@
 <script>
     import Button from "./Button.svelte";
     import { page } from "$app/state";
-    import { slide } from "svelte/transition";
-    import { quartInOut } from "svelte/easing";
-    import { getContext } from "svelte";
 
     let { children = null, href, name = 'test', ...props} = $props();
 

@@ -1,6 +1,6 @@
 <script lang='ts'>
     import { ChevronDown } from '@lucide/svelte';
-    import { fade, fly, slide } from 'svelte/transition';
+    import { fade, fly } from 'svelte/transition';
     import { onMount } from 'svelte';
     import { quartInOut } from 'svelte/easing';
 

@@ -13,14 +13,11 @@
   let isVisible: boolean = false;
   let hideTimeout: ReturnType<typeof setTimeout>;
 
-  // --- Calculations ---
-
   function updateThumb(): void {
-    if (!container) return;
+    if (!container || !track) return;
     const { scrollTop, scrollHeight, clientHeight } = container;
     const ratio = clientHeight / scrollHeight;
 
-    // Hide scrollbar if content fits
     isVisible = ratio < 1;
     if (!isVisible) return;
 
@@ -29,8 +26,6 @@
     thumbTop = (scrollTop / (scrollHeight - clientHeight)) * maxThumbTop;
   }
 
-  // --- Scroll event ---
-
   function onScroll(): void {
     updateThumb();
     showScrollbar();
@@ -38,13 +33,8 @@
 
   function showScrollbar(): void {
     clearTimeout(hideTimeout);
-    // Re-trigger CSS visibility (handled via class binding)
-    hideTimeout = setTimeout(() => {
-      // Fade handled by CSS transition on opacity
-    }, 1200);
+    hideTimeout = setTimeout(() => {}, 1200);
   }
-
-  // --- Thumb dragging ---
 
   function onThumbMousedown(e: MouseEvent): void {
     e.preventDefault();
@@ -71,8 +61,6 @@
     window.removeEventListener('mouseup', onMouseUp);
   }
 
-  // --- Track click (jump to position) ---
-
   function onTrackClick(e: MouseEvent): void {
     if (e.target === thumb) return;
     const trackRect = track.getBoundingClientRect();
@@ -81,8 +69,6 @@
     container.scrollTop = Math.max(0, Math.min(1, clickRatio)) * (scrollHeight - clientHeight);
   }
 
-  // --- ResizeObserver ---
-
   let resizeObserver: ResizeObserver;
 
   onMount(() => {
@@ -90,7 +76,6 @@
 
     resizeObserver = new ResizeObserver(updateThumb);
     resizeObserver.observe(container);
-    // Also watch content size changes
     if (container.firstElementChild) {
       resizeObserver.observe(container.firstElementChild);
     }
@@ -105,7 +90,6 @@
 </script>
 
 <div class="scroll-wrapper">
-  <!-- Scrollable content area -->
   <div
     class="scroll-content"
     bind:this={container}
@@ -114,27 +98,26 @@
     <slot />
   </div>
 
-  <!-- Custom scrollbar -->
-  {#if isVisible}
+  <!-- Always rendered so `track` binding is always available -->
+  <div
+    class="scrollbar-track"
+    class:hidden={!isVisible}
+    bind:this={track}
+    on:mousedown={onTrackClick}
+    role="scrollbar"
+    aria-controls="scroll-content"
+    aria-valuenow={thumbTop}
+    tabindex="-1"
+  >
     <div
-      class="scrollbar-track"
-      bind:this={track}
-      on:mousedown={onTrackClick}
-      role="scrollbar"
-      aria-controls="scroll-content"
-      aria-valuenow={thumbTop}
-      tabindex="-1"
-    >
-      <div
-        class="scrollbar-thumb"
-        bind:this={thumb}
-        class:dragging={isDragging}
-        style="height: {thumbHeight}px; transform: translateY({thumbTop}px);"
-        on:mousedown={onThumbMousedown}
-        role="presentation"
-      ></div>
-    </div>
-  {/if}
+      class="scrollbar-thumb"
+      bind:this={thumb}
+      class:dragging={isDragging}
+      style="height: {thumbHeight}px; transform: translateY({thumbTop}px);"
+      on:mousedown={onThumbMousedown}
+      role="presentation"
+    ></div>
+  </div>
 </div>
 
 <style>
@@ -146,19 +129,17 @@
     width: 100%;
   }
 
-  /* Hide the native scrollbar */
   .scroll-content {
     flex: 1;
     overflow-y: scroll;
     overflow-x: hidden;
-    scrollbar-width: none; /* Firefox */
+    scrollbar-width: none;
   }
 
   .scroll-content::-webkit-scrollbar {
-    display: none; /* WebView / Chrome */
+    display: none;
   }
 
-  /* --- Scrollbar track --- */
   .scrollbar-track {
     position: relative;
     width: 6px;
@@ -167,15 +148,19 @@
     border-radius: 999px;
     background: transparent;
     cursor: pointer;
-    transition: width 0.15s ease, background 0.15s ease;
+    transition: width 0.15s ease, background 0.15s ease, opacity 0.15s ease;
   }
 
-  .scroll-wrapper:hover .scrollbar-track {
+  .scrollbar-track.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .scroll-wrapper:hover .scrollbar-track:not(.hidden) {
     width: 8px;
     background: var(--primary-color);
   }
 
-  /* --- Scrollbar thumb --- */
   .scrollbar-thumb {
     position: absolute;
     top: 0;
@@ -197,6 +182,6 @@
   .scrollbar-thumb.dragging {
     background: var(--highlight-color);
     cursor: grabbing;
-    transition: background 0.1s ease; /* skip transform transition while dragging */
+    transition: background 0.1s ease;
   }
 </style>

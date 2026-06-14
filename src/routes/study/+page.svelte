@@ -1,6 +1,5 @@
 <script lang='ts'>
     import Button from '$lib/Button.svelte';
-    import Card from '$lib/Card.svelte';
     import Dropdown from '$lib/Dropdown.svelte';
     import NumberInput from '$lib/NumberInput.svelte';
     import Countdown from '$lib/Countdown.svelte';
@@ -8,7 +7,7 @@
     import { timerStore } from '$lib/types/timerStore.svelte';
     import { quartInOut, quartOut } from 'svelte/easing';
     import { fly } from 'svelte/transition';
-    import { flip } from 'svelte/animate';
+
     
     let studyTypes: Record<string, StudyType> = {
         "Pomodoro": {name: "Pomodoro", studyTime: 25, breakTime: 5},

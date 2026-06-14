@@ -1,5 +1,5 @@
 <script lang='ts'>
-	import { fade, fly, slide } from "svelte/transition";
+	import { fly, slide } from "svelte/transition";
 	import { quartInOut, quartOut } from "svelte/easing";
 	import { onMount } from "svelte";
 	import { invoke } from "@tauri-apps/api/core";

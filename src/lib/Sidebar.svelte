@@ -1,10 +1,9 @@
 <script lang="ts">
-    import { Blocks, Clock, House, Info, ListTodo, Menu, Settings } from "@lucide/svelte";
+    import { Clock, House, Info, ListTodo, Settings } from "@lucide/svelte";
     import { onMount, setContext, type Component } from "svelte";
     import SidebarButton from "./SidebarButton.svelte";
     import { page } from "$app/state";
-    import { fly, slide } from "svelte/transition";
-    import { expoIn, expoInOut, expoOut, quadInOut, quartInOut } from "svelte/easing";
+    import { expoInOut } from "svelte/easing";
 
     let sidebarExpanded = $state({ state: false });
     setContext('sidebarExpanded', sidebarExpanded);

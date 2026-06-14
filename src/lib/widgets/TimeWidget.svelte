@@ -1,7 +1,7 @@
 <script lang='ts'>
     import { onMount, type Component } from "svelte";
-    import { getSimpleTimeOfDay } from "./misc/timeofday";
-    import { startClock } from "./stores.svelte";
+    import { getSimpleTimeOfDay } from "../misc/timeofday";
+    import { startClock } from "../stores.svelte";
     import { fly } from "svelte/transition";
     import { quartOut } from "svelte/easing";
     import { MoonStar, Sun, Sunrise, Sunset, type IconProps } from "@lucide/svelte";

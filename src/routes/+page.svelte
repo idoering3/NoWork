@@ -4,16 +4,15 @@
     import { invoke } from "@tauri-apps/api/core";
     import { load } from '@tauri-apps/plugin-store';
     import { onMount } from "svelte";
-    import { quadInOut, quartIn, quartOut, sineInOut } from "svelte/easing";
+    import { quartOut } from "svelte/easing";
     import { fly } from "svelte/transition";
     import type { Task } from "$lib/types/task";
     import { getSimpleTimeOfDay } from "$lib/misc/timeofday";
     import { hasDueDate } from "$lib/types/taskStore.svelte";
     import { getDayOfWeekAndTextStandardDateShort, dateFormats, type DateFormatName } from "$lib/misc/datePrints";
-    import CalendarWidget from "$lib/CalendarWidget.svelte";
-    import TimeWidget from "$lib/TimeWidget.svelte";
+    import CalendarWidget from "$lib/widgets/CalendarWidget.svelte";
+    import TimeWidget from "$lib/widgets/TimeWidget.svelte";
     import type { CalendarEvent } from "$lib/cal/calendar";
-    import CustomScrollbar from "$lib/misc/CustomScrollbar.svelte";
 
     type WidgetType = "calendar" | "time";
 
@@ -44,6 +43,15 @@
         getDayOfWeekAndTextStandardDateShort
     );
 
+    type Location = {
+        city: string;
+        region: string;
+        country: string;
+    }
+
+    let location: Location | undefined = $state();
+    let timeOfDay = $state();
+
     onMount (async () => {
         message = await invoke( 'greet' );
         
@@ -64,11 +72,14 @@
             await store.save();
         }
 
+        location = await getLocation();
         await refreshTasks();
 
-        startClock(date => currentDate = date);
-
         timeOfDay = await getSimpleTimeOfDay(new Date());
+    });
+
+    onMount(() => {
+        return startClock(date => currentDate = date);
     });
 
     async function completeTask (taskId: number) {
@@ -100,20 +111,55 @@
         (tasks ?? []).filter(hasDueDate)
     );
 
-    let timeOfDay = $state("");
+
+
+    export async function getLocation(): Promise<Location> {
+        const res = await fetch("https://ipapi.co/json/");
+        const data = await res.json();
+
+        console.log(data);
+
+        return {
+            city: data.city,
+            region: data.region,
+            country: data.country
+        };
+    }
 </script>
 
 
 
 <div class="container">
-<!-- username hello -->
-    <h5 in:fly={{ y: 30, delay: 50, duration: 1500, easing: quartOut}}
-        style="color: var(--hover-primary-dark);"
-    >
-        {dateFormatFunction(currentDate)}
-    </h5>
-    <h1 in:fly={{ y: 30, delay: 200, duration: 1500, easing: quartOut}}>Hello, {username.name}.</h1>
-    <h6 in:fly={{ y: 10, delay: 1200, duration: 2500, easing: quartOut}} style="font-style: italic;">{message}</h6>
+    <!-- username hello -->
+    <div style="display: flex; justify-content: space-between">
+        <!-- left side -->
+        <div>
+            <h5 in:fly={{ y: 30, delay: 50, duration: 1500, easing: quartOut}}
+                style="color: var(--hover-primary-dark);"
+            >
+                {dateFormatFunction(currentDate)}
+            </h5>
+            <h1 in:fly={{ y: 30, delay: 200, duration: 1500, easing: quartOut}}>Hello, {username.name}.</h1>
+            <h6 in:fly={{ y: 10, delay: 1200, duration: 2500, easing: quartOut}} style="font-style: italic;">{message}</h6>    
+
+        </div>
+        <!-- right side -->
+        <div style="display: flex; justify-content: flex-end; flex-direction: column; align-items: end;">
+            <h1 
+                in:fly={{ y: 15, delay: 600, duration: 1500, easing: quartOut}}    
+            >
+                {currentDate.getHours().toString().padStart(2, "0")}:{currentDate.getMinutes().toString().padStart(2, "0")} 
+            </h1>
+            <p style="color: var(--hover-primary-dark);">
+                {#if location}
+                    {location.city}, {location.region}
+                {:else}
+                    Getting location...
+                {/if}
+            </p>
+        </div>
+    </div>
+
     <hr in:fly={{ y: 10, delay: 1600, duration: 2500, easing: quartOut}} style="margin-top: 3rem; margin-bottom: 3rem; border-color: var(--border-color); border-width: 0.5px;"/>
     <div class="grid">
         {#each items as item (item.id)}

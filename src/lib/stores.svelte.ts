@@ -1,7 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import type { Theme } from "./theme";
 import type { Tag, TagColor } from "./types/task";
-import { dateFormats, type DateFormatName } from "./misc/datePrints";
+import type { DateFormatName } from "./misc/datePrints";
 
 export let themes: Record<string, Theme> = {
     "Pink Light": {
@@ -91,13 +91,12 @@ export const flavorMap = {
 
 
 export function startClock(update: (date: Date) => void) {
-  function tick() {
-    const now = new Date();
-    update(now);
-  }
-
-  tick(); // run immediately
-  setInterval(tick, 1000);
+    function tick() {
+        update(new Date());
+    }
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
 }
 
 export async function getAllTags() {

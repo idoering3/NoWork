@@ -2,7 +2,6 @@
     import { ChevronDown, ChevronUp } from "@lucide/svelte";
     import Button from "./Button.svelte";
     import { onMount } from "svelte";
-    import { fade } from "svelte/transition";
     
     let {
         num = $bindable(120),

@@ -18,9 +18,10 @@ pub struct CalendarEvent {
 }
 
 #[tauri::command]
-pub async fn test_auth() -> Result<Vec<CalendarEvent>, String> {
-    const email: &str = "yungro10@icloud.com";
-    const pass: &str = "kgoj-lvdb-kloo-pveq";
+pub async fn test_auth(email: &str) -> Result<Vec<CalendarEvent>, String> {
+    
+    // load credentials
+    let pass = load_credentials(email)?;
 
     println!("testing auth");
     // this gets caldav user root identity, required for the actual url
@@ -32,7 +33,7 @@ pub async fn test_auth() -> Result<Vec<CalendarEvent>, String> {
         .request(method.clone(), "https://caldav.icloud.com/.well-known/caldav")
         .basic_auth(
             email,
-            Some(pass),
+            Some(pass.clone()),
         )
         .header("Depth", "0")
         .body(
@@ -58,7 +59,6 @@ pub async fn test_auth() -> Result<Vec<CalendarEvent>, String> {
     // more testing of the url we received
     let url = format!("https://caldav.icloud.com{}", href);
 
-
     let body = r#"<?xml version="1.0" encoding="utf-8" ?>
         <propfind xmlns="DAV:">
         <prop>
@@ -69,7 +69,7 @@ pub async fn test_auth() -> Result<Vec<CalendarEvent>, String> {
     let response2 = client.request(method.clone(), url)
         .basic_auth(
                 email,
-                Some(pass),
+                Some(pass.clone()),
             ).header("Depth", "0").body(body).send().await.map_err(|e| e.to_string())?;
 
 
@@ -105,7 +105,7 @@ pub async fn test_auth() -> Result<Vec<CalendarEvent>, String> {
     let response3 = client.request(method.clone(), url)
         .basic_auth(
                 email,
-                Some(pass),
+                Some(pass.clone()),
             ).header("Depth", "1").body(body).send().await.map_err(|e| e.to_string())?;
     
     let text = response3.text().await.map_err(|e| e.to_string())?;
@@ -188,7 +188,7 @@ fn parse_events(calendar_data: &str) -> Vec<CalendarEvent> {
 
                     let now = chrono::Utc::now();
                     let start_of_week = (now - chrono::Duration::days(
-                        now.weekday().num_days_from_monday() as i64
+                        now.weekday().num_days_from_sunday() as i64
                     )).date_naive().and_hms_opt(0, 0, 0).unwrap().and_utc();
                     let end_of_week = start_of_week + chrono::Duration::days(7);
                     let start_of_week = start_of_week.with_timezone(&Tz::UTC);
@@ -257,6 +257,8 @@ fn normalize_ical_dt(s: &str) -> Option<String> {
 }
 
 use futures::future::join_all;
+
+use crate::calendar::cal_credentials::load_credentials;
 
 pub async fn fetch_all_calendars(
     client: &Client,

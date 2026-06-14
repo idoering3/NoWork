@@ -1,10 +1,10 @@
 <script lang='ts'>
-    import { fly, slide } from "svelte/transition";
+    import { fly } from "svelte/transition";
     import Button from "./Button.svelte";
     import Calendar from "@lucide/svelte/icons/calendar";
     import { onMount } from "svelte";
     import { ChevronLeft, ChevronRight } from "@lucide/svelte";
-    import { quartInOut, quartOut } from "svelte/easing";
+    import { quartOut } from "svelte/easing";
 
     let dropdownOpen = $state(false);
 

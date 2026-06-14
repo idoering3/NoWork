@@ -1,7 +1,9 @@
 <script lang='ts'>
-    import { onMount } from "svelte";
-    import type { CalendarEvent } from "./calendar";
+    import { Clock } from "@lucide/svelte";
+import type { CalendarEvent } from "./calendar";
     import { stringToDate } from "./dateCalculations";
+  import { quartOut } from "svelte/easing";
+  import { fly } from "svelte/transition";
 
     
     interface Props {
@@ -55,45 +57,76 @@
     let duration    = $derived(getEventDuration(calEvent));
     let startOffset = $derived(getEventStartTime(calEvent, startingHour));
     let pixelsPerHour = $derived(height / numHours);
-    let eventTop = $derived(startOffset * pixelsPerHour)
-    let eventHeight = $derived(pixelsPerHour * duration)
+    let eventTop = $derived(startOffset * pixelsPerHour);
+    let eventHeight = $derived(pixelsPerHour * duration);
 
 
 
     // if any of these conditions is false, we hide the event
     let visible = $derived(
         duration > 0 &&
-        startOffset >= 0 &&
-        startOffset + duration <= numHours
+        startOffset >= 0
+        // startOffset + duration <= numHours
         );
+
+    let isCompact = $derived( eventHeight < 36);
+
+    let nameFontSize = $derived(
+        isCompact
+            ? `${Math.min(12.8, Math.max(9, eventHeight * 0.55))}px`
+            : "0.8rem"
+    );
+
+    let padding = $state(2);
 </script>
 
 {#if visible}
-    <div class="card" style="width: {width}px; height: {eventHeight}px; top: {eventTop}px;">
+    <div
+        class="card" 
+        style="
+            width: {width - padding }px; 
+            height: {eventHeight - padding}px; 
+            top: {eventTop + padding / 2}px;
+            left: {padding / 2}px; 
+            border-radius:{isCompact ? '4px' : '5px'}">
         <div class="bar"></div>
-        <div class="inner">
-            <p class="xs" style="color: rgb(112, 112, 112);">
-                {
-                new Intl.DateTimeFormat("en-GB", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: false,
-                    }).format(stringToDate(calEvent.start))
-                }
-            </p>
-            <p class='xs' style="color: var(--primary-dark);">
+        <div class="inner {isCompact ? 'centered' : ''}">
+            <p class='xs' style="color: var(--primary-dark); font-size: {nameFontSize}">
                 {calEvent.summary}
             </p>
+            {#if !isCompact}
+                <div style="color: rgb(112, 112, 112); display: flex; gap: 0.2rem; align-items: center;">
+                    <Clock size={12} />
+                    <p class="xs" style="color: rgb(112, 112, 112);">
+                        {
+                        new Intl.DateTimeFormat("en-GB", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: false,
+                            }).format(stringToDate(calEvent.start))
+                        } -
+                        {
+                        new Intl.DateTimeFormat("en-GB", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: false,
+                            }).format(stringToDate(calEvent.end))
+                        }
+                    </p>
+                </div>
+            {/if}
         </div>
     </div>
 {/if}
 
 <style>
-
+    .centered {
+        display: flex;
+        align-items: center;
+    }
     .inner {
         padding: 0.3rem;
-        opacity: 0.7;
-        background-color: var(--primary-color);
+        background-color: color-mix(in srgb, var(--primary-color) 50%, transparent);
         width: 100%;
     }
     .xs {
@@ -107,7 +140,6 @@
         position:absolute;
         box-sizing: border-box;
         border: 1px solid var(--border-color);
-        border-radius: 7px;
         margin: 0;
         padding: 0;
         overflow: hidden;
@@ -116,9 +148,11 @@
     }
 
     .bar {
-        flex-shrink: 0;
-        flex-grow: 0;
+        /* flex-shrink: 0; */
+        /* flex-grow: 0; */
         width: 4px;
+        margin: 0.2rem 0rem 0.2rem 0.2rem;
+        border-radius: 15px;
         background: var(--border-color);
     }
 </style>

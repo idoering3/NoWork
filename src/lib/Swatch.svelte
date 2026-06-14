@@ -1,7 +1,7 @@
 <script lang='ts'>
     import { onMount } from "svelte";
     import Card from "./Card.svelte";
-    import { fly, slide } from "svelte/transition";
+    import { fly } from "svelte/transition";
     import { quartInOut } from "svelte/easing";
     import Textbox from "./Textbox.svelte";
 

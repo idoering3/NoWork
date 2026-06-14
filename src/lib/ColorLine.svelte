@@ -1,7 +1,4 @@
 <script lang='ts'>
-    import type { Snippet } from "svelte";
-    import { quartInOut } from "svelte/easing";
-    import { scale } from "svelte/transition";
     import { flavorMap } from "./stores.svelte";
 
     interface Props {

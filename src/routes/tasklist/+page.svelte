@@ -8,12 +8,12 @@
     import Button from "$lib/Button.svelte";
     import ArrowUp from "@lucide/svelte/icons/arrow-up";
     import TagSelector from "$lib/TagSelector.svelte";
-    import { ArrowDownUp, Network, Plus, Search, X } from "@lucide/svelte";
-    import { onDestroy, onMount, tick } from "svelte";
+    import { X } from "@lucide/svelte";
+    import { onDestroy, onMount } from "svelte";
     import Datepicker from "$lib/DatePicker.svelte";
-    import { fade, fly, scale, slide } from "svelte/transition";
-    import { circInOut, quartIn, quartInOut, quartOut } from "svelte/easing";
-    import { load, Store } from "@tauri-apps/plugin-store";
+    import { fly } from "svelte/transition";
+    import { quartIn, quartInOut, quartOut } from "svelte/easing";
+    import { load } from "@tauri-apps/plugin-store";
     import { flip } from "svelte/animate";
     import { beforeNavigate } from "$app/navigation";
     import CustomScrollbar from "$lib/misc/CustomScrollbar.svelte";
