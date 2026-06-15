@@ -1,6 +1,6 @@
 use std::io::BufReader;
 
-use chrono::{Datelike, Duration};
+use chrono::{Datelike, Duration, TimeZone};
 use ical::{IcalParser, property::Property};
 use reqwest::{Client, Method};
 use roxmltree::Document;
@@ -207,9 +207,8 @@ fn parse_events(calendar_data: &str) -> Vec<CalendarEvent> {
                     }
                 }
                 _ => {
-                    // Normalize to RFC3339 for consistency with the recurring branch
-                    let start_norm = normalize_ical_dt(&start).unwrap_or(start);
-                    let end_norm   = normalize_ical_dt(&end).unwrap_or(end);
+                    let start_norm = normalize_ical_dt(props, "DTSTART").unwrap_or(start);
+                    let end_norm   = normalize_ical_dt(props, "DTEND").unwrap_or(end);
                     events.push(CalendarEvent {
                         summary, start: start_norm, end: end_norm, uid, description, location,
                     });
@@ -245,16 +244,32 @@ fn event_duration(start: &str, end: &str) -> Option<Duration> {
     Some(e.signed_duration_since(s))
 }
 
-fn normalize_ical_dt(s: &str) -> Option<String> {
-    if s.len() == 8 && s.chars().all(|c| c.is_ascii_digit()) {
-        return Some(format!("{}-{}-{}", &s[0..4], &s[4..6], &s[6..8]));
+fn normalize_ical_dt(props: &[Property], name: &str) -> Option<String> {
+    let prop = props.iter().find(|p| p.name == name)?;
+    let value = prop.value.as_deref()?;
+    
+    // Check for TZID parameter
+    let tzid = prop.params.as_ref()
+        .and_then(|ps| ps.iter().find(|(k, _)| k == "TZID"))
+        .and_then(|(_, vs)| vs.first())
+        .map(|s| s.as_str());
+
+    if let Some(tz_name) = tzid {
+        // Parse with timezone
+        let tz: chrono_tz::Tz = tz_name.parse().ok()?;
+        let naive = chrono::NaiveDateTime::parse_from_str(value, "%Y%m%dT%H%M%S").ok()?;
+        let dt = tz.from_local_datetime(&naive).single()?;
+        Some(dt.to_rfc3339())
+    } else {
+        // No TZID — trailing Z means UTC, no Z is ambiguous but treat as UTC
+        let naive = chrono::NaiveDateTime::parse_from_str(
+            value.trim_end_matches('Z'), "%Y%m%dT%H%M%S"
+        ).ok()?;
+        Some(chrono::DateTime::<chrono::Utc>::from_naive_utc_and_offset(naive, chrono::Utc)
+            .to_rfc3339())
     }
-    let naive = chrono::NaiveDateTime::parse_from_str(
-        s.trim_end_matches('Z'), "%Y%m%dT%H%M%S"
-    ).ok()?;
-    Some(chrono::DateTime::<chrono::Utc>::from_naive_utc_and_offset(naive, chrono::Utc)
-        .to_rfc3339())
 }
+
 
 use futures::future::join_all;
 

@@ -35,15 +35,53 @@
 
     let days = $derived(getWeekDays(currentDate));
 
+    type CachedCalendarEvents = {
+        eventsList: CalendarEvent[];
+        lastUpdated: number;
+    }
+
     onMount(async () => {
         const store = await load(".settings.json");
-        const emailName = await store.get<{ value: string }>("email");
-        if (emailName?.value) {
-            let email = emailName.value;
-            events = await invoke("test_auth", {email: email});
+        
+        // get the cached events
+        let calEvents = await store.get<{ value: CachedCalendarEvents }>('calendarEvents');
+        
+        
+        if (calEvents?.value) {
+            let cachedEvents = calEvents.value;
+            
+            // check if the data is stale
+            const age = Date.now() - cachedEvents.lastUpdated;
+            // compare against 5 min
+            if (age > 60000 * 5) {
+                console.log("Date is stale");
+                
+                // we need to go to the api to get calendar events
+                const emailName = await store.get<{ value: string }>("email");
+                if (emailName?.value) {
+                    let email = emailName.value;
+                    events = await invoke("test_auth", {email: email});
+                    // make sure to update cachedEvents lastmodified to the current time
+                    if (events) {
+                        cachedEvents = {
+                            eventsList: events,
+                            lastUpdated: Date.now()
+                        }
+                    }
+
+                    await store.set('calendarEvents', { value: cachedEvents});
+                }
+            } else {
+                // else the cached events are ok
+                events = cachedEvents.eventsList;
+                console.log(cachedEvents);
+            }
         }
     });
-
+    
+    $effect(() => {
+        $inspect(events);
+    });
     const eventsByDay = $derived.by(() => {
         const grouped: Record<string, CalendarEvent[]> = {};
 
@@ -119,14 +157,18 @@
                     <div style="position: absolute;">
                         {#if eventsByDay}
                             {#if eventsByDay[dayKey(day)]}
-                                {#each eventsByDay[dayKey(day)] as event}
-                                    <EventCard 
-                                        calEvent={event} 
-                                        {numHours} 
-                                        {startingHour} 
-                                        width={dayWidth} 
-                                        height={dayHeight}
-                                    />
+                                {#each eventsByDay[dayKey(day)] as event, i}
+                                    <div                             
+                                        in:fly|global={{ y: 15, delay: 1000 + 300 * i, duration: 1500, easing: quartOut}}    
+                                    >
+                                        <EventCard 
+                                            calEvent={event} 
+                                            {numHours} 
+                                            {startingHour} 
+                                            width={dayWidth} 
+                                            height={dayHeight}
+                                        />
+                                    </div>
                                 {/each}
                             {/if}
                         {/if}

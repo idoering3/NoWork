@@ -12,7 +12,6 @@
     import { getDayOfWeekAndTextStandardDateShort, dateFormats, type DateFormatName } from "$lib/misc/datePrints";
     import CalendarWidget from "$lib/widgets/CalendarWidget.svelte";
     import TimeWidget from "$lib/widgets/TimeWidget.svelte";
-    import type { CalendarEvent } from "$lib/cal/calendar";
 
     type WidgetType = "calendar" | "time";
 
@@ -125,6 +124,91 @@
             country: data.country
         };
     }
+
+    type WelcomeMessage = {
+        message: string;
+        weight: number;
+        valid?: () => boolean;
+    };
+
+    let welcomeMessages: WelcomeMessage[] = [
+        {
+            message: "Hello",
+            weight: 1.0
+        },
+        {
+            message: "Welcome",
+            weight: 1.0
+        },
+        {
+            message: "Good Morning",
+            weight: 1.0,
+            valid: () => {
+                const hour = new Date().getHours();
+                return hour >= 5 && hour < 12;
+            }
+        },
+        {
+            message: "Good Afternoon",
+            weight: 1.0,
+            valid: () => {
+                const hour = new Date().getHours();
+                return hour >= 12 && hour < 18;
+            }
+        },
+        {
+            message: "Good Evening",
+            weight: 1.0,
+            valid: () => {
+                const hour = new Date().getHours();
+                return hour >= 18 || hour < 5;
+            }
+        },
+        {
+            message: "Evenin'",
+            weight: 0.5,
+            valid: () => {
+                const hour = new Date().getHours();
+                return hour >= 18 || hour < 5;
+            }
+        },
+        {
+            message: "Top of the Hour to Ya",
+            weight: 0.1,
+            valid: () => {
+                const hour = new Date().getHours();
+                return hour >= 18 || hour < 5;
+            }
+        },
+        {
+            message: "Vamosssss",
+            weight: 0.05
+        }
+    ];
+
+    function selectWelcomeMessage() {
+        // only keep valid greetings
+        const validMessages = welcomeMessages.filter(
+            msg => !msg.valid || msg.valid()
+        );
+
+        const totalWeight = validMessages.reduce(
+            (sum, msg) => sum + msg.weight,
+            0
+        );
+
+        let random = Math.random() * totalWeight;
+
+        for (const msg of validMessages) {
+            random -= msg.weight;
+
+            if (random <= 0) {
+                return msg.message;
+            }
+        }
+
+        return validMessages[0].message;
+    }
 </script>
 
 
@@ -135,22 +219,25 @@
         <!-- left side -->
         <div>
             <h5 in:fly={{ y: 30, delay: 50, duration: 1500, easing: quartOut}}
-                style="color: var(--hover-primary-dark);"
+                style="color: var(--hover-primary-dark); mix-blend-mode: screen;"
             >
                 {dateFormatFunction(currentDate)}
             </h5>
-            <h1 in:fly={{ y: 30, delay: 200, duration: 1500, easing: quartOut}}>Hello, {username.name}.</h1>
+            <h1 in:fly={{ y: 30, delay: 200, duration: 1500, easing: quartOut}}>{selectWelcomeMessage()}, {username.name}.</h1>
             <h6 in:fly={{ y: 10, delay: 1200, duration: 2500, easing: quartOut}} style="font-style: italic;">{message}</h6>    
 
         </div>
         <!-- right side -->
-        <div style="display: flex; justify-content: flex-end; flex-direction: column; align-items: end;">
+        <div style="display: flex; justify-content: flex-start; flex-direction: column; align-items: end;">
             <h1 
-                in:fly={{ y: 15, delay: 600, duration: 1500, easing: quartOut}}    
+                in:fly={{ y: 15, delay: 1000, duration: 1500, easing: quartOut}}    
             >
                 {currentDate.getHours().toString().padStart(2, "0")}:{currentDate.getMinutes().toString().padStart(2, "0")} 
             </h1>
-            <p style="color: var(--hover-primary-dark);">
+            <p 
+                style="color: var(--hover-primary-dark); mix-blend-mode: screen;"
+                in:fly={{ y: 15, delay: 1200, duration: 1500, easing: quartOut}}
+            >
                 {#if location}
                     {location.city}, {location.region}
                 {:else}
