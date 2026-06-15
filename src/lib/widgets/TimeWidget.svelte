@@ -23,21 +23,6 @@
         timeOfDay = await getSimpleTimeOfDay(currentDate);
     });
 
-    let months = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December"
-    ];
-
     let Icons: Record<string, Component<IconProps>> = {
         "night": MoonStar,
         "dawn": Sunrise,
@@ -50,14 +35,8 @@
 
 <div class="container" in:fly|global={{ y: 30, delay: 600, duration: 1500, easing: quartOut}}>
     <div style="display: flex; gap: 0.5rem;">
-        <h4 in:fly={{ y: 15, delay: 600, duration: 1500, easing: quartOut}}>
-            {currentDate.getHours().toString().padStart(2, "0")}:{currentDate.getMinutes().toString().padStart(2, "0")} | 
-        </h4>
-        <h4 in:fly={{ y: 15, delay: 900, duration: 1500, easing: quartOut}}>
-            {months[currentDate.getMonth()]} {currentDate.getDate()} |
-        </h4>
         <h4 style="padding-top:0.2rem;" in:fly={{ y: 15, delay: 1200, duration: 1500, easing: quartOut}}>
-            <CurrentIcon />
+            Hello <CurrentIcon />
         </h4>
     </div>
 </div>
