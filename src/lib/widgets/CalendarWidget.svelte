@@ -7,7 +7,7 @@
     import { onMount } from "svelte";
     import { load } from "@tauri-apps/plugin-store";
     import { invoke } from "@tauri-apps/api/core";
-    import type { CalendarEvent } from "$lib/cal/calendar";
+    import { getMaxConcurrent, type CalendarEvent } from "$lib/cal/calendar";
 
     interface Props {
         showCurrentTime: boolean;
@@ -158,6 +158,7 @@
                         {#if eventsByDay}
                             {#if eventsByDay[dayKey(day)]}
                                 {#each eventsByDay[dayKey(day)] as event, i}
+                                    {@const overlapCount = getMaxConcurrent(event, eventsByDay[dayKey(day)])}
                                     <div                             
                                         in:fly|global={{ y: 15, delay: 1000 + 300 * i, duration: 1500, easing: quartOut}}    
                                     >
@@ -167,6 +168,7 @@
                                             {startingHour} 
                                             width={dayWidth} 
                                             height={dayHeight}
+                                            {overlapCount}
                                         />
                                     </div>
                                 {/each}

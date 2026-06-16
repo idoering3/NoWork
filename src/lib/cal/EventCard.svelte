@@ -1,5 +1,5 @@
 <script lang='ts'>
-    import { Clock } from "@lucide/svelte";
+    import { Clock, MapPin } from "@lucide/svelte";
 import type { CalendarEvent } from "./calendar";
     import { stringToDate } from "./dateCalculations";
   import { quartOut } from "svelte/easing";
@@ -8,10 +8,11 @@ import type { CalendarEvent } from "./calendar";
     
     interface Props {
         calEvent: CalendarEvent
-        width: number
-        height: number
-        numHours: number
-        startingHour: number
+        width: number;
+        height: number;
+        numHours: number;
+        startingHour: number;
+        overlapCount: number;
     }
 
     let {
@@ -19,7 +20,8 @@ import type { CalendarEvent } from "./calendar";
         width,
         height,
         numHours,
-        startingHour
+        startingHour,
+        overlapCount
     }: Props = $props();
 
     // to calculate the actual height, we take the viewport height and then we need to find the duration of the event
@@ -59,6 +61,7 @@ import type { CalendarEvent } from "./calendar";
     let pixelsPerHour = $derived(height / numHours);
     let eventTop = $derived(startOffset * pixelsPerHour);
     let eventHeight = $derived(pixelsPerHour * duration);
+    let leftShift = $derived(overlapCount * 12);
 
 
 
@@ -84,10 +87,10 @@ import type { CalendarEvent } from "./calendar";
     <div
         class="card" 
         style="
-            width: {width - padding }px; 
+            width: {width - padding - leftShift * 3 / 2}px; 
             height: {eventHeight - padding}px; 
             top: {eventTop + padding / 2}px;
-            left: {padding / 2}px; 
+            left: {padding / 2 + leftShift}px; 
             border-radius:{isCompact ? '4px' : '5px'}">
         <div class="bar"></div>
         <div class="inner {isCompact ? 'centered' : ''}">
@@ -114,6 +117,14 @@ import type { CalendarEvent } from "./calendar";
                         }
                     </p>
                 </div>
+                {#if calEvent.location}
+                    <div style="color: rgb(112, 112, 112); display: flex; gap: 0.2rem; align-items: flex-start; margin-top: 0.2rem;">
+                        <MapPin size={12} style="flex-shrink: 0; margin-top: 2px;"/>
+                        <p class='xs' style="color: rgb(112, 112, 112); white-space: pre-line;">
+                            {calEvent.location?.replace(/\\n/g, " ").replace(/\\(?!n)/g, "")}
+                        </p>
+                    </div>
+                {/if}
             {/if}
         </div>
     </div>
