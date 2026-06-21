@@ -2,7 +2,7 @@ use crate::commands::{
     database,
     types::{NewTag, Tag, Task},
 };
-use chrono::{DateTime, Local, TimeZone, Utc};
+use chrono::{DateTime, Datelike, Duration, Local, NaiveDate, TimeZone, Utc};
 use rusqlite::params;
 use tauri::AppHandle;
 
@@ -201,6 +201,68 @@ pub fn get_tasks_due_today(app: AppHandle) -> Result<Vec<Task>, String> {
     let today = Local::now().date_naive();
     let start = today.and_hms_opt(0, 0, 0).unwrap();
     let end = today.and_hms_opt(23, 59, 59).unwrap();
+
+    let start_utc = Local
+        .from_local_datetime(&start)
+        .unwrap()
+        .with_timezone(&Utc);
+    let end_utc = Local.from_local_datetime(&end).unwrap().with_timezone(&Utc);
+
+    let mut stmt = conn
+        .prepare(
+            "SELECT id, name, due_date, created_at, completed, completed_at
+         FROM tasks
+         WHERE due_date IS NOT NULL AND due_date >= ?1 AND due_date <= ?2",
+        )
+        .map_err(|e| e.to_string())?;
+
+    let rows = stmt
+        .query_map(
+            params![start_utc.to_rfc3339(), end_utc.to_rfc3339()],
+            |row| {
+                Ok((
+                    row.get::<_, i32>(0)?,
+                    row.get::<_, String>(1)?,
+                    row.get::<_, Option<String>>(2)?,
+                    row.get::<_, String>(3)?,
+                    row.get::<_, i32>(4)?,
+                    row.get::<_, Option<String>>(5)?,
+                ))
+            },
+        )
+        .map_err(|e| e.to_string())?;
+
+    let mut tasks = Vec::new();
+    for row in rows {
+        let (id, name, due_date_str, created_at_str, completed_int, completed_at_str) =
+            row.map_err(|e| e.to_string())?;
+
+        tasks.push(Task {
+            id,
+            name,
+            due_date: parse_opt_date(due_date_str)?,
+            created_at: parse_opt_date(Some(created_at_str))?.unwrap(),
+            completed: completed_int != 0,
+            completed_at: parse_opt_date(completed_at_str)?,
+            tags: fetch_tags(&conn, id)?,
+        });
+    }
+
+    Ok(tasks)
+}
+
+#[tauri::command]
+pub fn get_tasks_due_this_week(app: AppHandle) -> Result<Vec<Task>, String> {
+    let conn = database::open_conn(&app).map_err(|e| e.to_string())?;
+
+    let today = Local::now().date_naive();
+    let weekday = today.weekday().number_from_sunday() as i64;
+
+    let start_date = today - Duration::days(weekday - 1);
+    let end_date = start_date + Duration::days(6);
+
+    let start = start_date.and_hms_opt(0, 0, 0).unwrap();
+    let end = end_date.and_hms_opt(23, 59, 59).unwrap();
 
     let start_utc = Local
         .from_local_datetime(&start)

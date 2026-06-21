@@ -62,6 +62,11 @@ export const flavorMap = {
     bgcolor: "#e6e6e6",
     color: "black"
   },
+  defaultoutline: {
+    name: "defaultoutline",
+    bgcolor: "#e6e6e6",
+    color: "black"
+  },
   secondary: {
     name: "secondary",
     bgcolor: "var(--highlight-color)",
@@ -86,6 +91,11 @@ export const flavorMap = {
     name: "green",
     bgcolor: "#86e28c",
     color: "#1a681a"
+  },
+  greenoutline: {
+    name: "greenoutline",
+    bgcolor: "#e1f5ee",
+    color: "#87d8bd"
   },
 } as const satisfies Record<TagColor, Flavor>;
 

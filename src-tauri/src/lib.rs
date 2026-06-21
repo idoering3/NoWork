@@ -36,6 +36,7 @@ pub fn run() {
             commands::tasks::get_incomplete_tasks,
             commands::tasks::get_completed_task_count,
             commands::tasks::get_tasks_due_today,
+            commands::tasks::get_tasks_due_this_week,
             commands::tasks::get_task_by_id,
             commands::tasks::update_task_name_by_id,
             commands::tasks::update_task_due_date_by_id,

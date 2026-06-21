@@ -44,6 +44,12 @@
         color: black;
         --badge-bg: #e6e6e6;
     }
+    
+    .badge.defaultoutline {
+        color: black;
+        --badge-bg: #e6e6e6;
+        border: 1px solid #9b9a9a;
+    }
 
     .badge.secondary {
         color: var(--primary-light);
@@ -63,6 +69,12 @@
     .badge.green {
         --badge-bg: #86e28c;
         color: #1a681a;
+    }
+
+    .badge.greenoutline {
+        --badge-bg: #daf7ed;
+        color: #1a681a;
+        border: 1px solid #1a681a;
     }
     
     .badge.outline {

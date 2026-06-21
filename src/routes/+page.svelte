@@ -11,7 +11,8 @@
     import { hasDueDate } from "$lib/types/taskStore.svelte";
     import { getDayOfWeekAndTextStandardDateShort, dateFormats, type DateFormatName } from "$lib/misc/datePrints";
     import CalendarWidget from "$lib/widgets/CalendarWidget.svelte";
-    import TimeWidget from "$lib/widgets/TimeWidget.svelte";
+    import TimeWidget from "$lib/widgets/WeatherWidget.svelte";
+  import DynamicBar from "$lib/widgets/DynamicBar.svelte";
 
     type WidgetType = "calendar" | "time";
 
@@ -230,13 +231,14 @@
         <!-- right side -->
         <div style="display: flex; justify-content: flex-start; flex-direction: column; align-items: end;">
             <h1 
+                style=""
                 in:fly={{ y: 15, delay: 1000, duration: 1500, easing: quartOut}}    
             >
                 {currentDate.getHours().toString().padStart(2, "0")}:{currentDate.getMinutes().toString().padStart(2, "0")} 
             </h1>
             <p 
                 style="color: var(--hover-primary-dark); mix-blend-mode: screen;"
-                in:fly={{ y: 15, delay: 1200, duration: 1500, easing: quartOut}}
+                in:fly={{ y: 15, delay: 1100, duration: 1500, easing: quartOut}}
             >
                 {#if location}
                     {location.city}, {location.region}
@@ -244,10 +246,12 @@
                     Getting location...
                 {/if}
             </p>
+            <!-- dynamic bar goes here -->
+            <DynamicBar />
         </div>
     </div>
 
-    <hr in:fly={{ y: 10, delay: 1600, duration: 2500, easing: quartOut}} style="margin-top: 3rem; margin-bottom: 3rem; border-color: var(--border-color); border-width: 0.5px;"/>
+    <hr in:fly={{ y: 10, delay: 1600, duration: 2500, easing: quartOut}} style="margin-top: 2rem; margin-bottom: 3rem; border-color: var(--border-color); border-width: 0.5px;"/>
     <div class="grid">
         {#each items as item (item.id)}
             {@const Component = registry[item.component]}

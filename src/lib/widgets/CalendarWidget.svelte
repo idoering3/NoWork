@@ -136,7 +136,7 @@
                     </h3>
                 </div>
 
-                {#if dayKey(day) === dayKey(currentDate)}
+                {#if dayKey(day) === dayKey(currentDate) && currentTimePixels < dayHeight}
                     <!-- add a red line for the current time -->
                     {#if showCurrentTime}
                         <div style="position: relative;">
