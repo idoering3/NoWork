@@ -123,3 +123,8 @@ export function dayKey(d: Date): string {
 export const selectedDateFormat = $state({
     name: "dayOfWeekAndMonth" as DateFormatName
 });
+
+export const currentLocation = $state({
+  lat: undefined as number | undefined,
+  lon: undefined as number | undefined
+});

@@ -1,4 +1,5 @@
 import * as SunCalc from 'suncalc';
+import { getGeoPosition } from '$lib/misc/position';
 
 type TimeOfDay =
 | "night"
@@ -10,13 +11,7 @@ type TimeOfDay =
 export async function getSimpleTimeOfDay(
     now: Date,
 ): Promise<TimeOfDay> {
-    const position = await new Promise<GeolocationCoordinates>((resolve, reject) => {
-        if (!navigator.geolocation) return reject("Geolocation not supported");
-        navigator.geolocation.getCurrentPosition(
-        (pos) => resolve(pos.coords),
-        (err) => reject(err)
-        );
-    });
+    const position = await getGeoPosition();
 
     const t = SunCalc.getTimes(now, position.latitude, position.longitude);
 

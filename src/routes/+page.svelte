@@ -11,10 +11,11 @@
     import { hasDueDate } from "$lib/types/taskStore.svelte";
     import { getDayOfWeekAndTextStandardDateShort, dateFormats, type DateFormatName } from "$lib/misc/datePrints";
     import CalendarWidget from "$lib/widgets/CalendarWidget.svelte";
-    import TimeWidget from "$lib/widgets/WeatherWidget.svelte";
+    import WeatherWidget from "$lib/widgets/WeatherWidget.svelte";
   import DynamicBar from "$lib/widgets/DynamicBar.svelte";
+  import TaskWidget from "$lib/widgets/TaskWidget.svelte";
 
-    type WidgetType = "calendar" | "time";
+    type WidgetType = "calendar" | "tasks" | "weather";
 
     // let's store the grid data as data
     let items: {
@@ -26,13 +27,15 @@
         h: number;
     }[] = [
         { id: "calendar", component: "calendar", x: 0, y: 0, w: 6, h: 4 },
-        { id: "time", component: "time", x: 6, y: 0, w: 2, h: 1 }
+        { id: "weather", component: "weather", x: 6, y: 0, w: 2, h: 1 },
+        { id: "tasks", component: "tasks", x: 6, y: 0, w: 2, h: 1 }
     ];
 
     // registry of components
     const registry: Record<WidgetType, any> = {
         calendar: CalendarWidget,
-        time: TimeWidget
+        weather: WeatherWidget,
+        tasks: TaskWidget
     };
 
     let message = $state();
@@ -114,16 +117,28 @@
 
 
     export async function getLocation(): Promise<Location> {
-        const res = await fetch("https://ipapi.co/json/");
-        const data = await res.json();
+        try {
+            const res = await fetch("https://ipapi.co/json/");
 
-        console.log(data);
+            if (!res.ok) throw new Error("IP lookup failed");
 
-        return {
-            city: data.city,
-            region: data.region,
-            country: data.country
-        };
+            const data = await res.json();
+
+            return {
+                city: data.city ?? "Unknown",
+                region: data.region ?? "Unknown",
+                country: data.country ?? "Unknown"
+            };
+        } catch {
+            // fallback #1: timezone
+            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+            return {
+                city: "Local Timezone",
+                region: timezone.split("/")[1]?.replaceAll("_", " ") ?? "Unknown",
+                country: "Unknown"
+            };
+        }
     }
 
     type WelcomeMessage = {
@@ -136,6 +151,10 @@
         {
             message: "Hello",
             weight: 1.0
+        },
+        {
+            message: "Howdy",
+            weight: 0.7
         },
         {
             message: "Welcome",
@@ -219,6 +238,7 @@
     <div style="display: flex; justify-content: space-between">
         <!-- left side -->
         <div>
+            <!-- date -->
             <h5 in:fly={{ y: 30, delay: 50, duration: 1500, easing: quartOut}}
                 style="color: var(--hover-primary-dark); mix-blend-mode: screen;"
             >

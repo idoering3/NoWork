@@ -79,9 +79,6 @@
         }
     });
     
-    $effect(() => {
-        $inspect(events);
-    });
     const eventsByDay = $derived.by(() => {
         const grouped: Record<string, CalendarEvent[]> = {};
 
@@ -257,5 +254,6 @@
         height:0.1rem;
         background-color: red;
         border-radius: 15px;
+        z-index: 50;
     }
 </style>
