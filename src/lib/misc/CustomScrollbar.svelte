@@ -98,7 +98,7 @@
     <slot />
   </div>
 
-  <!-- Always rendered so `track` binding is always available -->
+  <!-- Always rendered so track binding is always available -->
   <div
     class="scrollbar-track"
     class:hidden={!isVisible}
@@ -123,14 +123,14 @@
 <style>
   .scroll-wrapper {
     position: relative;
-    display: flex;
     overflow: hidden;
     height: 100%;
     width: 100%;
   }
 
   .scroll-content {
-    flex: 1;
+    height: 100%;
+    width: 100%;
     overflow-y: scroll;
     overflow-x: hidden;
     scrollbar-width: none;
@@ -141,14 +141,16 @@
   }
 
   .scrollbar-track {
-    position: relative;
-    width: 6px;
-    flex-shrink: 0;
-    margin: 4px 2px;
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    right: 2px;
+    width: 4px;
     border-radius: 999px;
     background: transparent;
     cursor: pointer;
     transition: width 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+    z-index: 10;
   }
 
   .scrollbar-track.hidden {
@@ -157,7 +159,7 @@
   }
 
   .scroll-wrapper:hover .scrollbar-track:not(.hidden) {
-    width: 8px;
+    width: 6px;
     background: var(--primary-color);
   }
 
@@ -169,8 +171,8 @@
     border-radius: 999px;
     background: var(--hover-color);
     transition:
-      background 0.15s ease,
-      transform 0.05s linear;
+    background 0.15s ease,
+    transform 0.05s linear;
     cursor: grab;
     will-change: transform;
   }

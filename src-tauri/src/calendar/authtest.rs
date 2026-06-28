@@ -186,13 +186,17 @@ fn parse_events(calendar_data: &str) -> Vec<CalendarEvent> {
                         continue;
                     };
 
-                    let now = chrono::Utc::now();
-                    let start_of_week = (now - chrono::Duration::days(
-                        now.weekday().num_days_from_sunday() as i64
-                    )).date_naive().and_hms_opt(0, 0, 0).unwrap().and_utc();
-                    let end_of_week = start_of_week + chrono::Duration::days(7);
-                    let start_of_week = start_of_week.with_timezone(&Tz::UTC);
-                    let end_of_week = end_of_week.with_timezone(&Tz::UTC);
+                    let now_local = chrono::Local::now();
+                    let start_of_week_naive = (now_local.date_naive()
+                        - chrono::Duration::days(now_local.weekday().num_days_from_sunday() as i64))
+                        .and_hms_opt(0, 0, 0)
+                        .unwrap();
+                    let start_of_week_local = chrono::Local.from_local_datetime(&start_of_week_naive).single()
+                        .expect("ambiguous local midnight");
+                    let end_of_week_local = start_of_week_local + chrono::Duration::days(7);
+
+                    let start_of_week = start_of_week_local.with_timezone(&Tz::UTC);
+                    let end_of_week = end_of_week_local.with_timezone(&Tz::UTC);
 
                     for occurrence in set.after(start_of_week).before(end_of_week).all(50).dates {
                         let occ_end = occurrence + duration;
@@ -293,12 +297,25 @@ pub async fn fetch_all_calendars(
         let method = method2.clone();
         
         // filtering so that we only get events for the week
-        let now = chrono::Utc::now();
-        let start_of_week = now - chrono::Duration::days(now.weekday().num_days_from_sunday() as i64);
-        let end_of_week = start_of_week + chrono::Duration::days(7);
+        use chrono::{Local, TimeZone};
 
-        let start_str = start_of_week.format("%Y%m%dT000000Z").to_string();
-        let end_str = end_of_week.format("%Y%m%dT000000Z").to_string();
+        let now_local = Local::now();
+        let start_of_week_naive = (now_local.date_naive()
+            - chrono::Duration::days(now_local.weekday().num_days_from_sunday() as i64))
+            .and_hms_opt(0, 0, 0)
+            .unwrap();
+        let start_of_week_local = Local.from_local_datetime(&start_of_week_naive).single()
+            .expect("ambiguous local midnight");
+        let end_of_week_local = start_of_week_local + chrono::Duration::days(7);
+
+        let start_str = start_of_week_local
+            .with_timezone(&chrono::Utc)
+            .format("%Y%m%dT%H%M%SZ")
+            .to_string();
+        let end_str = end_of_week_local
+            .with_timezone(&chrono::Utc)
+            .format("%Y%m%dT%H%M%SZ")
+            .to_string();
 
         let body = format!(r#"<?xml version="1.0" encoding="utf-8" ?>
                 <c:calendar-query

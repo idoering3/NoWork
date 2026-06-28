@@ -30,10 +30,6 @@
 
         const innerColor = cssVarToRGBArray("--accent-color");
         const outerColor = cssVarToRGBArray("--primary-color");
-
-        const pos = await getGeoPosition();
-        currentLocation.lat = pos.latitude;
-        currentLocation.lon = pos.longitude;
         
         renderer = new ShaderRenderer(canvas, innerColor, outerColor);
         await renderer.startUpdatingSun(60000);
@@ -55,6 +51,12 @@
             await store.set('hasNotifiedToday', {date: dayKey(new Date())});
         }
 
+    });
+
+    onMount(async () => {
+        const pos = await getGeoPosition();
+        currentLocation.lat = pos.latitude;
+        currentLocation.lon = pos.longitude;
     });
 
 

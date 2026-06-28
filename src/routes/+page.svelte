@@ -27,8 +27,8 @@
         h: number;
     }[] = [
         { id: "calendar", component: "calendar", x: 0, y: 0, w: 6, h: 4 },
-        { id: "weather", component: "weather", x: 6, y: 0, w: 2, h: 1 },
-        { id: "tasks", component: "tasks", x: 6, y: 0, w: 2, h: 1 }
+        { id: "weather", component: "weather", x: 6, y: 0, w: 2, h: 2 },
+        { id: "tasks", component: "tasks", x: 6, y: 2, w: 2, h: 3 }
     ];
 
     // registry of components
@@ -240,7 +240,7 @@
         <div>
             <!-- date -->
             <h5 in:fly={{ y: 30, delay: 50, duration: 1500, easing: quartOut}}
-                style="color: var(--hover-primary-dark); mix-blend-mode: screen;"
+                style=""
             >
                 {dateFormatFunction(currentDate)}
             </h5>
@@ -249,7 +249,7 @@
 
         </div>
         <!-- right side -->
-        <div style="display: flex; justify-content: flex-start; flex-direction: column; align-items: end;">
+        <div style="display: flex; justify-content: flex-start; flex-direction: column; align-items: end; padding-right:3rem;">
             <h1 
                 style=""
                 in:fly={{ y: 15, delay: 1000, duration: 1500, easing: quartOut}}    
@@ -257,7 +257,7 @@
                 {currentDate.getHours().toString().padStart(2, "0")}:{currentDate.getMinutes().toString().padStart(2, "0")} 
             </h1>
             <p 
-                style="color: var(--hover-primary-dark); mix-blend-mode: screen;"
+                style=""
                 in:fly={{ y: 15, delay: 1100, duration: 1500, easing: quartOut}}
             >
                 {#if location}
@@ -271,7 +271,7 @@
         </div>
     </div>
 
-    <hr in:fly={{ y: 10, delay: 1600, duration: 2500, easing: quartOut}} style="margin-top: 2rem; margin-bottom: 3rem; border-color: var(--border-color); border-width: 0.5px;"/>
+    <hr in:fly={{ y: 10, delay: 1600, duration: 2500, easing: quartOut}} style="margin: 2rem 2rem 3rem 0rem; border-color: var(--border-color); border-width: 0.5px;"/>
     <div class="grid">
         {#each items as item (item.id)}
             {@const Component = registry[item.component]}
@@ -303,7 +303,7 @@
 
 <style>
     .container {
-        padding: 3rem;
+        padding: 3rem 0rem 3rem 3rem;
     }
     .grid {
         display: grid;

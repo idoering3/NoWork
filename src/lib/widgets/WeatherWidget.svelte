@@ -3,7 +3,7 @@
     import { currentLocation, startClock } from "../stores.svelte";
     import { fly } from "svelte/transition";
     import { quartOut } from "svelte/easing";
-    import { CircleSmall} from "@lucide/svelte";
+    import { CircleSmall, Droplet, Wind} from "@lucide/svelte";
     import { getCurrentWeather, getWeatherIcon, type WeatherData } from "$lib/misc/weather";
 
     const WEATHER_POLL_INTERVAL = 10* 60 * 1000; // 10 min in ms
@@ -75,12 +75,32 @@
                 {Math.round(currentWeather.daily.temperature_2m_min[0])}<span>&#176;</span> 
             {/if}
         </p>
+        <hr>
+        <p style="display: flex; align-items: center; gap: 0.5rem;" class="faded">
+            <Wind strokeWidth={1.1} size={20}/>
+            {#if currentWeather?.current.wind_speed_10m}
+                {Math.round(currentWeather.current.wind_speed_10m)}
+            {/if}
+            mph
+        </p>
+        <p style="display: flex; align-items: center; gap: 0.5rem;" class="faded">
+            <Droplet strokeWidth={1.1} size={20}/>
+            {#if currentWeather?.current.precipitation}
+                {Math.round(currentWeather.current.precipitation * 100) / 100}
+            {:else}
+                0.00
+            {/if}
+            in
+        </p>
     </div>
 </div>
 
 <style>
+    hr {
+        border-color: var(--border-color);
+    }
+
     .container {
-        padding: 1rem;
         border: 1px solid var(--border-color);
         margin: 0.5rem;
         border-radius: 15px;
@@ -89,12 +109,17 @@
         display: flex;
         gap: 0.5rem;
         flex-direction: column;
+        height: 100%;
     }
 
     .weather-icon {
         margin: 1rem;
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
-
+    
     .inner {
         margin-left: 1rem;
     }
