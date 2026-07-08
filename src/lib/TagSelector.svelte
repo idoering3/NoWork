@@ -159,12 +159,12 @@
 						{placeholders}
 					/>
 					<div style="display: flex;">
-						<div style="border-radius: 15px; display: flex; border: 1px solid var(--border-color); overflow: hidden; margin-right:1rem;">
+						<div style="border-radius: 15px; display: flex; border: 1px solid var(--border-color); overflow: hidden; margin-right:1rem; height: 1.5rem">
 							{#each Object.values(flavorMap) as color}
 								<button
 									style="background-color: {color.bgcolor};
-									width: 2rem;
-									height: 2rem;
+									width: 1.5rem;
+									height: 1.5rem;
 									border: none;
 									"
 									onclick={() => setTagColor(color.name)}

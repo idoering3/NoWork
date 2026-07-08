@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { Task } from "$lib/types/task";
+    import type { TagColor, Task } from "$lib/types/task";
     import Check from "@lucide/svelte/icons/check";
     import { Plus, Trash, X } from "@lucide/svelte";
     import Button from "./Button.svelte";
@@ -14,9 +14,10 @@
         allowsEdit?: boolean;
         onComplete: (id: number) => void;
         onDelete?: (id: number) => void;
+        size?: "big" | "small" | "normal"
     }
 
-    let { task = $bindable(), allowsEdit = true, onComplete = $bindable(), onDelete = $bindable() }: Props = $props();
+    let { task = $bindable(), allowsEdit = true, size="normal", onComplete = $bindable(), onDelete = $bindable()}: Props = $props();
 
     function complete() {
         onComplete(task.id);
@@ -143,7 +144,7 @@
     }
 </script>
 
-{#snippet tagsn(name: string, id: number, color: 'default' | 'secondary' | 'outline' | 'danger' | 'blue' | 'green')}
+{#snippet tagsn(name: string, id: number, color: TagColor)}
     <Badge flavor={color} noPadding>
         {#if task.tags?.some(tag => tag.name === name)}
             <span style="padding-left: 0.5rem;">
@@ -175,29 +176,30 @@
     class="task-container"
     bind:this={container}
     class:edit={editing}
+    class:small={size == "small"}
     oncontextmenu={onRightClick}
     role="document"
 >
-    <div class="task-card" class:overdue={overdue} class:due-today={dueToday}>
-        <Button onclick={complete} Icon={Check} flavor="outline" class="square small" />
+    <div class="task-card" class:overdue={overdue} class:due-today={dueToday} class:small={size == "small"}>
+        <Button onclick={complete} Icon={Check} flavor="outline" class={`square ${size == "normal" ? "small" : "xsmall"}`} />
         {#if !editing}
-        <div class="stacked">
-            <p style="font-size: 1rem">{task.name}</p>
-            {#key task}
-                <p class="date">
-                    {dueDate ? dueDate.toLocaleDateString(undefined, { month: 'long', day: 'numeric' }) : ''}
-                </p>
-            {/key}
-        </div>
-        <div class="tags">
-            {#if task.tags}
-                {#each task.tags as tag}
-                    <Badge flavor={tag.color}>{tag.name}</Badge>
-                {/each}
-            {/if}
-        </div>
+            <div class="stacked">
+                <p class:smallname={size == "small"}>{task.name}</p>
+                {#key task}
+                    <p class="date" class:smalldate={ size == "small"}>
+                        {dueDate ? dueDate.toLocaleDateString(undefined, { month: 'long', day: 'numeric' }) : ''}
+                    </p>
+                {/key}
+            </div>
+            <div class="tags">
+                {#if task.tags}
+                    {#each task.tags as tag}
+                        <Badge flavor={tag.color}>{tag.name}</Badge>
+                    {/each}
+                {/if}
+            </div>
         {:else}
-            <div style="width: fit-content;">
+            <div style="width: fit-content; text-overflow: ellipsis; white-space: nowrap;">
                 <Textbox preamble={false} placeholders={["Enter task name"]} bind:value={name} />
             </div>
             {#if dueDate}
@@ -237,18 +239,30 @@
     .task-container {
         gap: 1rem;
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         align-items: center;
-        justify-content: space-between;
-        width: fit-content;
+        justify-content: flex-start;
         padding: 0rem 0.5rem;
         min-height: 3rem;
         max-height: 9rem;
         max-width: 100%;
+        width: 100%;
         box-sizing: border-box;
         border-radius: 15px;
         border: 1px solid transparent;
         transition: 300ms ease-in-out;
+    }
+
+    .small {
+        min-height:1.75rem;
+    }
+
+    .smallname {
+        font-size: 0.8rem;
+    }
+
+    .date.smalldate {
+        font-size: 0.7rem;
     }
 
     .task-container.edit {
@@ -258,9 +272,9 @@
     .task-card {
         gap: 1rem;
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         align-items: center;
-        justify-content: space-between;
+        justify-content: flex-start;
         padding: 0rem 0.5rem;
         width: 100%;
         height: auto;
@@ -284,10 +298,19 @@
         display: flex;
         flex-direction: column;
         min-height: 0;
+        min-width: 0;
+        flex: 0 1 auto;
+        overflow:hidden;
+    }
+    .stacked p {
+        overflow:hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .tags {
         display: flex;
         gap: 0.5rem;
+        flex-shrink: 0;
     }
 </style>

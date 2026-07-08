@@ -1,3 +1,4 @@
+import { flavorMap } from "$lib/stores.svelte";
 import { invoke } from "@tauri-apps/api/core";
 
 export interface Task {
@@ -20,7 +21,7 @@ export interface NewTag {
   color: TagColor
 }
 
-export type TagColor = 'default' | 'defaultoutline' | 'secondary' | 'outline' | 'danger' | 'blue' | 'green' | 'greenoutline';
+export type TagColor = keyof typeof flavorMap;
 
 export async function getTasksDueToday(): Promise<Task[]> {
   let taskContainer = await invoke<Task[]>('get_tasks_due_today');

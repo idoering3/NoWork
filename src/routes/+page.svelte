@@ -28,7 +28,7 @@
     }[] = [
         { id: "calendar", component: "calendar", x: 0, y: 0, w: 6, h: 4 },
         { id: "weather", component: "weather", x: 6, y: 0, w: 2, h: 2 },
-        { id: "tasks", component: "tasks", x: 6, y: 2, w: 2, h: 3 }
+        { id: "tasks", component: "tasks", x: 6, y: 2, w: 2, h: 2 }
     ];
 
     // registry of components
@@ -237,7 +237,7 @@
     <!-- username hello -->
     <div style="display: flex; justify-content: space-between">
         <!-- left side -->
-        <div>
+        <div style="min-width: 0; flex: 1 1 auto; overflow-wrap: break-word;">
             <!-- date -->
             <h5 in:fly={{ y: 30, delay: 50, duration: 1500, easing: quartOut}}
                 style=""
@@ -249,7 +249,7 @@
 
         </div>
         <!-- right side -->
-        <div style="display: flex; justify-content: flex-start; flex-direction: column; align-items: end; padding-right:3rem;">
+        <div style="flex: 0 0 auto; display: flex; justify-content: flex-start; flex-direction: column; align-items: end; padding-right:3rem;">
             <h1 
                 style=""
                 in:fly={{ y: 15, delay: 1000, duration: 1500, easing: quartOut}}    

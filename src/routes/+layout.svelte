@@ -10,7 +10,7 @@
     import { load } from '@tauri-apps/plugin-store';
     import { setColors, type Theme } from '$lib/theme';
     import { onDestroy, onMount } from 'svelte';
-    import { currentLocation, dayKey, theme, themes } from "$lib/stores.svelte";
+    import { currentLocation, dayKey, theme, themes, type ThemeName } from "$lib/stores.svelte";
     import { cssVarToRGBArray, ShaderRenderer } from '$lib/shaders/shader';
     import { sendNotif } from '$lib/misc/notifications';
     import { invoke } from '@tauri-apps/api/core';
@@ -36,10 +36,10 @@
         renderer.start();
 
         const store = await load(".settings.json");
-        const value = await store.get<{ value: Theme }>("theme");
+        const value = await store.get<{ value: ThemeName }>("theme");
 
         if (value?.value) {
-            theme.theme = value.value;
+            theme.theme = themes[value.value];
             setColors(root, theme.theme, renderer);
         }
 

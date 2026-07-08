@@ -7,7 +7,7 @@ export interface Theme {
     hoverpdark: string;
     pcolor: string;
     scolor: string;
-    hcolor: string;
+    highlightcolor: string;
     bcolor: string;
     hovercolor: string;
     accentcolor: string;
@@ -19,7 +19,7 @@ export function setColors(root: HTMLElement, theme: Theme, renderer: ShaderRende
     root.style.setProperty("--hover-primary-dark", theme.hoverpdark);
     root.style.setProperty("--primary-color", theme.pcolor);
     root.style.setProperty("--secondary-color", theme.scolor);
-    root.style.setProperty("--highlight-color", theme.hcolor);
+    root.style.setProperty("--highlight-color", theme.highlightcolor);
     root.style.setProperty("--border-color", theme.bcolor);
     root.style.setProperty("--hover-color", theme.hovercolor);
     root.style.setProperty("--accent-color", theme.accentcolor);

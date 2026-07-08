@@ -6,7 +6,7 @@
     import { setColors, type Theme } from "$lib/theme";
     import { invoke } from "@tauri-apps/api/core";
     import { load } from "@tauri-apps/plugin-store";
-    import { selectedDateFormat, theme, themes, username } from "$lib/stores.svelte";
+    import { selectedDateFormat, theme, themes, username, type ThemeName } from "$lib/stores.svelte";
     import { onMount } from "svelte";
     import Textbox from "$lib/Textbox.svelte";
     import { fly } from "svelte/transition";
@@ -39,19 +39,19 @@
     let email = $state("");
     let password = $state("");
     
-    let selectedTheme = $state("");
-    const themeOptions = Object.entries(themes).map(([key, theme]) => ({
+    let selectedTheme = $state<ThemeName>("pinkDark");
+    const themeOptions = (Object.keys(themes) as ThemeName[]).map((key) => ({
         value: key,
-        label: theme.name ?? key
+        label: themes[key].name
     }));
     
-    async function updateTheme(newThemeName: string) {
-        if (newThemeName) {
-            theme.theme = themes[newThemeName]
-            const store = await load(".settings.json");
-            await store.set("theme", { value: themes[newThemeName] });
-            await store.save();
-        }
+    async function updateTheme(newThemeName: ThemeName) {
+        theme.name = newThemeName;
+        theme.theme = themes[newThemeName];
+
+        const store = await load(".settings.json");
+        await store.set("theme", { value: newThemeName });
+        await store.save();
     }
 
     async function updateDateFormat(newDateFormatFunctionName: DateFormatName) {
@@ -73,21 +73,18 @@
             updateDateFormat(selectedDateFormat.name);
         }
     });
-
+    
     onMount(async () => {
-        if (theme.theme) {
-            selectedTheme = theme.theme.name;
-        } else {
-            const store = await load(".settings.json");
-            const value = await store.get<{ value: Theme }>("theme");
+        const store = await load(".settings.json");
 
-            if (value?.value) {
-                theme.theme = value.value;
-                selectedTheme = theme.theme.name;
-            }
+        const value = await store.get<{ value: ThemeName }>("theme");
+
+        if (value?.value) {
+            theme.name = value.value;
+            theme.theme = themes[value.value];
+            selectedTheme = value.value;
         }
 
-        const store = await load(".settings.json");
 
         const dateFormat = await store.get<{ value: DateFormatName }>("dateFormat");
         const calendarNumberHours = await store.get<{ value: number}>("calendarNumHours");
