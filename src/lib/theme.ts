@@ -4,7 +4,7 @@ export interface Theme {
     name: string;
     plight: string;
     pdark: string;
-    hoverpdark: string;
+    fadedtext: string;
     pcolor: string;
     scolor: string;
     highlightcolor: string;
@@ -16,7 +16,7 @@ export interface Theme {
 export function setColors(root: HTMLElement, theme: Theme, renderer: ShaderRenderer) {
     root.style.setProperty("--primary-light", theme.plight);
     root.style.setProperty("--primary-dark", theme.pdark);
-    root.style.setProperty("--hover-primary-dark", theme.hoverpdark);
+    root.style.setProperty("--hover-primary-dark", theme.fadedtext);
     root.style.setProperty("--primary-color", theme.pcolor);
     root.style.setProperty("--secondary-color", theme.scolor);
     root.style.setProperty("--highlight-color", theme.highlightcolor);

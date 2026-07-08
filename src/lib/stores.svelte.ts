@@ -9,7 +9,7 @@ export const themes = {
     name: "Pink Light",
     plight: "#ffffff",
     pdark: "#383838",
-    hoverpdark: "#202020",
+    fadedtext: "#202020",
     pcolor: "#f8edf0",
     scolor: "#f8dae0",
     highlightcolor: "#946363",
@@ -22,7 +22,7 @@ export const themes = {
     name: "Pink Dark",
     plight: "#221c1c",
     pdark: "#f9e1e1",
-    hoverpdark: "#cda7a7",
+    fadedtext: "#cda7a7",
     pcolor: "#312529",
     scolor: "#312529",
     highlightcolor: "#e6b7c6",
@@ -35,7 +35,7 @@ export const themes = {
     name: "Ocean",
     plight: "#f8fafc",
     pdark: "#1e293b",
-    hoverpdark: "#334155",
+    fadedtext: "#334155",
     pcolor: "#e0f2fe",
     scolor: "#bae6fd",
     highlightcolor: "#0369a1",
@@ -48,7 +48,7 @@ export const themes = {
     name: "Forest",
     plight: "#f7faf7",
     pdark: "#243024",
-    hoverpdark: "#344434",
+    fadedtext: "#344434",
     pcolor: "#e7f5e7",
     scolor: "#cce8cc",
     highlightcolor: "#3f7d3f",
@@ -61,7 +61,7 @@ export const themes = {
     name: "Nord",
     plight: "#2e3440",
     pdark: "#eceff4",
-    hoverpdark: "#d8dee9",
+    fadedtext: "#d8dee9",
     pcolor: "#3b4252",
     scolor: "#434c5e",
     highlightcolor: "#88c0d0",
@@ -74,7 +74,7 @@ export const themes = {
     name: "Solarized",
     plight: "#fdf6e3",
     pdark: "#073642",
-    hoverpdark: "#586e75",
+    fadedtext: "#586e75",
     pcolor: "#eee8d5",
     scolor: "#eee8d5",
     highlightcolor: "#268bd2",
@@ -86,7 +86,7 @@ export const themes = {
     name: "Kimbie Dark",
     plight: "#282522",      // warm dark background
     pdark: "#f5e6c8",       // light foreground/text
-    hoverpdark: "#4a4035",  // warm hover
+    fadedtext: "#847261",  // warm hover
     pcolor: "#362f2a",      // panels/surfaces
     scolor: "#453d34",      // secondary surfaces
     highlightcolor: "#d8a657",      // golden headings
