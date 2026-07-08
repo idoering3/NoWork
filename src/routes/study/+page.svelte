@@ -113,7 +113,7 @@
                         in:fly|global={{ y: 30, delay: 1200, duration: 1500, easing: quartOut}}
                         out:fly|global={{ y: -30, duration: 300 , easing: quartOut}}
                     > 
-                        <Button flavor="primary" onclick={startTimer}>Start Studying</Button>
+                        <Button flavor="primary" class="circular" onclick={startTimer}>Start Studying</Button>
                     </div>
                 </div>
             {/if}

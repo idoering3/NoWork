@@ -224,7 +224,7 @@
                 <p class="field-hint">
                     Permanently deletes <strong>all</strong> tasks (completed and incomplete) and all tags. This cannot be undone.
                 </p>
-                <Button flavor="danger" class="rounded border" onclick={confirmResetDatabase}>
+                <Button flavor="danger" class="circular border" onclick={confirmResetDatabase}>
                     Reset Database
                 </Button>
             </div>
