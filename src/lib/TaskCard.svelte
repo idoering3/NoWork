@@ -242,7 +242,7 @@
         flex-wrap: nowrap;
         align-items: center;
         justify-content: flex-start;
-        padding: 0rem 0.5rem;
+        padding: 0rem 1.5rem 0 0.5rem;
         min-height: 3rem;
         max-height: 9rem;
         max-width: 100%;
