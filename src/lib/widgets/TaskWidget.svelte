@@ -20,6 +20,7 @@
 
     async function getIncompleteTasks() {
         tasks = await invoke('get_incomplete_tasks');
+        tasks = tasks?.slice(0,7);
     }
 
     
@@ -27,8 +28,8 @@
 
 <div class="container" in:fly|global={{ y: 30, delay: 600, duration: 1500, easing: quartOut}}>
     {#if tasks.length > 0}
-        {#each tasks as task}
-            <TaskCard {task} allowsEdit={false} size={"small"} onComplete={completeTask}/>
+        {#each tasks as task (task.id)}
+            <TaskCard {task} allowsEdit={false} size={"small"} onComplete={() => completeTask(task.id)}/>
         {/each}
     {:else}
         No tasks!
