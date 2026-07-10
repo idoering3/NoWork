@@ -1,9 +1,6 @@
-export async function getGeoPosition(): Promise<GeolocationCoordinates> {
-    return await new Promise<GeolocationCoordinates>((resolve, reject) => {
-        if (!navigator.geolocation) return reject("Geolocation not supported");
-        navigator.geolocation.getCurrentPosition(
-        (pos) => resolve(pos.coords),
-        (err) => reject(err)
-        );
-    });
+import { invoke } from '@tauri-apps/api/core';
+
+export async function getGeoPosition(): Promise<{ latitude: number; longitude: number }> {
+    const pos = await invoke<{ lat: number; lon: number }>('get_ip_geoposition');
+    return { latitude: pos.lat, longitude: pos.lon };
 }

@@ -32,8 +32,16 @@
         const outerColor = cssVarToRGBArray("--primary-color");
         
         renderer = new ShaderRenderer(canvas, innerColor, outerColor);
-        await renderer.startUpdatingSun(60000);
-        renderer.start();
+        renderer.start(); // start rendering immediately, no geo dependency
+
+        try {
+            const pos = await getGeoPosition();
+            currentLocation.lat = pos.latitude;
+            currentLocation.lon = pos.longitude;
+            renderer.startUpdatingSun(pos.latitude, pos.longitude);
+        } catch (err) {
+            console.warn("Geolocation failed, sun position will stay default:", err);
+        }
 
         const store = await load(".settings.json");
         const value = await store.get<{ value: ThemeName }>("theme");
@@ -51,12 +59,6 @@
             await store.set('hasNotifiedToday', {date: dayKey(new Date())});
         }
 
-    });
-
-    onMount(async () => {
-        const pos = await getGeoPosition();
-        currentLocation.lat = pos.latitude;
-        currentLocation.lon = pos.longitude;
     });
 
 

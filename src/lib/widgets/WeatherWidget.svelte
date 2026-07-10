@@ -60,6 +60,7 @@
         padding: 0.5rem;
         {day != 0 ? "background-color:none" : "background-color: var(--secondary-color)"}
         "
+        in:fly|global={{ y: 10, delay: 1200 + day * 75, duration: 1500, easing: quartOut}}
     >
         <div style="padding: 0.2rem;">
             {#if ForecastIcons?.[day]}
@@ -80,7 +81,7 @@
     <div style="display: flex; flex-direction: column;" class="inner">
         <div 
             style="display: flex; align-items:center;" 
-            in:fly|global={{ y: 15, delay: 800, duration: 1500, easing: quartOut}}
+            in:fly|global={{ y: 10, delay: 800, duration: 1500, easing: quartOut}}
         >
             <div>
                 <h1 style="padding-top:0.2rem;">
@@ -95,7 +96,7 @@
                     {/if}
                 </h1>
     
-                <p class="faded" in:fly|global={{ y: 15, delay: 1000, duration: 1500, easing: quartOut}}>
+                <p class="faded" in:fly|global={{ y: 10, delay: 1000, duration: 1500, easing: quartOut}}>
                     H 
                     {#if currentWeather?.daily.temperature_2m_max}
                         {Math.round(currentWeather.daily.temperature_2m_max[0])}<span>&#176;</span> 
@@ -108,23 +109,27 @@
             </div>
 
             <div class="weather-icon">
-                <div class="weather-icon-circle">
-                    {#if WeatherIcon}
+                {#if WeatherIcon}
+                    <div class="weather-icon-circle">
                         <WeatherIcon size={40} absoluteStrokeWidth={true}/>
-                    {/if}
-                </div>
+                    </div>
+                {/if}
             </div>
         </div>
         <div>
             <hr style="">
-            <p style="display: flex; align-items: center; gap: 0.5rem;" class="faded">
+            <p style="display: flex; align-items: center; gap: 0.5rem;" class="faded"
+                in:fly|global={{ y: 10, delay: 1200, duration: 1500, easing: quartOut}}
+            >
                 <Wind strokeWidth={1.1} size={20}/>
                 {#if currentWeather?.current.wind_speed_10m}
                     {Math.round(currentWeather.current.wind_speed_10m)}
                 {/if}
                 mph
             </p>
-            <p style="display: flex; align-items: center; gap: 0.5rem;" class="faded">
+            <p style="display: flex; align-items: center; gap: 0.5rem;" class="faded"
+                in:fly|global={{ y: 10, delay: 1400, duration: 1500, easing: quartOut}}
+            >
                 <Droplet strokeWidth={1.1} size={20}/>
                 {#if currentWeather?.current.precipitation}
                     {Math.round(currentWeather.current.precipitation * 100) / 100}

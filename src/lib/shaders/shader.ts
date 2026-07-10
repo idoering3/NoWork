@@ -242,25 +242,23 @@ export class ShaderRenderer {
         this.outerColor = outer;
     }
 
-    startUpdatingSun(intervalMs: number = 60_000, radiusX = 0.3, radiusY = 0.125) {
-        this.updateSunTarget(radiusX, radiusY);
-        if (this.sunIntervalId !== null) clearInterval(this.sunIntervalId);
-        this.sunIntervalId = window.setInterval(() => {
-            this.updateSunTarget(radiusX, radiusY);
-        }, intervalMs)
-    }
-
-    async updateSunTarget(radiusX = 0.4, radiusY = 0.2) {
-        try {
-            const { x, y } = await getUserSunPosition(radiusX, radiusY)
-            if (this.animationId !== null) { 
-                this.targetCenter = [x, y]
-            }
-        } catch (err) {
-            console.warn("Could not get sun position:", err)
+    async updateSunTarget(lat: number, lon: number, radiusX = 0.4, radiusY = 0.2) {
+        const sunPos = SunCalc.getPosition(new Date(), lat, lon);
+        const x = 0.5 - radiusX * Math.sin(sunPos.azimuth);
+        const y = 0.09 - radiusY * Math.sin(sunPos.altitude);
+        if (this.animationId !== null) {
+            this.targetCenter = [x, y];
         }
     }
 
+    startUpdatingSun(lat: number, lon: number, intervalMs = 60_000, radiusX = 0.3, radiusY = 0.125) {
+        this.updateSunTarget(lat, lon, radiusX, radiusY);
+        if (this.sunIntervalId !== null) clearInterval(this.sunIntervalId);
+        this.sunIntervalId = window.setInterval(() => {
+            this.updateSunTarget(lat, lon, radiusX, radiusY);
+        }, intervalMs);
+    }
+    
     destroy() {
         this.stop()
 
