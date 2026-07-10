@@ -20,16 +20,17 @@ export interface DailyWeather {
     time: Date[];
     temperature_2m_max: Float32Array | null;
     temperature_2m_min: Float32Array | null;
+    weather_code: Float32Array | null;
 }
 
 export async function getCurrentWeather(lat: number, lon: number): Promise<WeatherData> {
     const params = {
         latitude: lat,
         longitude: lon,
-        daily: ["temperature_2m_max", "temperature_2m_min"],
+        daily: ["temperature_2m_max", "temperature_2m_min", "weather_code"],
         current: ["temperature_2m", "precipitation", "wind_speed_10m", "cloud_cover", "weather_code", "is_day"],
         timezone: "auto",
-        forecast_days: 1,
+        forecast_days: 6,
         wind_speed_unit: "mph",
         temperature_unit: "fahrenheit",
         precipitation_unit: "inch",
@@ -69,6 +70,7 @@ export async function getCurrentWeather(lat: number, lon: number): Promise<Weath
             ),
             temperature_2m_max: daily.variables(0)!.valuesArray(),
             temperature_2m_min: daily.variables(1)!.valuesArray(),
+            weather_code: daily.variables(2)!.valuesArray()
         },
     };
 
