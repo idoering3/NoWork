@@ -28,7 +28,7 @@
     <Badge flavor="defaultoutline">
         <CircleCheck size={16} class={numTasksDueToday == 0 ? "no-tasks-icon" : ""} />
         <div class={numTasksDueToday == 0 ? "no-tasks-text" : ""}>
-            {numTasksDueThisWeek - incompleteNumTasksDueThisWeek} / {numTasksDueThisWeek} task{numTasksDueToday > 1 || numTasksDueToday < 1 ? "s" : ''} this week
+            {numTasksDueThisWeek - incompleteNumTasksDueThisWeek} / {numTasksDueThisWeek} task{numTasksDueThisWeek > 1 ? "s" : ''} this week
         </div>
     </Badge>
 
