@@ -38,6 +38,9 @@
             const pos = await getGeoPosition();
             currentLocation.lat = pos.latitude;
             currentLocation.lon = pos.longitude;
+            currentLocation.city = pos.city;
+            currentLocation.country = pos.country;
+            currentLocation.region = pos.region;
             renderer.startUpdatingSun(pos.latitude, pos.longitude);
         } catch (err) {
             console.warn("Geolocation failed, sun position will stay default:", err);

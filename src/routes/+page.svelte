@@ -1,6 +1,6 @@
 <script lang='ts'>
     import Card from "$lib/Card.svelte";
-    import { selectedDateFormat, startClock, username } from "$lib/stores.svelte";
+    import { currentLocation, selectedDateFormat, startClock, username } from "$lib/stores.svelte";
     import { invoke } from "@tauri-apps/api/core";
     import { load } from '@tauri-apps/plugin-store';
     import { onMount } from "svelte";
@@ -52,7 +52,6 @@
         country: string;
     }
 
-    let location: Location | undefined = $state();
     let timeOfDay = $state();
 
     onMount (async () => {
@@ -75,7 +74,6 @@
             await store.save();
         }
 
-        location = await getLocation();
         await refreshTasks();
 
         timeOfDay = await getSimpleTimeOfDay(new Date());
@@ -113,33 +111,6 @@
     let tasksWithDueDates = $derived(
         (tasks ?? []).filter(hasDueDate)
     );
-
-
-
-    export async function getLocation(): Promise<Location> {
-        try {
-            const res = await fetch("https://ipapi.co/json/");
-
-            if (!res.ok) throw new Error("IP lookup failed");
-
-            const data = await res.json();
-
-            return {
-                city: data.city ?? "Unknown",
-                region: data.region ?? "Unknown",
-                country: data.country ?? "Unknown"
-            };
-        } catch {
-            // fallback #1: timezone
-            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-            return {
-                city: "Local Timezone",
-                region: timezone.split("/")[1]?.replaceAll("_", " ") ?? "Unknown",
-                country: "Unknown"
-            };
-        }
-    }
 
     type WelcomeMessage = {
         message: string;
@@ -260,8 +231,8 @@
                 style=""
                 in:fly={{ y: 15, delay: 1100, duration: 1500, easing: quartOut}}
             >
-                {#if location}
-                    {location.city}, {location.region}
+                {#if currentLocation}
+                    {currentLocation.city}, {currentLocation.region}
                 {:else}
                     Getting location...
                 {/if}

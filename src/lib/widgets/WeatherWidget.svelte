@@ -68,10 +68,10 @@
                 <Icon size={24} absoluteStrokeWidth={true}/>
             {/if}
         </div>
-        <p class="faded">
+        <p class="faded" style="font-size: 0.8rem;">
             H {Math.round(currentWeather!.daily.temperature_2m_max![day])}
         </p>
-        <p class="faded">
+        <p class="faded" style="font-size: 0.8rem;">
             L {Math.round(currentWeather!.daily.temperature_2m_min![day])}
         </p>
     </div>

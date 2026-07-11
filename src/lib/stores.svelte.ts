@@ -193,5 +193,8 @@ export const selectedDateFormat = $state({
 
 export const currentLocation = $state({
   lat: undefined as number | undefined,
-  lon: undefined as number | undefined
+  lon: undefined as number | undefined,
+  city: "" as string,
+  region: "" as string,
+  country: "" as string
 });
