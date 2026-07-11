@@ -1,12 +1,15 @@
 <script lang='ts'>
-  import TaskCard from "$lib/TaskCard.svelte";
-  import type { Task } from "$lib/types/task";
+    import TaskCard from "$lib/TaskCard.svelte";
+    import type { Task } from "$lib/types/task";
     import { invoke } from "@tauri-apps/api/core";
     import { onMount } from "svelte";
-    import { quartOut } from "svelte/easing";
+    import { flip } from "svelte/animate";
+    import { quartInOut, quartOut } from "svelte/easing";
     import { fly } from "svelte/transition";
 
     let tasks: Task[] = $state([]);
+        let runCollapse = $state(true);
+
 
     onMount(async () => {
         tasks = await invoke("get_incomplete_tasks");
@@ -28,8 +31,15 @@
 
 <div class="container" in:fly|global={{ y: 30, delay: 600, duration: 1500, easing: quartOut}}>
     {#if tasks.length > 0}
-        {#each tasks as task (task.id)}
-            <TaskCard {task} allowsEdit={false} size={"small"} onComplete={() => completeTask(task.id)}/>
+        {#each tasks as task, i (task.id)}
+            <div animate:flip|global={{ duration: 300, easing: quartInOut }}>
+                <div 
+                    in:fly|global={{ duration: 1000, y: 15, easing: quartOut, delay: runCollapse ? 150 + 75 * (i + 1) : 0 }}
+                    onintroend={() => runCollapse ? runCollapse = false : ""}
+                >
+                    <TaskCard {task} allowsEdit={false} size={"small"} onComplete={() => completeTask(task.id)}/>
+                </div>
+            </div>
         {/each}
     {:else}
         No tasks!
