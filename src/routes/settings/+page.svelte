@@ -146,18 +146,18 @@
 </script>
 
 <div class="page">
-    <h1 in:fly={{ y: 20, delay: 100, duration: 800, easing: quartOut }}>
+    <h1 in:fly={{ y: 20, delay: 100, duration: 1000, easing: quartOut }}>
         Settings
     </h1>
 
     <div class="settings-grid">
 
         <!-- Appearance -->
-        <section class="card" in:fly={{ y: 20, delay: 200, duration: 800, easing: quartOut }}>
+        <section class="card" in:fly={{ y: 30, delay: 175, duration: 1000, easing: quartOut}}>
             <h5 class="card-title">Appearance</h5>
 
             <div class="field">
-                <label class="field-label">Display Name</label>
+                <p class="field-label">Display Name</p>
                 <p class="field-hint">Shown on the homepage greeting.</p>
                 <div class="input-wrap">
                     <Textbox placeholders={["Enter your name"]} preamble={false} bind:value={username.name} />
@@ -167,36 +167,48 @@
             <div class="divider"></div>
 
             <div class="field">
-                <label class="field-label">Theme</label>
+                <p class="field-label">Theme</p>
                 <p class="field-hint">Choose a preset or build your own.</p>
                 <Dropdown options={themeOptions} bind:selected={selectedTheme} />
-                <div class="swatches">
-                    <Swatch color={"var(--primary-light)"} />
-                    <Swatch color={"var(--primary-dark)"} />
-                    <Swatch color={"var(--hover-primary-dark)"} />
-                    <Swatch color={"var(--primary-color)"} />
-                    <Swatch color={"var(--secondary-color)"} />
-                    <Swatch color={"var(--highlight-color)"} />
-                    <Swatch color={"var(--border-color)"} />
-                    <Swatch color={"var(--hover-color)"} />
+                <div style="display: flex; justify-content: center;">
+                    <div class="swatches">
+                        <Swatch color={"var(--primary-light)"} />
+                        <Swatch color={"var(--primary-dark)"} />
+                        <Swatch color={"var(--hover-primary-dark)"} />
+                        <Swatch color={"var(--primary-color)"} />
+                        <Swatch color={"var(--secondary-color)"} />
+                        <Swatch color={"var(--highlight-color)"} />
+                        <Swatch color={"var(--border-color)"} />
+                        <Swatch color={"var(--hover-color)"} />
+                    </div>
                 </div>
             </div>
 
             <div class="divider"></div>
 
             <div class="field">
-                <label class="field-label">Date Format</label>
+                <p class="field-label">Date Format</p>
                 <p class="field-hint">Controls how dates appear throughout the app.</p>
                 <Dropdown options={dateFormatOptions} bind:selected={selectedDateFormat.name} />
             </div>
         </section>
 
         <!-- Calendar -->
-        <section class="card" in:fly={{ y: 20, delay: 350, duration: 800, easing: quartOut }}>
+        <section class="card" in:fly={{ y: 20, delay: 250, duration: 1000, easing: quartOut }}>
             <h5 class="card-title">Calendar</h5>
 
+            <!-- actual calendar customization -->
             <div class="field">
-                <label class="field-label">iCloud Account</label>
+                <p class="field-label">Calendar</p>
+                <p class="field-hint">Modify the homepage calendar</p>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Icloud account fields -->
+
+            <div class="field">
+                <p class="field-label">iCloud Account</p>
                 <p class="field-hint">Use an app-specific password from appleid.apple.com.</p>
                 <div class="input-wrap">
                     <Textbox placeholders={["Email"]} preamble={false} bind:value={email} />
@@ -216,11 +228,11 @@
         </section>
 
         <!-- Danger Zone -->
-        <section class="card danger-card" in:fly={{ y: 20, delay: 500, duration: 800, easing: quartOut }}>
+        <section class="card danger-card" in:fly={{ y: 20, delay: 325, duration: 800, easing: quartOut }}>
             <h5 class="card-title">Danger Zone</h5>
 
             <div class="field">
-                <label class="field-label">Reset Database</label>
+                <p class="field-label">Reset Database</p>
                 <p class="field-hint">
                     Permanently deletes <strong>all</strong> tasks (completed and incomplete) and all tags. This cannot be undone.
                 </p>
@@ -261,6 +273,7 @@
     /* Cards */
     .card {
         border: 1px solid var(--border-color);
+        background-color: var(--primary-light);
         border-radius: 15px;
         padding: 1.5rem;
         display: flex;
@@ -289,7 +302,7 @@
     }
 
     .field-hint {
-        font-size: 0.8125rem;
+        font-size: 0.8rem;
         opacity: 0.6;
         margin: 0;
         padding: 0;

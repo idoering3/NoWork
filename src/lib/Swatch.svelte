@@ -36,7 +36,7 @@
     });
 
     const root = document.documentElement;
-    let colorText = $state(color.substring(color.indexOf('--'), color.lastIndexOf(')')));
+    let colorText = $derived(color.substring(color.indexOf('--'), color.lastIndexOf(')')));
     let colorHex: string | undefined = $state();
 
     $effect(() => {
@@ -115,7 +115,7 @@
     }
 
 	.swatch {
-		width: 3rem;
-		height: 3rem;
+		width: 2.5rem;
+        height: 2.5rem;
 	}
 </style>
