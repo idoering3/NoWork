@@ -241,7 +241,7 @@
         </div>
         {#each tags as tag, i}
             <div style={tag.name === selectedTag?.name ? "" : ""} 
-                in:fly={{ y: 30, delay: 600 + (i + 1) * 300, duration: 1500, easing: quartOut}}
+                in:fly={{ y: 30, delay: 375 + (i + 1) * 75, duration: 1500, easing: quartOut}}
                 // out:fly={{ y: -15, duration: 300, easing: quartOut}}
             >
             <!-- The button for each tag -->

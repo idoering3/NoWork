@@ -90,14 +90,14 @@
                     </div>
                     <div class="side-by-side">
                         <div class="stack" 
-                            in:fly|global={{ y: 30, delay: 600, duration: 1500, easing: quartOut}}
+                            in:fly|global={{ y: 30, delay: 375, duration: 1500, easing: quartOut}}
                             out:fly|global={{ y: -30, duration: 300 , easing: quartOut}}
                             >
                             <h7 class="header">Study</h7>
                             <NumberInput label="mins" roundtoNearest={1} increment={1} lowerLimitNum={1} bind:num={studyTime}/>
                         </div>
                         <div class="stack" 
-                            in:fly|global={{ y: 30, delay: 600, duration: 1500, easing: quartOut}}
+                            in:fly|global={{ y: 30, delay: 375, duration: 1500, easing: quartOut}}
                             out:fly|global={{ y: -30, duration: 300 , easing: quartOut}}    
                         >
                             <h7 class="header">Break</h7>
@@ -105,14 +105,14 @@
                         </div>
                     </div>
                         <div class="stack" 
-                            in:fly|global={{ y: 30, delay: 900, duration: 1500, easing: quartOut}}
+                            in:fly|global={{ y: 30, delay: 450, duration: 1500, easing: quartOut}}
                             out:fly|global={{ y: -30, duration: 300 , easing: quartOut}}
                         >
                             <h7 class="header">Repetitions</h7>
                             <NumberInput label="times" roundtoNearest={1} increment={1} upperLimitNum={30} lowerLimitNum={1} bind:num={repetitions}/>
                         </div>
                     <div 
-                        in:fly|global={{ y: 30, delay: 1200, duration: 1500, easing: quartOut}}
+                        in:fly|global={{ y: 30, delay: 525, duration: 1500, easing: quartOut}}
                         out:fly|global={{ y: -30, duration: 300 , easing: quartOut}}
                     > 
                         <Button flavor="primary" class="circular" onclick={startTimer}>Start Studying</Button>
