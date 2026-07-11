@@ -34,7 +34,7 @@
         {#each tasks as task, i (task.id)}
             <div animate:flip|global={{ duration: 300, easing: quartInOut }}>
                 <div 
-                    in:fly|global={{ duration: 1000, y: 15, easing: quartOut, delay: runCollapse ? 150 + 75 * (i + 1) : 0 }}
+                    in:fly|global={{ duration: 1000, y: 15, easing: quartOut, delay: runCollapse ? 450 + 75 * (i + 1) : 0 }}
                     onintroend={() => runCollapse ? runCollapse = false : ""}
                 >
                     <TaskCard {task} allowsEdit={false} size={"small"} onComplete={() => completeTask(task.id)}/>
