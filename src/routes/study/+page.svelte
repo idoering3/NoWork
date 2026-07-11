@@ -53,8 +53,6 @@
         timerStore.start();
     }
 
-    let dropdownAnimating = $state(false);
-
     let pageEl = $state<HTMLElement>();
     setPageEl( () => pageEl );
 </script>
