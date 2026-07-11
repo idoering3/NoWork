@@ -13,6 +13,7 @@
     import { quartOut } from "svelte/easing";
     import { dateFormatOptions, type DateFormatName } from "$lib/misc/datePrints";
     import { loadCredentials, saveCredentials } from "$lib/cal/calendarCredentialStorage";
+    import { setPageEl } from "$lib/misc/context";
 
     async function resetDatabase() {
         await invoke('reset_database');
@@ -143,9 +144,12 @@
         password = "";
         email = "";
     }
+
+    let pageEl = $state<HTMLElement>();
+    setPageEl( () => pageEl );
 </script>
 
-<div class="page">
+<div class="page" bind:this={pageEl}>
     <h1 in:fly={{ y: 20, delay: 100, duration: 1000, easing: quartOut }}>
         Settings
     </h1>
@@ -254,6 +258,7 @@
 
 <style>
     .page {
+        position:relative;
         padding: 3rem;
         max-width: 860px;
     }

@@ -5,8 +5,9 @@
     import Countdown from '$lib/Countdown.svelte';
     import type { StudyType } from '$lib/types/Study.ts';
     import { timerStore } from '$lib/types/timerStore.svelte';
-    import { quartInOut, quartOut } from 'svelte/easing';
+    import { quartOut } from 'svelte/easing';
     import { fly } from 'svelte/transition';
+    import { setPageEl } from '$lib/misc/context';
 
     
     let studyTypes: Record<string, StudyType> = {
@@ -53,10 +54,16 @@
     }
 
     let dropdownAnimating = $state(false);
+
+    let pageEl = $state<HTMLElement>();
+    setPageEl( () => pageEl );
 </script>
 
 
-<div style="padding: 3rem; display: flex; align-items:center; justify-content: center; flex-direction: column; position: relative;">
+<div 
+    style="padding: 3rem; display: flex; align-items:center; justify-content: center; flex-direction: column; position: relative;"
+    bind:this={pageEl}
+>
     <h1 
         in:fly|global={{ y: 30, delay: 150, duration: 1500, easing: quartOut}}
         
@@ -77,11 +84,8 @@
                     <div 
                         in:fly|global={{ y: 30, delay: 300, duration: 1500, easing: quartOut}}
                         out:fly|global={{ y: -30, duration: 300 , easing: quartOut}}
-                        onintrostart={() => dropdownAnimating = true}
-                        onintroend={() => dropdownAnimating = false}
                     >
                         <Dropdown
-                            dropDisabled={dropdownAnimating}
                             options={Object.keys(studyTypes).map(key => ({ label: key, value: key }))}
                             bind:selected={selectedName}
                         />

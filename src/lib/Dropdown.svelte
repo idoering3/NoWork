@@ -3,6 +3,8 @@
     import { fade, fly } from 'svelte/transition';
     import { onMount } from 'svelte';
     import { quartInOut } from 'svelte/easing';
+    import { portal } from './misc/portal';
+    import { getPageEl } from './misc/context';
 
     type DropdownOption = {
         label: string;
@@ -19,30 +21,48 @@
         dropDisabled?: boolean
     } = $props();
 
-    let dropdownOpen = $state(false);
-
-    let dropdownEl: HTMLElement;
+    let open = $state(false);
+    let triggerEl = $state<HTMLButtonElement>();
+    let portalEl = $state<HTMLDivElement>();
+    let pos = $state({top: 0, left: 0});
+    const getPageElement = getPageEl();
 
     let selectedLabel = $derived.by(() =>
         options.find(o => o.value === selected)?.label ?? ""
     );
 
     function handleClickOutside(event: MouseEvent) {
-        if (dropdownEl && !dropdownEl.contains(event.target as Node)) {
-            dropdownOpen = false;
+        const target = event.target as Node;
+        const insideTrigger = triggerEl?.contains(target);
+        const insidePortal = portalEl?.contains(target);
+        if (!insideTrigger && !insidePortal) {
+            open = false;
         }
     }
 
     function selectOption(option: DropdownOption) 
     {
         selected = option.value;
-        dropdownOpen = false;
+        open = false;
     }
 
     onMount(() => {
         document.addEventListener('click', handleClickOutside);
         return () => document.removeEventListener('click', handleClickOutside);
     });
+
+    function toggle() {
+        open = !open;
+        const pageEl = getPageElement();
+        if (open && triggerEl && pageEl) {
+            const rect = triggerEl.getBoundingClientRect();
+            const pageRect = pageEl.getBoundingClientRect();
+            pos = { 
+                top: rect.bottom - pageRect.top + pageEl.scrollTop, 
+                left: rect.left - pageRect.left + pageEl.scrollLeft
+            };
+        }
+    }
 </script>
 
 {#snippet optionSnippet(option: DropdownOption)}
@@ -52,8 +72,8 @@
 {/snippet}
 
 <div class="container">
-    <div class="dropdown-container" bind:this={dropdownEl}>
-        <button class="dropdown" onclick={() => dropdownOpen = !dropdownOpen}>
+    <div class="dropdown-container">
+        <button class="dropdown" onclick={toggle} bind:this={triggerEl}>
             <div style="position:relative; display: flex; width:100%; align-items: center;">
                 {#if selected}
                     {#key selected}
@@ -63,8 +83,12 @@
                 <span class="right-align"><ChevronDown size={20} strokeWidth={1}/></span>
             </div>
         </button>
-        {#if dropdownOpen && !dropDisabled}
-            <div style='position:relative; display: flex; align-items: center; justify-content: center;'>
+        {#if open && !dropDisabled}
+            <div 
+                style='position:absolute; top: {pos.top}px; left: {pos.left}px; z-index: 999;' 
+                use:portal={getPageElement}
+                bind:this={portalEl}
+            >
                 <div transition:fly={{y: -15, duration: 150, easing: quartInOut}} class="options">
                     {#each options as option}
                         {#if option}
