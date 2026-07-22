@@ -1,6 +1,6 @@
 # NoWork
 
-NoWork is a passion project designed to keep track of tasks, focused on providing tools to drive focus and study, as well as task management. I wanted to install a task app, but found that I was not happy with the vast majority of them. NoWork intends to fix that, with version 1.1 aimed at providing the basic features needed to daily life, and version 1.2 aimed at delivering the app to devices that are not desktop computers such as mobile.
+NoWork is a passion project designed to keep track of tasks, focused on providing tools to drive focus and study, as well as task management. I wanted to install a task app, but found that I was not happy with the vast majority of them. NoWork intends to fix that, with version 1.1 aimed at providing the basic features needed for daily life, and version 1.2 aimed at delivering the app to devices that are not desktop computers such as mobile.
 
 <img width="1918" height="1027" alt="image" src="https://github.com/user-attachments/assets/0c6f4e18-369d-454e-b507-88ceb0a4365c" />
 
