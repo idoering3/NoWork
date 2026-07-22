@@ -58,6 +58,7 @@
         border: 1px solid var(--border-color);
         border-radius: 15px;
         padding: 0.5rem;
+        white-space: nowrap;
         {day != 0 ? "background-color:none" : "background-color: var(--secondary-color)"}
         "
         in:fly|global={{ y: 10, delay: 1200 + day * 75, duration: 1500, easing: quartOut}}
