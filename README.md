@@ -2,7 +2,7 @@
 
 NoWork is a passion project designed to keep track of tasks, focused on providing tools to drive focus and study, as well as task management. I wanted to install a task app, but found that I was not happy with the vast majority of them. NoWork intends to fix that, with version 1.1 aimed at providing the basic features needed to daily life, and version 1.2 aimed at delivering the app to devices that are not desktop computers such as mobile.
 
-<img width="1912" height="1024" alt="image" src="https://github.com/user-attachments/assets/1de67bf9-9034-498e-802c-c691efe074e1" />
+<img width="1918" height="1027" alt="image" src="https://github.com/user-attachments/assets/0c6f4e18-369d-454e-b507-88ceb0a4365c" />
 
 # Releases
 NoWork officially released in 1.0 in December of 2025. However, due to various issues, the original repository had to be deleted and re-created. NoWork is quickly approaching version 1.1, which includes a reworked home bar, Apple calendar support, and more advanced tasks.
