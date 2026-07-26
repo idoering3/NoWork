@@ -215,8 +215,6 @@ export async function updateCalendarNumHours(hours: number) {
   const store = await load(".settings.json");
   await store.set("calendarNumHours", { value: hours });
   await store.save();
-
-  console.log("Calendar num hours updated to", hours);
 }
 
 export async function getCalendarNumHours() {
