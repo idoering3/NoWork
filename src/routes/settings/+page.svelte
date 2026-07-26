@@ -143,113 +143,118 @@
         Settings
     </h1>
 
-    <div class="settings-grid">
+    <div class="settings-columns">
+        
+        <div class="column">
+            <!-- Appearance -->
+            <section class="card" in:fly={{ y: 30, delay: 250, duration: 1500, easing: quartOut}}>
+                <h5 class="card-title">Appearance</h5>
 
-        <!-- Appearance -->
-        <section class="card" in:fly={{ y: 30, delay: 250, duration: 1500, easing: quartOut}}>
-            <h5 class="card-title">Appearance</h5>
-
-            <div class="field">
-                <p class="field-label">Display Name</p>
-                <p class="field-hint">Shown on the homepage greeting.</p>
-                <div class="input-wrap">
-                    <Textbox placeholders={["Enter your name"]} preamble={false} bind:value={username.name} />
-                </div>
-            </div>
-
-            <div class="divider"></div>
-
-            <div class="field">
-                <p class="field-label">Theme</p>
-                <p class="field-hint">Choose a preset or build your own.</p>
-                <Dropdown options={themeOptions} bind:selected={selectedTheme} />
-                <div style="display: flex; justify-content: center;">
-                    <div class="swatches">
-                        <Swatch color={"var(--primary-light)"} />
-                        <Swatch color={"var(--primary-dark)"} />
-                        <Swatch color={"var(--hover-primary-dark)"} />
-                        <Swatch color={"var(--primary-color)"} />
-                        <Swatch color={"var(--secondary-color)"} />
-                        <Swatch color={"var(--highlight-color)"} />
-                        <Swatch color={"var(--border-color)"} />
-                        <Swatch color={"var(--hover-color)"} />
+                <div class="field">
+                    <p class="field-label">Display Name</p>
+                    <p class="field-hint">Shown on the homepage greeting.</p>
+                    <div class="input-wrap">
+                        <Textbox placeholders={["Enter your name"]} preamble={false} bind:value={username.name} />
                     </div>
                 </div>
-            </div>
 
-            <div class="divider"></div>
+                <div class="divider"></div>
 
-            <div class="field">
-                <p class="field-label">Date Format</p>
-                <p class="field-hint">Controls how dates appear throughout the app.</p>
-                <Dropdown options={dateFormatOptions} bind:selected={selectedDateFormat.name} />
-            </div>
-        </section>
-
-        <!-- Calendar -->
-        <section class="card" in:fly={{ y: 20, delay: 325, duration: 1500, easing: quartOut }}>
-            <h5 class="card-title">Calendar</h5>
-
-            <!-- actual calendar customization -->
-            <div class="field">
-                <p class="field-label">Calendar</p>
-                <p class="field-hint">Modify the homepage calendar</p>
-                <!-- Calendar Start Time -->
-                <div>
-                    <NumberInput 
-                        bind:num={calStartTime} 
-                        label="Start Time"
-                        upperLimitNum={23}
-                        lowerLimitNum={0}
-                        increment={1}
-                    /> 
-                    <NumberInput 
-                        bind:num={calEndTime} 
-                        label="End Time"
-                        upperLimitNum={24}
-                        bind:lowerLimitNum={minCalEndTime}
-                        increment={1}
-                    /> 
+                <div class="field">
+                    <p class="field-label">Theme</p>
+                    <p class="field-hint">Choose a preset or build your own.</p>
+                    <Dropdown options={themeOptions} bind:selected={selectedTheme} />
+                    <div style="display: flex; justify-content: center;">
+                        <div class="swatches">
+                            <Swatch color={"var(--primary-light)"} />
+                            <Swatch color={"var(--primary-dark)"} />
+                            <Swatch color={"var(--hover-primary-dark)"} />
+                            <Swatch color={"var(--primary-color)"} />
+                            <Swatch color={"var(--secondary-color)"} />
+                            <Swatch color={"var(--highlight-color)"} />
+                            <Swatch color={"var(--border-color)"} />
+                            <Swatch color={"var(--hover-color)"} />
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="divider"></div>
-            <!-- Icloud account fields -->
+                <div class="divider"></div>
 
-            <div class="field">
-                <p class="field-label">iCloud Account</p>
-                <p class="field-hint">Use an app-specific password from appleid.apple.com.</p>
-                <div class="input-wrap">
-                    <Textbox placeholders={["Email"]} preamble={false} bind:value={email} />
+                <div class="field">
+                    <p class="field-label">Date Format</p>
+                    <p class="field-hint">Controls how dates appear throughout the app.</p>
+                    <Dropdown options={dateFormatOptions} bind:selected={selectedDateFormat.name} />
                 </div>
-                <div class="input-wrap">
-                    <Textbox placeholders={["App-specific password"]} preamble={false} bind:value={password} />
-                </div>
-                <div class="button-row">
-                    <Button flavor="primary" class="circular" onclick={() => saveCredentials(email, password)}>
-                        Save
-                    </Button>
-                    <Button flavor="danger" class="circular border" onclick={() => removeCredentials(email)}>
-                        Clear
+            </section>
+
+            <!-- Danger Zone -->
+            <section class="card danger-card" in:fly={{ y: 20, delay: 400, duration: 1500, easing: quartOut }}>
+                <h5 class="card-title">Danger Zone</h5>
+
+                <div class="field">
+                    <p class="field-label">Reset Database</p>
+                    <p class="field-hint">
+                        Permanently deletes <strong>all</strong> tasks (completed and incomplete) and all tags. This cannot be undone.
+                    </p>
+                    <Button flavor="danger" class="circular border" onclick={confirmResetDatabase}>
+                        Reset Database
                     </Button>
                 </div>
-            </div>
-        </section>
+            </section>
+        </div>
+    
+        <div class="column">
 
-        <!-- Danger Zone -->
-        <section class="card danger-card" in:fly={{ y: 20, delay: 400, duration: 1500, easing: quartOut }}>
-            <h5 class="card-title">Danger Zone</h5>
-
-            <div class="field">
-                <p class="field-label">Reset Database</p>
-                <p class="field-hint">
-                    Permanently deletes <strong>all</strong> tasks (completed and incomplete) and all tags. This cannot be undone.
-                </p>
-                <Button flavor="danger" class="circular border" onclick={confirmResetDatabase}>
-                    Reset Database
-                </Button>
-            </div>
-        </section>
+            <!-- Calendar -->
+            <section class="card" in:fly={{ y: 20, delay: 325, duration: 1500, easing: quartOut }}>
+                <h5 class="card-title">Calendar</h5>
+    
+                <!-- actual calendar customization -->
+                <div class="field">
+                    <p class="field-label">Calendar</p>
+                    <p class="field-hint">Modify the homepage calendar</p>
+                    <!-- Calendar Start Time -->
+                    <div>
+                        <NumberInput 
+                            bind:num={calStartTime} 
+                            label="Start Time"
+                            upperLimitNum={23}
+                            lowerLimitNum={0}
+                            increment={1}
+                        /> 
+                        <NumberInput 
+                            bind:num={calEndTime} 
+                            label="End Time"
+                            upperLimitNum={24}
+                            bind:lowerLimitNum={minCalEndTime}
+                            increment={1}
+                        /> 
+                    </div>
+                </div>
+    
+                <div class="divider"></div>
+                <!-- Icloud account fields -->
+    
+                <div class="field">
+                    <p class="field-label">iCloud Account</p>
+                    <p class="field-hint">Use an app-specific password from appleid.apple.com.</p>
+                    <div class="input-wrap">
+                        <Textbox placeholders={["Email"]} preamble={false} bind:value={email} />
+                    </div>
+                    <div class="input-wrap">
+                        <Textbox placeholders={["App-specific password"]} preamble={false} bind:value={password} />
+                    </div>
+                    <div class="button-row">
+                        <Button flavor="primary" class="circular" onclick={() => saveCredentials(email, password)}>
+                            Save
+                        </Button>
+                        <Button flavor="danger" class="circular border" onclick={() => removeCredentials(email)}>
+                            Clear
+                        </Button>
+                    </div>
+                </div>
+            </section>
+        </div>
 
     </div>
 </div>
@@ -273,11 +278,16 @@
     }
 
     /* Grid: two columns on wide viewports, single column otherwise */
-    .settings-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    .settings-columns {
+        display: flex;
         gap: 1.5rem;
-        align-items: start;
+    }
+
+    .column {
+        display: flex;
+        gap: 1.5rem;
+        flex-direction: column;
+        width: calc((100vw - 3rem) / 4);
     }
 
     /* Cards */
