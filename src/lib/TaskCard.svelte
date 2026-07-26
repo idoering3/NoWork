@@ -144,6 +144,12 @@
     }
 </script>
 
+
+
+
+
+
+
 {#snippet tagsn(name: string, id: number, color: TagColor)}
     <Badge flavor={color} noPadding>
         {#if task.tags?.some(tag => tag.name === name)}
@@ -172,6 +178,12 @@
     </Badge>
 {/snippet}
 
+
+
+
+
+
+
 <div
     class="task-container"
     bind:this={container}
@@ -199,7 +211,7 @@
                 {/if}
             </div>
         {:else}
-            <div style="width: fit-content; text-overflow: ellipsis; white-space: nowrap;">
+            <div style="width: 25rem; text-overflow: ellipsis; white-space: nowrap;">
                 <Textbox preamble={false} placeholders={["Enter task name"]} bind:value={name} />
             </div>
             {#if dueDate}
