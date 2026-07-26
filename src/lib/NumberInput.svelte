@@ -6,7 +6,7 @@
     let {
         num = $bindable(120),
         upperLimitNum = 995,
-        lowerLimitNum = 10,
+        lowerLimitNum = $bindable(10),
         increment = 5,
         label = "",
         roundtoNearest = 1

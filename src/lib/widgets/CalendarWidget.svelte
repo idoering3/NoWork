@@ -1,6 +1,6 @@
 <script lang="ts">
     import { fly } from "svelte/transition";
-    import { dayKey, startClock } from "../stores.svelte";
+    import { dayKey, getCalendarNumHours, getCalendarStartTime, startClock } from "../stores.svelte";
     import { quartOut } from "svelte/easing";
     import type { Task } from "../types/task";
     import EventCard from "$lib/cal/EventCard.svelte";
@@ -31,6 +31,9 @@
     let currentDate = $state(new Date());
     startClock(date => currentDate = date);
 
+    let startingHour = $state(7);
+    let numHours = $state(12);
+
     let events: CalendarEvent[] | undefined = $state();
 
     let days = $derived(getWeekDays(currentDate));
@@ -41,6 +44,10 @@
     }
 
     onMount(async () => {
+        startingHour = await getCalendarStartTime();
+        console.log(startingHour);
+        numHours = await getCalendarNumHours();
+
         const store = await load(".settings.json");
         
         // get the cached events
@@ -98,9 +105,6 @@
         } 
         return undefined;
     });
-
-    let startingHour = $state(7);
-    let numHours = $state(12);
 
     let dayWidth = $state(0);
     let dayHeight = $state(0);

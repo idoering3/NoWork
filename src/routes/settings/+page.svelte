@@ -3,10 +3,9 @@
     import Button from "$lib/Button.svelte";
     import Dropdown from "$lib/Dropdown.svelte";
     import Swatch from "$lib/Swatch.svelte";
-    import { setColors, type Theme } from "$lib/theme";
     import { invoke } from "@tauri-apps/api/core";
     import { load } from "@tauri-apps/plugin-store";
-    import { selectedDateFormat, theme, themes, username, type ThemeName } from "$lib/stores.svelte";
+    import { getCalendarNumHours, getCalendarStartTime, selectedDateFormat, theme, themes, updateCalendarNumHours, updateCalendarStartTime, username, type ThemeName } from "$lib/stores.svelte";
     import { onMount } from "svelte";
     import Textbox from "$lib/Textbox.svelte";
     import { fly } from "svelte/transition";
@@ -14,6 +13,7 @@
     import { dateFormatOptions, type DateFormatName } from "$lib/misc/datePrints";
     import { loadCredentials, saveCredentials } from "$lib/cal/calendarCredentialStorage";
     import { setPageEl } from "$lib/misc/context";
+    import NumberInput from "$lib/NumberInput.svelte";
 
     async function resetDatabase() {
         await invoke('reset_database');
@@ -33,8 +33,10 @@
 
     let databaseConfirmDialogOpen = $state(false);
     let confirmDialog = $state();
-    let calNumHours = $state(10);
     let calStartTime = $state(7);
+    let minCalEndTime = $derived(calStartTime + 1);
+    let calEndTime = $state(19);
+    let calNumHours = $derived(calEndTime - calStartTime);
     let loaded = $state(false);
     let mounted = $state(false);
     let email = $state("");
@@ -88,12 +90,11 @@
 
 
         const dateFormat = await store.get<{ value: DateFormatName }>("dateFormat");
-        const calendarNumberHours = await store.get<{ value: number}>("calendarNumHours");
-        const calendarStartTime = await store.get<{ value: number}>("calendarStartTime");
         const emailName = await store.get<{ value: string}>("email");
 
-        calNumHours = calendarNumberHours?.value ?? 10;
-        calStartTime = calendarStartTime?.value ?? 10;
+        calNumHours = await getCalendarNumHours();
+        calStartTime = await getCalendarStartTime();
+        calEndTime = calStartTime + calNumHours;
 
         if (emailName?.value) {
             email = emailName.value;
@@ -120,21 +121,9 @@
 
     $effect(() => {
         if (!mounted) return;
-        if (calNumHours && loaded) updateCalendarNumHours(calNumHours);
+        if (calEndTime && loaded) updateCalendarNumHours(calNumHours);
         if (calStartTime && loaded) updateCalendarStartTime(calStartTime);
     });
-
-    async function updateCalendarStartTime(startHour: number) {
-        const store = await load(".settings.json");
-        await store.set("calendarStartTime", { value: startHour });
-        await store.save();
-    }
-
-    async function updateCalendarNumHours(hours: number) {
-        const store = await load(".settings.json");
-        await store.set("calendarNumHours", { value: hours });
-        await store.save();
-    }
 
     export async function removeCredentials(email: string): Promise<void> {
         await invoke("delete_credentials", { email });
@@ -150,14 +139,14 @@
 </script>
 
 <div class="page" bind:this={pageEl}>
-    <h1 in:fly={{ y: 20, delay: 100, duration: 1000, easing: quartOut }}>
+    <h1 in:fly={{ y: 20, delay: 100, duration: 1500, easing: quartOut }}>
         Settings
     </h1>
 
     <div class="settings-grid">
 
         <!-- Appearance -->
-        <section class="card" in:fly={{ y: 30, delay: 175, duration: 1000, easing: quartOut}}>
+        <section class="card" in:fly={{ y: 30, delay: 250, duration: 1500, easing: quartOut}}>
             <h5 class="card-title">Appearance</h5>
 
             <div class="field">
@@ -198,17 +187,33 @@
         </section>
 
         <!-- Calendar -->
-        <section class="card" in:fly={{ y: 20, delay: 250, duration: 1000, easing: quartOut }}>
+        <section class="card" in:fly={{ y: 20, delay: 325, duration: 1500, easing: quartOut }}>
             <h5 class="card-title">Calendar</h5>
 
             <!-- actual calendar customization -->
             <div class="field">
                 <p class="field-label">Calendar</p>
                 <p class="field-hint">Modify the homepage calendar</p>
+                <!-- Calendar Start Time -->
+                <div>
+                    <NumberInput 
+                        bind:num={calStartTime} 
+                        label="Start Time"
+                        upperLimitNum={23}
+                        lowerLimitNum={0}
+                        increment={1}
+                    /> 
+                    <NumberInput 
+                        bind:num={calEndTime} 
+                        label="End Time"
+                        upperLimitNum={24}
+                        bind:lowerLimitNum={minCalEndTime}
+                        increment={1}
+                    /> 
+                </div>
             </div>
 
             <div class="divider"></div>
-
             <!-- Icloud account fields -->
 
             <div class="field">
@@ -232,7 +237,7 @@
         </section>
 
         <!-- Danger Zone -->
-        <section class="card danger-card" in:fly={{ y: 20, delay: 325, duration: 800, easing: quartOut }}>
+        <section class="card danger-card" in:fly={{ y: 20, delay: 400, duration: 1500, easing: quartOut }}>
             <h5 class="card-title">Danger Zone</h5>
 
             <div class="field">

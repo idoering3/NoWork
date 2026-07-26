@@ -2,6 +2,7 @@ import { invoke } from "@tauri-apps/api/core";
 import type { Theme } from "./theme";
 import type { Tag, TagColor } from "./types/task";
 import type { DateFormatName } from "./misc/datePrints";
+import { load } from "@tauri-apps/plugin-store";
 
 
 export const themes = {  
@@ -198,3 +199,34 @@ export const currentLocation = $state({
   region: "" as string,
   country: "" as string
 });
+
+export interface CalendarDisplay {
+  startHour: number;
+  numHours: number;
+}
+
+export async function updateCalendarStartTime(startHour: number) {
+  const store = await load(".settings.json");
+  await store.set("calendarStartTime", { value: startHour });
+  await store.save();
+}
+
+export async function updateCalendarNumHours(hours: number) {
+  const store = await load(".settings.json");
+  await store.set("calendarNumHours", { value: hours });
+  await store.save();
+
+  console.log("Calendar num hours updated to", hours);
+}
+
+export async function getCalendarNumHours() {
+  const store = await load(".settings.json");
+  const calNumHours = await store.get<{ value: number }>("calendarNumHours");
+  return calNumHours?.value ?? 12;
+}
+
+export async function getCalendarStartTime() {
+  const store = await load(".settings.json");
+  const calStartTime = await store.get<{ value: number }>("calendarStartTime");
+  return calStartTime?.value ?? 7;
+}
