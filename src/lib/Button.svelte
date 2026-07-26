@@ -89,8 +89,8 @@
     }
 
     button.square.xsmall, a.square.xsmall {
-        width: 1.5rem;
-        height: 1.5rem;
+        width: 1.4rem;
+        height: 1.4rem;
     }
 
     button.square.small, a.square.small {

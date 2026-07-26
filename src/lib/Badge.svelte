@@ -24,7 +24,7 @@
         --badge-color: {flavorMap[flavor].color};
         --badge-border: {flavorMap[flavor].border ?? 'none'};
     "
-    class={[flavorMap[flavor].name, 'badge']}
+    class={[flavorMap[flavor].name, 'badge', noPadding ? 'no-padding' : '']}
 >
     {@render children?.()}
 </div>
