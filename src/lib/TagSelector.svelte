@@ -165,7 +165,7 @@
 									style="background-color: {color.bgcolor};
 									width: 1.5rem;
 									height: 1.5rem;
-									border: none;
+									border: {color.border ? color.border : 'none'};
 									"
 									onclick={() => setTagColor(color.name)}
 									aria-label="whatever"
