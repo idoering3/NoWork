@@ -158,7 +158,7 @@
 
     let { selectedDate = $bindable(), size = '', slowAnimation = true }: Props = $props();
 
-    let dropsUp = $state(false);
+    let dropsUp = $state(true);
     let posRight = $state(false);
 
     function updateDropDirection(inputEl: HTMLElement, dropdownHeight: number, dropdownWidth: number) {
