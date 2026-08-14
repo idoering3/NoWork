@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { TagColor, Task } from "$lib/types/task";
     import Check from "@lucide/svelte/icons/check";
-    import { Plus, Trash, X } from "@lucide/svelte";
+    import { FlagTriangleRight, Plus, Trash, X } from "@lucide/svelte";
     import Button from "./Button.svelte";
     import Badge from "./Badge.svelte";
     import { getAllTags } from "./stores.svelte";
@@ -199,7 +199,7 @@
 
                 <!-- The TASK NAME is HERE -->
                 <p class:smallname={size == "small"}>
-                    {task.name} {task.priority ? `(${task.priority})` : 'null'}
+                    {task.name}
                 </p>
                 
                 {#key task}
@@ -209,7 +209,12 @@
                 {/key}
             </div>
 
+            <!-- PRIORITY GOES HERE -->
+            {#if task.priority}
+                <FlagTriangleRight />
+            {/if}
 
+            <!-- TAGS GO HERE -->
             <div class="tags">
                 {#if task.tags}
                     {#each task.tags as tag}

@@ -1,6 +1,6 @@
 <script>
     import { Minus, Square, X } from "@lucide/svelte";
-    import Button from "./Button.svelte";
+    import Button from "../Button.svelte";
     import { getCurrentWindow } from "@tauri-apps/api/window";
 
     let appWindow = getCurrentWindow();

@@ -1,6 +1,6 @@
 <script lang='ts'>
     import '../app.css';
-    import Header from '$lib/Header.svelte';
+    import Header from '$lib/misc/Header.svelte';
     import Sidebar from '$lib/Sidebar.svelte';
     import { page } from '$app/state';
     import { fade, fly } from 'svelte/transition';
