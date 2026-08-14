@@ -19,8 +19,8 @@
 
 {#if open}
     <div class="container">
-        <div transition:scale={{ duration: 150, easing: quartInOut, start: 0.75, opacity: 0 }}>
-            <Card>
+        <div transition:scale={{ duration: 75, easing: quartInOut, start: 0.75, opacity: 0 }}>
+            <div class="mica-card">
                 <div class="card">
                     <div>
                         <h6>
@@ -39,7 +39,7 @@
                         </div>
                     </div>
                 </div>
-            </Card>
+            </div>
         </div>
     </div>
 {/if}
@@ -54,13 +54,48 @@
         color: var(--primary-dark);
     }
 
+    .mica-card {
+        padding: 1rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0px 0px 5px -2px var(--border-color);
+        background: 
+        linear-gradient(
+            190deg,
+            color-mix(in srgb, var(--accent-color) 5%, transparent),
+            transparent 60%
+        ),
+        color-mix(
+            in srgb,
+            var(--primary-light) 75%,
+            transparent
+        );
+        border-radius: 15px;
+        border: 1px solid color-mix(
+            in srgb,
+            var(--border-color) 50%,
+            transparent
+        );
+        width: fit-content;
+        box-shadow:
+            0 1px 2px rgb(0 0 0 / 4%),
+            0 8px 24px rgb(0 0 0 / 6%);
+        
+        backdrop-filter: blur(20px);
+        display: flex;
+        flex-direction: column;
+        align-content: center;
+        gap: 0.5rem;
+    }
+
     .options {
         display: flex;
         justify-content: end;
         gap: 0.5rem;
     }
     .container {
-        top: 0;
+        z-index: 1000;
+        top: -3rem;
         left: 0;
         position: absolute;
         width: 100%;
@@ -68,7 +103,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background-color: color-mix(in srgb, var(--primary-dark), transparent 50%);
     }
     .card {
         padding: 1rem;
