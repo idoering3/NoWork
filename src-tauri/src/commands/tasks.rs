@@ -1,10 +1,38 @@
 use crate::commands::{
-    database,
-    types::{NewTag, Tag, Task},
+    database, types::{NewTag, Tag, Task, TaskPriority},
 };
-use chrono::{DateTime, Datelike, Duration, Local, NaiveDate, TimeZone, Utc};
-use rusqlite::params;
+use chrono::{DateTime, Datelike, Duration, Local, TimeZone, Utc};
+use rusqlite::{Connection, params};
 use tauri::AppHandle;
+
+struct TaskRow {
+    id: i32,
+    name: String,
+    due_date: Option<String>,
+    created_at: String,
+    completed: i32,
+    completed_at: Option<String>,
+    priority: Option<i32>,
+}
+
+// helper to construct a task given a sqlite row
+fn task_from_row(
+    row: TaskRow,
+    conn: &Connection) 
+-> Result<Task, String> {
+    let priority_enum = row.priority.and_then(|n| TaskPriority::from_i32(n));
+
+    Ok(Task {
+        id: row.id,
+        name: row.name,
+        due_date: parse_opt_date(row.due_date)?,
+        created_at: parse_opt_date(Some(row.created_at))?.unwrap(),
+        completed: row.completed != 0,
+        completed_at: parse_opt_date(row.completed_at)?,
+        priority: priority_enum,
+        tags: fetch_tags(conn, row.id)?,
+    })
+}
 
 // Helper to fetch tags for a task
 fn fetch_tags(conn: &rusqlite::Connection, task_id: i32) -> Result<Option<Vec<Tag>>, String> {
@@ -52,15 +80,17 @@ pub fn add_database_task(
     app: AppHandle,
     name: String,
     due_date: Option<DateTime<Utc>>,
+    priority: Option<TaskPriority>,
     tags: Option<Vec<NewTag>>,
 ) -> Result<(), String> {
     let mut conn = database::open_conn(&app).map_err(|e| e.to_string())?;
     let tx = conn.transaction().map_err(|e| e.to_string())?;
 
     let due_date_str = due_date.map(|dt| dt.to_rfc3339());
+    let priority_num = priority.map(|p| p.as_i32());
     tx.execute(
-        "INSERT INTO tasks (name, due_date) VALUES (?1, ?2)",
-        params![name, due_date_str],
+        "INSERT INTO tasks (name, due_date, priority) VALUES (?1, ?2, ?3)",
+        params![name, due_date_str, priority_num],
     )
     .map_err(|e| e.to_string())?;
 
@@ -100,36 +130,29 @@ pub fn add_database_task(
 pub fn get_all_tasks(app: AppHandle) -> Result<Vec<Task>, String> {
     let conn = database::open_conn(&app).map_err(|e| e.to_string())?;
     let mut stmt = conn
-        .prepare("SELECT id, name, due_date, created_at, completed, completed_at FROM tasks")
+        .prepare("SELECT id, name, due_date, created_at, completed, completed_at, priority FROM tasks")
         .map_err(|e| e.to_string())?;
 
     let rows = stmt
         .query_map([], |row| {
-            Ok((
-                row.get::<_, i32>(0)?,
-                row.get::<_, String>(1)?,
-                row.get::<_, Option<String>>(2)?,
-                row.get::<_, String>(3)?,
-                row.get::<_, i32>(4)?,
-                row.get::<_, Option<String>>(5)?,
-            ))
+            Ok(TaskRow {
+                id: row.get(0)?,
+                name: row.get(1)?,
+                due_date: row.get(2)?,
+                created_at: row.get(3)?,
+                completed: row.get(4)?,
+                completed_at: row.get(5)?,
+                priority: row.get(6)?
+            })
         })
         .map_err(|e| e.to_string())?;
 
     let mut tasks = Vec::new();
     for row in rows {
-        let (id, name, due_date_str, created_at_str, completed_int, completed_at_str) =
-            row.map_err(|e| e.to_string())?;
+        let task_row = row.map_err(|e| e.to_string())?;
+        let task = task_from_row(task_row, &conn)?;
 
-        tasks.push(Task {
-            id,
-            name,
-            due_date: parse_opt_date(due_date_str)?,
-            created_at: parse_opt_date(Some(created_at_str))?.unwrap(),
-            completed: completed_int != 0,
-            completed_at: parse_opt_date(completed_at_str)?,
-            tags: fetch_tags(&conn, id)?,
-        });
+        tasks.push(task);
     }
     Ok(tasks)
 }
@@ -139,36 +162,29 @@ pub fn get_all_tasks(app: AppHandle) -> Result<Vec<Task>, String> {
 pub fn get_incomplete_tasks(app: AppHandle) -> Result<Vec<Task>, String> {
     let conn = database::open_conn(&app).map_err(|e| e.to_string())?;
     let mut stmt = conn
-        .prepare("SELECT id, name, due_date, created_at, completed, completed_at FROM tasks WHERE completed = 0")
+        .prepare("SELECT id, name, due_date, created_at, completed, completed_at, priority FROM tasks WHERE completed = 0")
         .map_err(|e| e.to_string())?;
 
     let rows = stmt
         .query_map([], |row| {
-            Ok((
-                row.get::<_, i32>(0)?,
-                row.get::<_, String>(1)?,
-                row.get::<_, Option<String>>(2)?,
-                row.get::<_, String>(3)?,
-                row.get::<_, i32>(4)?,
-                row.get::<_, Option<String>>(5)?,
-            ))
+            Ok(TaskRow {
+                id: row.get(0)?,
+                name: row.get(1)?,
+                due_date: row.get(2)?,
+                created_at: row.get(3)?,
+                completed: row.get(4)?,
+                completed_at: row.get(5)?,
+                priority: row.get(6)?
+            })
         })
         .map_err(|e| e.to_string())?;
 
     let mut tasks = Vec::new();
     for row in rows {
-        let (id, name, due_date_str, created_at_str, completed_int, completed_at_str) =
-            row.map_err(|e| e.to_string())?;
+        let task_row = row.map_err(|e| e.to_string())?;
+        let task = task_from_row(task_row, &conn)?;
 
-        tasks.push(Task {
-            id,
-            name,
-            due_date: parse_opt_date(due_date_str)?,
-            created_at: parse_opt_date(Some(created_at_str))?.unwrap(),
-            completed: completed_int != 0,
-            completed_at: parse_opt_date(completed_at_str)?,
-            tags: fetch_tags(&conn, id)?,
-        });
+        tasks.push(task);
     }
     Ok(tasks)
 }
@@ -210,44 +226,33 @@ pub fn get_tasks_due_today(app: AppHandle) -> Result<Vec<Task>, String> {
 
     let mut stmt = conn
         .prepare(
-            "SELECT id, name, due_date, created_at, completed, completed_at
+            "SELECT id, name, due_date, created_at, completed, completed_at, priority
          FROM tasks
          WHERE due_date IS NOT NULL AND due_date >= ?1 AND due_date <= ?2",
         )
         .map_err(|e| e.to_string())?;
 
     let rows = stmt
-        .query_map(
-            params![start_utc.to_rfc3339(), end_utc.to_rfc3339()],
-            |row| {
-                Ok((
-                    row.get::<_, i32>(0)?,
-                    row.get::<_, String>(1)?,
-                    row.get::<_, Option<String>>(2)?,
-                    row.get::<_, String>(3)?,
-                    row.get::<_, i32>(4)?,
-                    row.get::<_, Option<String>>(5)?,
-                ))
-            },
-        )
+        .query_map([], |row| {
+            Ok(TaskRow {
+                id: row.get(0)?,
+                name: row.get(1)?,
+                due_date: row.get(2)?,
+                created_at: row.get(3)?,
+                completed: row.get(4)?,
+                completed_at: row.get(5)?,
+                priority: row.get(6)?
+            })
+        })
         .map_err(|e| e.to_string())?;
 
     let mut tasks = Vec::new();
     for row in rows {
-        let (id, name, due_date_str, created_at_str, completed_int, completed_at_str) =
-            row.map_err(|e| e.to_string())?;
+        let task_row = row.map_err(|e| e.to_string())?;
+        let task = task_from_row(task_row, &conn)?;
 
-        tasks.push(Task {
-            id,
-            name,
-            due_date: parse_opt_date(due_date_str)?,
-            created_at: parse_opt_date(Some(created_at_str))?.unwrap(),
-            completed: completed_int != 0,
-            completed_at: parse_opt_date(completed_at_str)?,
-            tags: fetch_tags(&conn, id)?,
-        });
+        tasks.push(task);
     }
-
     Ok(tasks)
 }
 
@@ -272,44 +277,33 @@ pub fn get_tasks_due_this_week(app: AppHandle) -> Result<Vec<Task>, String> {
 
     let mut stmt = conn
         .prepare(
-            "SELECT id, name, due_date, created_at, completed, completed_at
+            "SELECT id, name, due_date, created_at, completed, completed_at, priority
          FROM tasks
          WHERE due_date IS NOT NULL AND due_date >= ?1 AND due_date <= ?2",
         )
         .map_err(|e| e.to_string())?;
 
     let rows = stmt
-        .query_map(
-            params![start_utc.to_rfc3339(), end_utc.to_rfc3339()],
-            |row| {
-                Ok((
-                    row.get::<_, i32>(0)?,
-                    row.get::<_, String>(1)?,
-                    row.get::<_, Option<String>>(2)?,
-                    row.get::<_, String>(3)?,
-                    row.get::<_, i32>(4)?,
-                    row.get::<_, Option<String>>(5)?,
-                ))
-            },
-        )
+        .query_map([], |row| {
+            Ok(TaskRow {
+                id: row.get(0)?,
+                name: row.get(1)?,
+                due_date: row.get(2)?,
+                created_at: row.get(3)?,
+                completed: row.get(4)?,
+                completed_at: row.get(5)?,
+                priority: row.get(6)?
+            })
+        })
         .map_err(|e| e.to_string())?;
 
     let mut tasks = Vec::new();
     for row in rows {
-        let (id, name, due_date_str, created_at_str, completed_int, completed_at_str) =
-            row.map_err(|e| e.to_string())?;
+        let task_row = row.map_err(|e| e.to_string())?;
+        let task = task_from_row(task_row, &conn)?;
 
-        tasks.push(Task {
-            id,
-            name,
-            due_date: parse_opt_date(due_date_str)?,
-            created_at: parse_opt_date(Some(created_at_str))?.unwrap(),
-            completed: completed_int != 0,
-            completed_at: parse_opt_date(completed_at_str)?,
-            tags: fetch_tags(&conn, id)?,
-        });
+        tasks.push(task);
     }
-
     Ok(tasks)
 }
 
@@ -333,7 +327,7 @@ pub fn get_task_by_id(app: AppHandle, task_id: i32) -> Result<Task, String> {
 
     let mut stmt = conn
         .prepare(
-            "SELECT id, name, due_date, created_at, completed, completed_at
+            "SELECT id, name, due_date, created_at, completed, completed_at, priority
              FROM tasks
              WHERE id = ?1",
         )
@@ -341,28 +335,21 @@ pub fn get_task_by_id(app: AppHandle, task_id: i32) -> Result<Task, String> {
 
     let row = stmt
         .query_row(params![task_id], |row| {
-            Ok((
-                row.get::<_, i32>(0)?,
-                row.get::<_, String>(1)?,
-                row.get::<_, Option<String>>(2)?,
-                row.get::<_, String>(3)?,
-                row.get::<_, i32>(4)?,
-                row.get::<_, Option<String>>(5)?,
-            ))
+            Ok(TaskRow {
+                id: row.get(0)?,
+                name: row.get(1)?,
+                due_date: row.get(2)?,
+                created_at: row.get(3)?,
+                completed: row.get(4)?,
+                completed_at: row.get(5)?,
+                priority: row.get(6)?,
+            })
         })
         .map_err(|e| e.to_string())?;
 
-    let (id, name, due_date_str, created_at_str, completed_int, completed_at_str) = row;
+    let task = task_from_row(row, &conn)?;
 
-    Ok(Task {
-        id,
-        name,
-        due_date: parse_opt_date(due_date_str)?,
-        created_at: parse_opt_date(Some(created_at_str))?.unwrap(),
-        completed: completed_int != 0,
-        completed_at: parse_opt_date(completed_at_str)?,
-        tags: fetch_tags(&conn, id)?,
-    })
+    Ok(task)
 }
 
 #[tauri::command]

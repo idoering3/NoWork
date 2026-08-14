@@ -21,7 +21,8 @@ pub fn init_db(app: &AppHandle) -> Result<()> {
             due_date TEXT,
             created_at TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
             completed BOOLEAN DEFAULT 0,
-            completed_at TEXT
+            completed_at TEXT,
+            priority INTEGER
         )",
         [],
     )?;
@@ -35,9 +36,9 @@ pub fn init_db(app: &AppHandle) -> Result<()> {
         [],
     )?;
 
-    // ignore error if column exists
+    // 1.1 migration, adds the priority column
     let _ = conn.execute(
-        "ALTER TABLE tags ADD COLUMN color TEXT DEFAULT 'default'",
+        "ALTER TABLE tasks ADD COLUMN priority INTEGER",
         [],
     );
 
