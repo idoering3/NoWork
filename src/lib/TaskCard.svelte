@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { TagColor, Task } from "$lib/types/task";
+    import type { TagColor, Task, TaskPriority } from "$lib/types/task";
     import Check from "@lucide/svelte/icons/check";
     import { FlagTriangleRight, Plus, Trash, X } from "@lucide/svelte";
     import Button from "./Button.svelte";
@@ -8,6 +8,8 @@
     import Textbox from "./Textbox.svelte";
     import { invoke } from "@tauri-apps/api/core";
     import DatePicker from "./DatePicker.svelte";
+  import { getPriorityColor } from "./misc/priority";
+  import PrioritySelector from "./PrioritySelector.svelte";
 
     interface Props {
         task: Task;
@@ -118,6 +120,13 @@
         await refreshTask();
     }
 
+    async function updateTaskPriority(id: number, priority: TaskPriority) {
+        await invoke("update_task_priority_by_id", {
+            taskId: id,
+            newPriority: priority
+        });
+    }
+
     let name = $state(task.name);
 
     // probably unnecessary
@@ -132,6 +141,12 @@
             cancelled = true;
         };
     });
+
+    $effect(() => {
+        (async () => {
+            await updateTaskPriority(task.id, task.priority);
+        })();
+    })
 
     $effect(() => {
         (async () => {
@@ -193,7 +208,9 @@
     role="document"
 >
     <div class="task-card" class:overdue={overdue} class:due-today={dueToday} class:small={size == "small"}>
-        <Button onclick={complete} Icon={Check} flavor="outline" class={`square ${size == "normal" ? "small" : "xsmall"}`} />
+        <div style="margin-right: 0.5rem;">
+            <Button onclick={complete} Icon={Check} flavor="outline" class={`square ${size == "normal" ? "small" : "xsmall"}`} />
+        </div>
         {#if !editing}
             <div class="stacked">
 
@@ -211,7 +228,7 @@
 
             <!-- PRIORITY GOES HERE -->
             {#if task.priority}
-                <FlagTriangleRight />
+                <FlagTriangleRight size={18} strokeWidth={1.1} color={getPriorityColor(task.priority)} fill={getPriorityColor(task.priority)} />
             {/if}
 
             <!-- TAGS GO HERE -->
@@ -234,9 +251,8 @@
                     <Button class="square xsmall" Icon={X} flavor='outline' onclick={removeDate}/>
                 </div>
             {/if}
-            <div>
-                <DatePicker size="small" slowAnimation={false} bind:selectedDate={dueDate}/>
-            </div>
+            <PrioritySelector bind:priority={task.priority} size={"small"}/>
+            <DatePicker size="small" slowAnimation={false} bind:selectedDate={dueDate}/>
             {#key task}
                 {#await getAllTags() then tags}
                     <div style="display: flex; justify-content:flex-start; gap: 0.5rem;">
@@ -294,8 +310,8 @@
     }
 
     .task-card {
-        gap: 1rem;
         display: flex;
+        gap: 0.5rem;
         flex-wrap: nowrap;
         align-items: center;
         justify-content: flex-start;

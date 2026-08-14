@@ -3,12 +3,12 @@ import { invoke } from "@tauri-apps/api/core";
 
 export const taskPriorityOptions = [
     { label: "No priority", value: null },
-    { label: "Low", value: "Low" },
-    { label: "Medium", value: "Medium" },
-    { label: "High", value: "High" },
+    { label: "Low", value: "low" },
+    { label: "Medium", value: "medium" },
+    { label: "High", value: "high" },
 ];
 
-export type TaskPriority = "Low" | "Medium" | "High" | null;
+export type TaskPriority = "low" | "medium" | "high" | null;
 
 export interface Task {
   id: number;
@@ -17,7 +17,7 @@ export interface Task {
   createdAt: string;
   completed: boolean;
   completedAt?: string | null;
-  priority?: TaskPriority | null;
+  priority: TaskPriority;
   tags?: Tag[] | null;
 }
 export interface Tag {

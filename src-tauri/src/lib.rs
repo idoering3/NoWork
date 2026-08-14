@@ -42,6 +42,7 @@ pub fn run() {
             commands::tasks::update_task_due_date_by_id,
             commands::tags::update_tag_color,
             commands::geolocation::get_ip_geoposition,
+            commands::priority::update_task_priority_by_id,
             calendar::authtest::test_auth,
             calendar::cal_credentials::save_credentials,
             calendar::cal_credentials::load_credentials,

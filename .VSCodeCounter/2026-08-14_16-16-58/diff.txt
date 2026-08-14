@@ -1,0 +1,107 @@
+Date : 2026-08-14 16:16:58
+Directory : c:\Users\yungr\Documents\Misc Projects\NoWork
+Total : 54 files,  1252 codes, 38 comments, 216 blanks, all 1506 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| Svelte     |         29 |        753 |         13 |        126 |        892 |
+| TypeScript |         11 |        303 |         21 |         57 |        381 |
+| Rust       |          8 |        146 |          4 |         31 |        181 |
+| JSON       |          3 |         37 |          0 |          0 |         37 |
+| XML        |          2 |          9 |          0 |          0 |          9 |
+| Markdown   |          1 |          4 |          0 |          2 |          6 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++---------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                    | files      | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                       |         54 |      1,252 |         38 |        216 |      1,506 |
+| . (Files)                                                                                               |          3 |         37 |          0 |          2 |         39 |
+| src                                                                                                     |         40 |      1,056 |         34 |        183 |      1,273 |
+| src-tauri                                                                                               |         11 |        159 |          4 |         31 |        194 |
+| src-tauri\assets                                                                                        |          1 |          4 |          0 |          0 |          4 |
+| src-tauri\icons                                                                                         |          2 |          9 |          0 |          0 |          9 |
+| src-tauri\icons\android                                                                                 |          2 |          9 |          0 |          0 |          9 |
+| src-tauri\icons\android\mipmap-anydpi-v26                                                               |          1 |          5 |          0 |          0 |          5 |
+| src-tauri\icons\android\values                                                                          |          1 |          4 |          0 |          0 |          4 |
+| src-tauri\src                                                                                           |          8 |        146 |          4 |         31 |        181 |
+| src-tauri\src (Files)                                                                                   |          1 |          3 |          0 |          0 |          3 |
+| src-tauri\src\calendar                                                                                  |          1 |         25 |          3 |          6 |         34 |
+| src-tauri\src\commands                                                                                  |          6 |        118 |          1 |         25 |        144 |
+| src\lib                                                                                                 |         35 |        866 |         25 |        140 |      1,031 |
+| src\lib (Files)                                                                                         |         15 |        -47 |          3 |          4 |        -40 |
+| src\lib\cal                                                                                             |          3 |         88 |         13 |         11 |        112 |
+| src\lib\misc                                                                                            |         10 |        247 |          7 |         36 |        290 |
+| src\lib\shaders                                                                                         |          1 |         -2 |          0 |          0 |         -2 |
+| src\lib\types                                                                                           |          1 |         22 |          0 |          6 |         28 |
+| src\lib\widgets                                                                                         |          5 |        558 |          2 |         83 |        643 |
+| src\routes                                                                                              |          5 |        190 |          9 |         43 |        242 |
+| src\routes (Files)                                                                                      |          2 |        124 |          4 |         12 |        140 |
+| src\routes\settings                                                                                     |          1 |         59 |          5 |         22 |         86 |
+| src\routes\study                                                                                        |          1 |          0 |          0 |          1 |          1 |
+| src\routes\tasklist                                                                                     |          1 |          7 |          0 |          8 |         15 |
++---------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++---------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                                                | language   | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| c:\Users\yungr\Documents\Misc Projects\NoWork\README.md                                                 | Markdown   |          4 |          0 |          2 |          6 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\package-lock.json                                         | JSON       |         32 |          0 |          0 |         32 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\package.json                                              | JSON       |          1 |          0 |          0 |          1 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src-tauri\assets\greeting.json                            | JSON       |          4 |          0 |          0 |          4 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src-tauri\icons\android\mipmap-anydpi-v26\ic_launcher.xml | XML        |          5 |          0 |          0 |          5 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src-tauri\icons\android\values\ic_launcher_background.xml | XML        |          4 |          0 |          0 |          4 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src-tauri\src\calendar\authtest.rs                        | Rust       |         25 |          3 |          6 |         34 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src-tauri\src\commands\database.rs                        | Rust       |          1 |          0 |          0 |          1 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src-tauri\src\commands\geolocation.rs                     | Rust       |         36 |          0 |          7 |         43 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src-tauri\src\commands\mod.rs                             | Rust       |          2 |          0 |         -1 |          1 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src-tauri\src\commands\priority.rs                        | Rust       |         17 |          0 |          6 |         23 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src-tauri\src\commands\tasks.rs                           | Rust       |         37 |          1 |         11 |         49 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src-tauri\src\commands\types.rs                           | Rust       |         25 |          0 |          2 |         27 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src-tauri\src\lib.rs                                      | Rust       |          3 |          0 |          0 |          3 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\AlertDialog.svelte                                | Svelte     |         32 |          0 |          2 |         34 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\Badge.svelte                                      | Svelte     |        -18 |          0 |         -5 |        -23 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\CalendarWidget.svelte                             | Svelte     |       -158 |          0 |        -26 |       -184 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\ColorLine.svelte                                  | Svelte     |         -3 |          0 |          0 |         -3 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\Dropdown.svelte                                   | Svelte     |         84 |          0 |         10 |         94 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\Header.svelte                                     | Svelte     |        -53 |          0 |         -5 |        -58 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\Logo.svelte                                       | Svelte     |        -36 |          0 |         -2 |        -38 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\NumberInput.svelte                                | Svelte     |         -1 |          0 |          0 |         -1 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\PrioritySelector.svelte                           | Svelte     |         80 |          0 |         10 |         90 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\Sidebar.svelte                                    | Svelte     |         -1 |          0 |          0 |         -1 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\SidebarButton.svelte                              | Svelte     |         -3 |          0 |          0 |         -3 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\TaskCard.svelte                                   | Svelte     |         36 |          3 |         20 |         59 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\TimeWidget.svelte                                 | Svelte     |        -78 |          0 |         -9 |        -87 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\WindowButtons.svelte                              | Svelte     |        -29 |          0 |         -5 |        -34 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\cal\EventCard.svelte                              | Svelte     |         43 |          0 |          2 |         45 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\cal\calendar.ts                                   | TypeScript |         33 |         11 |          8 |         52 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\cal\calendarCredentialStorage.ts                  | TypeScript |         12 |          2 |          1 |         15 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\misc\CustomScrollbar.svelte                       | Svelte     |         -8 |         -1 |         -4 |        -13 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\misc\Header.svelte                                | Svelte     |         53 |          0 |          5 |         58 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\misc\Logo.svelte                                  | Svelte     |         36 |          0 |          2 |         38 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\misc\WindowButtons.svelte                         | Svelte     |         29 |          0 |          5 |         34 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\misc\context.ts                                   | TypeScript |          3 |          2 |          3 |          8 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\misc\portal.ts                                    | TypeScript |         11 |          1 |          2 |         14 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\misc\position.ts                                  | TypeScript |          5 |          0 |          1 |          6 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\misc\priority.ts                                  | TypeScript |         14 |          0 |          1 |         15 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\misc\timeofday.ts                                 | TypeScript |         -5 |          0 |          0 |         -5 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\misc\weather.ts                                   | TypeScript |        109 |          5 |         21 |        135 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\shaders\shader.ts                                 | TypeScript |         -2 |          0 |          0 |         -2 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\stores.svelte.ts                                  | TypeScript |        101 |          0 |         14 |        115 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\types\task.ts                                     | TypeScript |         22 |          0 |          6 |         28 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\widgets\CalendarWidget.svelte                     | Svelte     |        222 |          1 |         40 |        263 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\widgets\DynamicBar.svelte                         | Svelte     |         42 |          0 |          7 |         49 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\widgets\TaskWidget.svelte                         | Svelte     |         52 |          0 |         10 |         62 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\widgets\TestWidget.svelte                         | Svelte     |         58 |          0 |          8 |         66 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\lib\widgets\WeatherWidget.svelte                      | Svelte     |        184 |          1 |         18 |        203 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\routes\+layout.svelte                                 | Svelte     |         11 |          0 |          1 |         12 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\routes\+page.svelte                                   | Svelte     |        113 |          4 |         11 |        128 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\routes\settings\+page.svelte                          | Svelte     |         59 |          5 |         22 |         86 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\routes\study\+page.svelte                             | Svelte     |          0 |          0 |          1 |          1 |
+| c:\Users\yungr\Documents\Misc Projects\NoWork\src\routes\tasklist\+page.svelte                          | Svelte     |          7 |          0 |          8 |         15 |
+| Total                                                                                                   |            |      1,252 |         38 |        216 |      1,506 |
++---------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+

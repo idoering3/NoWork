@@ -2,7 +2,7 @@
     import { invoke } from "@tauri-apps/api/core";
     import Card from "$lib/Card.svelte";
     import Badge from "$lib/Badge.svelte";
-    import { type Task, type Tag, taskPriorityOptions } from "$lib/types/task";
+    import { type Task, type Tag, taskPriorityOptions, type TaskPriority } from "$lib/types/task";
     import TaskCard from "$lib/TaskCard.svelte";
     import Textbox from "$lib/Textbox.svelte";
     import Button from "$lib/Button.svelte";
@@ -17,9 +17,8 @@
     import { flip } from "svelte/animate";
     import { beforeNavigate } from "$app/navigation";
     import CustomScrollbar from "$lib/misc/CustomScrollbar.svelte";
-    import Dropdown from "$lib/Dropdown.svelte";
-  import { setPageEl } from "$lib/misc/context";
-  import PrioritySelector from "$lib/PrioritySelector.svelte";
+    import { setPageEl } from "$lib/misc/context";
+    import PrioritySelector from "$lib/PrioritySelector.svelte";
 
     let tasks: Task[] = $state([]);
     let show = $state(false);
@@ -102,7 +101,7 @@
 
     let selectedTags: Tag[] = $state([]);
     let selectedDate: Date | null = $state(null);
-    let selectedPriority: TaskPriority | null = $state(null);
+    let selectedPriority: TaskPriority = $state(null);
 
 
 	let taskContainer: HTMLDivElement;
@@ -339,7 +338,7 @@
                         {selectedDate.toLocaleDateString()}
                         <Button class="square xsmall" Icon={X} flavor='outline' onclick={removeDate}/>
                     {/if}
-                    <PrioritySelector />
+                    <PrioritySelector bind:priority={selectedPriority}/>
                     <TagSelector bind:selectedTags={selectedTags} refreshTags={getAllTags} bind:allTags={tags} />
                     <Datepicker bind:selectedDate={selectedDate}/>
                     <div in:fly|global={{ duration: 1500, delay:1200, y:7, easing: quartOut }}>
