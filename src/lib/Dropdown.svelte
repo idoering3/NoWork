@@ -150,7 +150,7 @@
                 use:portal={getPageElement}
                 bind:this={portalEl}
             >
-                <div in:dynamicSlide={{duration: 75, direction: slideDirection}} class="options">
+                <div in:dynamicSlide={{duration: 50, direction: slideDirection}} class="options">
                     {#each options as option}
                         {#if option}
                             {@render optionSnippet(option)}
