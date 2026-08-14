@@ -26,8 +26,8 @@ export class ShaderRenderer {
     lastFrameTime: number = 0;
 
     // Interpolation
-    currentCenter: [number, number] = [0.5, 0.2]
-    targetCenter: [number, number] = [0.5, 0.2]
+    currentCenter: [number, number] = [0.5, 0.1]
+    targetCenter: [number, number] = [0.5, 0.1]
     lerpFactor: number = 0.15
 
     constructor(

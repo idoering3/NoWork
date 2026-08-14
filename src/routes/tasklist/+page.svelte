@@ -265,7 +265,7 @@
     <div class='container'>
         <div class='header'>
             <h1 bind:this={header} in:fly|global={{ y: 30, delay: 150, duration: 1500, easing: quartOut}}>
-                Task List
+                Tasks
             </h1>
             <div style="display: flex; flex-direction: column; gap: 0.5rem;">
                 <h6 in:fly={{ x: -15, delay: 600, duration: 1500, easing: quartOut}}>
