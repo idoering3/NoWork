@@ -2,7 +2,7 @@
     import { invoke } from "@tauri-apps/api/core";
     import Card from "$lib/Card.svelte";
     import Badge from "$lib/Badge.svelte";
-    import type { Task, Tag } from "$lib/types/task";
+    import { type Task, type Tag, taskPriorityOptions } from "$lib/types/task";
     import TaskCard from "$lib/TaskCard.svelte";
     import Textbox from "$lib/Textbox.svelte";
     import Button from "$lib/Button.svelte";
@@ -17,6 +17,9 @@
     import { flip } from "svelte/animate";
     import { beforeNavigate } from "$app/navigation";
     import CustomScrollbar from "$lib/misc/CustomScrollbar.svelte";
+    import Dropdown from "$lib/Dropdown.svelte";
+  import { setPageEl } from "$lib/misc/context";
+  import PrioritySelector from "$lib/PrioritySelector.svelte";
 
     let tasks: Task[] = $state([]);
     let show = $state(false);
@@ -35,6 +38,7 @@
 
     async function getIncompleteTasks() {
         tasks = await invoke('get_incomplete_tasks');
+        console.log(tasks);
         completedTasks = await getCompletedTaskCount();
     }
 
@@ -68,7 +72,7 @@
 
     async function submitTask () {
         if (taskName) {
-            await invoke('add_database_task', {name: taskName, dueDate: selectedDate?.toISOString(), tags: selectedTags});
+            await invoke('add_database_task', {name: taskName, dueDate: selectedDate?.toISOString(), priority: selectedPriority, tags: selectedTags});
             getIncompleteTasks();
             selectedDate = null;
             taskName = '';
@@ -98,7 +102,7 @@
 
     let selectedTags: Tag[] = $state([]);
     let selectedDate: Date | null = $state(null);
-
+    let selectedPriority: TaskPriority | null = $state(null);
 
 
 	let taskContainer: HTMLDivElement;
@@ -224,6 +228,9 @@
     async function removeDate() {
         selectedDate = null;
     }
+
+    let pageEl = $state<HTMLElement>();
+    setPageEl( () => pageEl );
 </script>
 
 
@@ -234,7 +241,7 @@
 
 
 
-<div style="overflow: hidden; display: flex; height: calc(100vh - 3rem);">
+<div style="overflow: hidden; display: flex; height: calc(100vh - 3rem);" bind:this={pageEl}>
     <div class='sidebar'>
         <h5 
             style="padding: 1rem; display:flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--border-color); color: var(--highlight-color);"
@@ -332,6 +339,7 @@
                         {selectedDate.toLocaleDateString()}
                         <Button class="square xsmall" Icon={X} flavor='outline' onclick={removeDate}/>
                     {/if}
+                    <PrioritySelector />
                     <TagSelector bind:selectedTags={selectedTags} refreshTags={getAllTags} bind:allTags={tags} />
                     <Datepicker bind:selectedDate={selectedDate}/>
                     <div in:fly|global={{ duration: 1500, delay:1200, y:7, easing: quartOut }}>

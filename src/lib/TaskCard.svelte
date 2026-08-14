@@ -196,13 +196,20 @@
         <Button onclick={complete} Icon={Check} flavor="outline" class={`square ${size == "normal" ? "small" : "xsmall"}`} />
         {#if !editing}
             <div class="stacked">
-                <p class:smallname={size == "small"}>{task.name}</p>
+
+                <!-- The TASK NAME is HERE -->
+                <p class:smallname={size == "small"}>
+                    {task.name} {task.priority ? `(${task.priority})` : 'null'}
+                </p>
+                
                 {#key task}
                     <p class="date" class:smalldate={ size == "small"}>
                         {dueDate ? dueDate.toLocaleDateString(undefined, { month: 'long', day: 'numeric' }) : ''}
                     </p>
                 {/key}
             </div>
+
+
             <div class="tags">
                 {#if task.tags}
                     {#each task.tags as tag}

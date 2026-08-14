@@ -3,6 +3,6 @@
 
 import { createContext } from 'svelte';
 
-type PageElement = () => HTMLElement | undefined;
+export type PageElement = () => HTMLElement | undefined;
 
 export const [getPageEl, setPageEl] = createContext<PageElement>();

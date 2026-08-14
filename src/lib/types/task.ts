@@ -1,6 +1,15 @@
 import { flavorMap } from "$lib/stores.svelte";
 import { invoke } from "@tauri-apps/api/core";
 
+export const taskPriorityOptions = [
+    { label: "No priority", value: null },
+    { label: "Low", value: "Low" },
+    { label: "Medium", value: "Medium" },
+    { label: "High", value: "High" },
+];
+
+export type TaskPriority = "Low" | "Medium" | "High" | null;
+
 export interface Task {
   id: number;
   name: string;
@@ -8,6 +17,7 @@ export interface Task {
   createdAt: string;
   completed: boolean;
   completedAt?: string | null;
+  priority?: TaskPriority | null;
   tags?: Tag[] | null;
 }
 export interface Tag {
