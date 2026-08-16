@@ -233,7 +233,7 @@ pub fn get_tasks_due_today(app: AppHandle) -> Result<Vec<Task>, String> {
         .map_err(|e| e.to_string())?;
 
     let rows = stmt
-        .query_map([], |row| {
+        .query_map(params![start_utc.to_rfc3339(), end_utc.to_rfc3339()], |row| {
             Ok(TaskRow {
                 id: row.get(0)?,
                 name: row.get(1)?,
@@ -241,7 +241,7 @@ pub fn get_tasks_due_today(app: AppHandle) -> Result<Vec<Task>, String> {
                 created_at: row.get(3)?,
                 completed: row.get(4)?,
                 completed_at: row.get(5)?,
-                priority: row.get(6)?
+                priority: row.get(6)?,
             })
         })
         .map_err(|e| e.to_string())?;
@@ -284,7 +284,7 @@ pub fn get_tasks_due_this_week(app: AppHandle) -> Result<Vec<Task>, String> {
         .map_err(|e| e.to_string())?;
 
     let rows = stmt
-        .query_map([], |row| {
+        .query_map(params![start_utc.to_rfc3339(), end_utc.to_rfc3339()], |row| {
             Ok(TaskRow {
                 id: row.get(0)?,
                 name: row.get(1)?,
