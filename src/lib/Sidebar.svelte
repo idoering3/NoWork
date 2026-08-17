@@ -94,7 +94,7 @@
 </script>
 
 <aside class="aside">
-    <div>
+    <div class="top-aside">
         {#each sidebarInfo as sidebar, i}
             {#if sidebar.isTop}
                 <SidebarButton onclick={() => selectPage(i)} iconSize={sidebar.iconSize} Icon={sidebar.Icon} href={sidebar.href} name={sidebar.name}>
@@ -138,6 +138,11 @@
         transition: 0.15s ease-in-out;
         height: calc(100vh - 3.25rem);
     }
+
+    .top-aside {
+        margin-top: 0.5rem;
+    }
+
     div {
         width: min-content;
     }
