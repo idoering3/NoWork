@@ -241,33 +241,6 @@
 
 
 <div style="overflow: hidden; display: flex; height: calc(100vh - 3rem);" bind:this={pageEl}>
-    <div class='sidebar'>
-        <h5 
-            style="padding: 1rem; display:flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--border-color); color: var(--highlight-color);"
-            in:fly={{ y: 30, delay: 300, duration: 1500, easing: quartOut}}
-        >
-            Tasks
-    </h5>
-        <div style={selectedTag?.name === "all" ? "" : ""} 
-            in:fly|global={{ y: 30, delay: 300, duration: 1500, easing: quartOut}}
-        >
-            <Button flavor="ghost" onclick={async () => await selectAllTasks()}><span style={filterMode === "all" ? "color:var(--highlight-color)" : ""}>all tasks</span></Button>
-        </div>
-        {#each tags as tag, i}
-            <div style={tag.name === selectedTag?.name ? "" : ""} 
-                in:fly={{ y: 30, delay: 375 + (i + 1) * 75, duration: 1500, easing: quartOut}}
-                // out:fly={{ y: -15, duration: 300, easing: quartOut}}
-            >
-            <!-- The button for each tag -->
-                <Button flavor="ghost" onclick={async () => await selectTag(tag)}>
-                    <span style={tag.name === selectedTag?.name ? "color:var(--highlight-color)" : ""}>
-                        {tag?.name}
-                    </span>
-                </Button>
-            </div>
-        {/each}
-        <!-- <Button flavor="ghost" Icon={Plus}></Button> -->
-    </div>
     <div class='container'>
         <div class='header'>
             <h1 bind:this={header} in:fly|global={{ y: 30, delay: 150, duration: 1500, easing: quartOut}}>
