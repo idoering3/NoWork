@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { TagColor, Task, TaskPriority } from "$lib/types/task";
     import Check from "@lucide/svelte/icons/check";
-    import { FlagTriangleRight, Plus, Trash, X } from "@lucide/svelte";
+    import { CircleSmall, FlagTriangleRight, Plus, Trash, X } from "@lucide/svelte";
     import Button from "./Button.svelte";
     import Badge from "./Badge.svelte";
     import { getAllTags } from "./stores.svelte";
@@ -228,7 +228,7 @@
 
             <!-- PRIORITY GOES HERE -->
             {#if task.priority}
-                <FlagTriangleRight size={18} strokeWidth={1.1} color={getPriorityColor(task.priority)} fill={getPriorityColor(task.priority)} />
+                <CircleSmall size={18} strokeWidth={1.1} color={getPriorityColor(task.priority)} fill={getPriorityColor(task.priority)} />
             {/if}
 
             <!-- TAGS GO HERE -->
