@@ -1,15 +1,14 @@
 <script lang="ts">
     import type { TagColor, Task, TaskPriority } from "$lib/types/task";
-    import Check from "@lucide/svelte/icons/check";
-    import { CircleSmall, FlagTriangleRight, Plus, Trash, X } from "@lucide/svelte";
+    import { CircleSmall, Plus, Trash, X } from "@lucide/svelte";
     import Button from "./Button.svelte";
     import Badge from "./Badge.svelte";
     import { getAllTags } from "./stores.svelte";
     import Textbox from "./Textbox.svelte";
     import { invoke } from "@tauri-apps/api/core";
     import DatePicker from "./DatePicker.svelte";
-  import { getPriorityColor } from "./misc/priority";
-  import PrioritySelector from "./PrioritySelector.svelte";
+    import { getPriorityColor } from "./misc/priority";
+    import PrioritySelector from "./PrioritySelector.svelte";
 
     interface Props {
         task: Task;
@@ -22,7 +21,18 @@
     let { task = $bindable(), allowsEdit = true, size="normal", onComplete = $bindable(), onDelete = $bindable()}: Props = $props();
 
     function complete() {
-        onComplete(task.id);
+        taskChecked = !taskChecked;
+
+        // we want to delay the completion of the task if it was a fat-finger
+        if (taskChecked) {
+            completionTimer = setTimeout(() => {
+                if (taskChecked) {
+                    onComplete(task.id);
+                }
+            }, 600);
+        } else {
+            clearTimeout(completionTimer);
+        }
     }
 
     function deleted() {
@@ -50,6 +60,8 @@
     const dueToday = $derived(dueDate && isSameLocalDate(dueDate, now));
     const overdue = $derived(dueDate && isPastDue(dueDate, now));
     let editing = $state(false);
+    let taskChecked = $state(false);
+    let completionTimer: ReturnType<typeof setTimeout>;
 
     let container: HTMLDivElement; // reference to the task container
 
@@ -209,13 +221,17 @@
 >
     <div class="task-card" class:overdue={overdue} class:due-today={dueToday} class:small={size == "small"}>
         <div style="margin-right: 0.5rem;">
-            <Button onclick={complete} Icon={Check} flavor="outline" class={`square ${size == "normal" ? "small" : "xsmall"}`} />
+            <button class="complete-button" aria-label="complete-task" onclick={complete}>
+                <span class="complete-circle" class:checked={taskChecked}>
+
+                </span>
+            </button>
         </div>
         {#if !editing}
             <div class="stacked">
 
                 <!-- The TASK NAME is HERE -->
-                <p class:smallname={size == "small"}>
+                <p class:smallname={size == "small"} class="task-name" class:checked={taskChecked}>
                     {task.name}
                 </p>
                 
@@ -281,8 +297,8 @@
         display: flex;
         flex-wrap: nowrap;
         align-items: center;
-        justify-content: flex-start;
-        padding: 0rem 1.5rem 0 0.5rem;
+        justify-content: space-between;
+        padding: 0rem 1.5rem 0 0.0rem;
         min-height: 3rem;
         max-height: 9rem;
         max-width: 100%;
@@ -291,6 +307,71 @@
         border-radius: 15px;
         border: 1px solid transparent;
         transition: 300ms ease-in-out;
+    }
+
+    .task-name {
+        transition: 150ms ease-in-out;
+    }
+
+    /* .task-card:has(.complete-button:hover) .task-name {
+        color: var(--faded-text);
+    } */
+
+    .task-card:has(.complete-button:hover) .task-name.checked {
+        color: var(--highlight-color);
+    }
+
+    .task-name.checked {
+        color: var(--highlight-color);
+    }
+
+    .complete-button {
+        height: 2.5rem;
+        width: 2.5rem;
+        background: transparent;
+        border: none;
+        display: flex;
+        justify-content:center;
+        align-items:center;
+    }
+
+    .complete-circle {
+        display:block;
+        height:1.25rem;
+        width:1.25rem;
+        border-radius: 50%;
+        border: 1px solid var(--border-color);
+        background: transparent;
+        transition: 150ms ease-in-out;
+        display: flex;
+        justify-content:center;
+        align-items:center;
+    }
+
+    .complete-circle.checked  {
+        border: 1px solid var(--highlight-color);
+    }
+
+    .complete-circle.checked::before {
+        background: var(--highlight-color);
+    }
+
+    .complete-circle::before {
+        display: block;
+        content: "";
+        width:1.0rem;
+        height:1.0rem;
+        border-radius: 50%;
+        background: transparent;
+        transition: 150ms ease-in-out;
+    }
+
+    .complete-button:hover .complete-circle::before {
+        background: var(--border-color);
+    }
+
+    .complete-button:hover .complete-circle.checked::before {
+        background: var(--highlight-color);
     }
 
     .small {
@@ -311,11 +392,11 @@
 
     .task-card {
         display: flex;
-        gap: 0.5rem;
+        gap: 0.25rem;
         flex-wrap: nowrap;
         align-items: center;
         justify-content: flex-start;
-        padding: 0rem 0.5rem;
+        padding: 0rem 0.0rem;
         width: 100%;
         height: auto;
         border-radius: 0.5rem;
