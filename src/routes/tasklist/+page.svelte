@@ -2,7 +2,7 @@
     import { invoke } from "@tauri-apps/api/core";
     import Card from "$lib/Card.svelte";
     import Badge from "$lib/Badge.svelte";
-    import { type Task, type Tag, taskPriorityOptions, type TaskPriority } from "$lib/types/task";
+    import { type Task, type Tag, type TaskPriority } from "$lib/types/task";
     import TaskCard from "$lib/TaskCard.svelte";
     import Textbox from "$lib/Textbox.svelte";
     import Button from "$lib/Button.svelte";
@@ -167,12 +167,7 @@
         }
     });
 
-    let disableTransitions = $state(false);
-
     onMount (async () => {
-        beforeNavigate(() => {
-            disableTransitions = true;
-        });
         getIncompleteTasks();
         getAllTags();
         const store = await load(".settings.json");

@@ -244,7 +244,7 @@
 
             <!-- PRIORITY GOES HERE -->
             {#if task.priority}
-                <CircleSmall size={18} strokeWidth={1.1} color={getPriorityColor(task.priority)} fill={getPriorityColor(task.priority)} />
+                <CircleSmall size={14} strokeWidth={1.1} color={getPriorityColor(task.priority)} fill={getPriorityColor(task.priority)} />
             {/if}
 
             <!-- TAGS GO HERE -->

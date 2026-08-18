@@ -43,38 +43,38 @@
 <div bind:this={dropdownEl} class="dropdown-container">
     <Button class={size === "normal" ? "square" : "square small"} flavor="outline" onclick={() => dropdownOpen =!dropdownOpen}>
         {#if priority}
-            <CircleSmall size={18} strokeWidth={1.1} color={getPriorityColor(priority)} fill={getPriorityColor(priority)}/>
+            <CircleSmall size={14} strokeWidth={1.1} color={getPriorityColor(priority)} fill={getPriorityColor(priority)}/>
         {:else}
-            <CircleSmall size={18} strokeWidth={1.1}/>
+            <CircleSmall size={14} strokeWidth={1.1}/>
         {/if}
     </Button>
     {#if dropdownOpen}
         <div class="dropdown-content" class:small={size === "small"} transition:fly={{ y: yTransitionAmt, easing: quartInOut, duration: 150 }}>
             {#if size === "normal"}
                 <Button class="square" flavor="ghost" onclick={() => priority = "high"}>
-                    <CircleSmall size={18} strokeWidth={1.1} color="#D64540" fill="#D64540"  />
+                    <CircleSmall size={14} strokeWidth={1.1} color="#D64540" fill="#D64540"  />
                 </Button>
                 <Button class="square" flavor="ghost" onclick={() => priority = "medium"}>
-                    <CircleSmall size={18} strokeWidth={1.1} color="orange" fill="orange" />
+                    <CircleSmall size={14} strokeWidth={1.1} color="orange" fill="orange" />
                 </Button>
                 <Button class="square" flavor="ghost" onclick={() => priority = "low"}>
-                    <CircleSmall size={18} strokeWidth={1.1} color={flavorMap['green'].bgcolor} fill={flavorMap['green'].bgcolor} />
+                    <CircleSmall size={14} strokeWidth={1.1} color={flavorMap['green'].bgcolor} fill={flavorMap['green'].bgcolor} />
                 </Button>
                 <Button class="square" flavor="ghost" onclick={() => priority = null}>
-                    <CircleSmall size={18} strokeWidth={1.1}/>
+                    <CircleSmall size={14} strokeWidth={1.1}/>
                 </Button>
             {:else if size === "small"}
                 <Button class="square small" flavor="ghost" onclick={() => priority = null}>
-                    <CircleSmall size={18} strokeWidth={1.1}/>
+                    <CircleSmall size={14} strokeWidth={1.1}/>
                 </Button>
                 <Button class="square small" flavor="ghost" onclick={() => priority = "low"}>
-                    <CircleSmall size={18} strokeWidth={1.1} color={flavorMap['green'].bgcolor} fill={flavorMap['green'].bgcolor} />
+                    <CircleSmall size={14} strokeWidth={1.1} color={flavorMap['green'].bgcolor} fill={flavorMap['green'].bgcolor} />
                 </Button>
                 <Button class="square small" flavor="ghost" onclick={() => priority = "medium"}>
-                    <CircleSmall size={18} strokeWidth={1.1} color="orange" fill="orange" />
+                    <CircleSmall size={14} strokeWidth={1.1} color="orange" fill="orange" />
                 </Button>
                 <Button class="square small" flavor="ghost" onclick={() => priority = "high"}>
-                    <CircleSmall size={18} strokeWidth={1.1} color="#D64540" fill="#D64540"  />
+                    <CircleSmall size={14} strokeWidth={1.1} color="#D64540" fill="#D64540"  />
                 </Button>
             {/if}
         </div>
