@@ -4,6 +4,8 @@
     import type { TaskFilter } from "./types/filter";
   import type { Tag, TaskPriority } from "./types/task";
   import { flavorMap } from "./stores.svelte";
+  import { fly } from "svelte/transition";
+  import { quartIn, quartOut } from "svelte/easing";
 
     interface Props {
         filter: TaskFilter;
@@ -44,22 +46,24 @@
 
 <div class="filter-container">
     <div class="filter-container-child">
-        {#each tags as tag}
-            <BadgeButton 
-                onClick={() => toggleFilterTag(tag)}
-                style={filter.tags.some(selected => selected.id === tag.id) ? `
-                    border: 1px solid ${flavorMap[tag.color].bgcolor};
-                    background-color: color-mix(in srgb, var(--primary-dark), transparent 90%);
-                ` : ""}
-            >
-                <CircleSmall size={14} strokeWidth={1.1} color={flavorMap[tag.color].bgcolor} fill={flavorMap[tag.color].bgcolor} />
-                {tag.name}
-            </BadgeButton>
+        {#each tags as tag, i}
+            <div in:fly={{ y: 15, duration: 1000, delay: 150 + 75 * (i + 1), easing: quartOut}}>
+                <BadgeButton 
+                    onClick={() => toggleFilterTag(tag)}
+                    style={filter.tags.some(selected => selected.id === tag.id) ? `
+                        border: 1px solid ${flavorMap[tag.color].bgcolor};
+                        background-color: color-mix(in srgb, var(--primary-dark), transparent 90%);
+                    ` : ""}
+                >
+                    <CircleSmall size={14} strokeWidth={1.1} color={flavorMap[tag.color].bgcolor} fill={flavorMap[tag.color].bgcolor} />
+                    {tag.name}
+                </BadgeButton>
+            </div>
         {/each}
         
 
         <!-- DO ALL THE PRIORITIES HERE -->
-        <div class="priority-button-group">
+        <div class="priority-button-group" in:fly={{ y:15, duration: 1000, delay: 300 + 75 * (tags.length + 1), easing: quartOut}}>
             <BadgeButton
                 onClick={() => toggleFilterPriority("high")}
                 style={`
@@ -101,12 +105,17 @@
             </BadgeButton>
         </div>
         {#if filter.tags.length > 0 || filter.priorities.length > 0}
-            <BadgeButton 
-                style="color: var(--faded-text)"
-                onClick={() => clearFilterTags()}
+            <div
+                in:fly={{duration: 1000, y:15, easing: quartOut}}
+                out:fly={{duration:150, y:-15, easing: quartIn}}
             >
-                Clear
-            </BadgeButton>
+                <BadgeButton 
+                    style="color: var(--faded-text)"
+                    onClick={() => clearFilterTags()}
+                >
+                    Clear
+                </BadgeButton>
+            </div>
         {/if}
     </div>
     <!-- RIGHT FILTER (DETAILED FILTER) -->
