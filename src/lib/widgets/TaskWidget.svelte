@@ -26,6 +26,11 @@
         tasks = tasks?.slice(0,7);
     }
 
+    async function refreshTask(taskId: number) {
+        const updatedTask = await invoke<Task>('get_task_by_id', { 'taskId':taskId });
+
+        tasks = tasks.map(task => task.id === updatedTask.id ? updatedTask : task);
+    }
     
 </script>
 
@@ -37,7 +42,7 @@
                     in:fly|global={{ duration: 1000, y: 15, easing: quartOut, delay: runCollapse ? 450 + 75 * (i + 1) : 0 }}
                     onintroend={() => runCollapse ? runCollapse = false : ""}
                 >
-                    <TaskCard {task} allowsEdit={false} size={"small"} onComplete={() => completeTask(task.id)}/>
+                    <TaskCard {task} allowsEdit={false} size={"small"} onComplete={() => completeTask(task.id)} onUpdate={refreshTask}/>
                 </div>
             </div>
         {/each}

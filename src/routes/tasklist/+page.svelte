@@ -15,10 +15,11 @@
     import { quartIn, quartInOut, quartOut } from "svelte/easing";
     import { load } from "@tauri-apps/plugin-store";
     import { flip } from "svelte/animate";
-    import { beforeNavigate } from "$app/navigation";
     import CustomScrollbar from "$lib/misc/CustomScrollbar.svelte";
     import { setPageEl } from "$lib/misc/context";
     import PrioritySelector from "$lib/PrioritySelector.svelte";
+    import { matchesFilter, type TaskFilter } from "$lib/types/filter";
+    import FilterBar from "$lib/FilterBar.svelte";
 
     let tasks: Task[] = $state([]);
     let show = $state(false);
@@ -37,7 +38,6 @@
 
     async function getIncompleteTasks() {
         tasks = await invoke('get_incomplete_tasks');
-        console.log(tasks);
         completedTasks = await getCompletedTaskCount();
     }
 
@@ -71,12 +71,12 @@
 
     async function submitTask () {
         if (taskName) {
-            await invoke('add_database_task', {name: taskName, dueDate: selectedDate?.toISOString(), priority: selectedPriority, tags: selectedTags});
+            await invoke('add_database_task', {name: taskName, dueDate: selectedDate?.toISOString(), priority: selectedPriority, tags: selectedAddingTags});
             getIncompleteTasks();
             selectedDate = null;
             taskName = '';
             if (selectedTag) {
-                selectedTags = [selectedTag];
+                selectedAddingTags = [selectedTag];
             }
         }
     }
@@ -91,17 +91,29 @@
         await getIncompleteTasks();
     }
 
+    async function refreshTask(taskId: number) {
+        const updatedTask = await invoke<Task>('get_task_by_id', { 'taskId':taskId });
+
+        tasks = tasks.map(task => task.id === updatedTask.id ? updatedTask : task);
+    }
+
     async function getCompletedTaskCount (): Promise<number> {
         return await invoke<number>('get_completed_task_count');
     }
 
     function removeTagFromTask(tag: string) {
-        selectedTags = selectedTags.filter(t => t.name !== tag);
+        selectedAddingTags = selectedAddingTags.filter(t => t.name !== tag);
     }
 
-    let selectedTags: Tag[] = $state([]);
+    // tags for adding a task
+    let selectedAddingTags: Tag[] = $state([]);
     let selectedDate: Date | null = $state(null);
     let selectedPriority: TaskPriority = $state(null);
+    // the filtering variable that stores all filters
+    let filter = $state<TaskFilter>({
+        tags: [],
+        priorities: [],
+    });
 
 
 	let taskContainer: HTMLDivElement;
@@ -155,29 +167,19 @@
         return false;
     }
 
-    //TODO better filterMode
-    let filterMode: "all" | "tag" = $state("tag");
     let selectedTag: Tag | null = $state(null);
-
-    $effect(() => {
-        if (filterMode === "tag" && selectedTag) {
-            selectedTags = [selectedTag];
-        } else {
-            selectedTags = [];
-        }
-    });
 
     onMount (async () => {
         getIncompleteTasks();
         getAllTags();
         const store = await load(".settings.json");
 
-        let filterModeVar = await store.get<"all" | "tag">("filterMode");
-        if (filterModeVar) {
-            filterMode = filterModeVar;
-        } else {
-            filterMode = "all";
+        let filterStore = await store.get<TaskFilter>("taskFilter");
+        if (filterStore) {
+            filter = filterStore;
+            console.log(filter);
         }
+
         const tag = await store.get<{ id: number, name: string, color: 'default' | 'outline' | 'danger' | 'blue' }>("selectedTag");
         if (tag) {
             selectedTag = tag;
@@ -188,35 +190,14 @@
 
     let completedTasks = $state();
 
-    async function selectTag(tag: Tag) {
-        await getIncompleteTasks();
-        runCollapse = true;
-        filterMode = "tag";
-        selectedTag = tag;
-
-        const store = await load(".settings.json");
-        await store.set("filterMode", "tag");
-        await store.set("selectedTag", tag);
-    }
-
-    async function selectAllTasks() {
-        await getIncompleteTasks();
-        runCollapse = true;
-        filterMode = "all";
-        selectedTag = null;
-
-        const store = await load(".settings.json");
-        await store.set("filterMode", "all");
-        await store.delete("selectedTag");
-    }
-
-    let visibleTasks = $derived(tasks
-    .filter(task => filterMode === 'all' || task.tags?.some(tag => tag.name === selectedTag?.name))
-    .sort((a, b) => {
-        if (!a.dueDate && !b.dueDate) return 0;
-        if (!a.dueDate) return 1;
-        if (!b.dueDate) return -1;
-        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+    let visibleTasks = $derived(
+        tasks
+            .filter(task => matchesFilter(task, filter))
+            .sort((a, b) => {
+                if (!a.dueDate && !b.dueDate) return 0;
+                if (!a.dueDate) return 1;
+                if (!b.dueDate) return -1;
+                return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
     }));
 
     async function removeDate() {
@@ -225,6 +206,12 @@
 
     let pageEl = $state<HTMLElement>();
     setPageEl( () => pageEl );
+
+    async function saveFilter(filter: TaskFilter) {
+        const store = await load(".settings.json");
+        await store.set("taskFilter", filter);
+        await store.save();
+    }
 </script>
 
 
@@ -237,6 +224,7 @@
 
 <div style="overflow: hidden; display: flex; height: calc(100vh - 3rem);" bind:this={pageEl}>
     <div class='container'>
+        <!-- TOP HEADER WITH TASKS AND INFO -->
         <div class='header'>
             <h1 bind:this={header} in:fly|global={{ y: 30, delay: 150, duration: 1500, easing: quartOut}}>
                 Tasks
@@ -250,6 +238,10 @@
                 </h6>
             </div>
         </div>
+
+        <!-- FILTERING GOES HERE???? -->
+        <FilterBar bind:filter tags={tags} saveFilter={saveFilter} />
+
         <div class='task-container' bind:this={taskContainer} in:fly|global={{ duration: 1500, delay:300, y:30, easing: quartOut }}>
             <CustomScrollbar>
                 <div style="position: relative;">
@@ -263,7 +255,7 @@
                                     out:fly|global={{ duration: 150, y: -15, easing: quartIn }}
                                     onintroend={() => runCollapse ? runCollapse = false : ""}
                                 >
-                                    <TaskCard {task} onComplete={completeTask} onDelete={deleteTask}/>
+                                    <TaskCard {task} onComplete={completeTask} onDelete={deleteTask} onUpdate={refreshTask}/>
                                 </div>
                             </div>
                             {/each}
@@ -292,7 +284,7 @@
                         <div
                             style="display: flex;"
                         >
-                        {#each selectedTags as tag (tag.name)}
+                        {#each selectedAddingTags as tag (tag.name)}
                             <div animate:flip|global={{ duration: 300, easing: quartInOut }} style="padding: 0.25rem;">
                                 <div style=""
                                 >
@@ -307,7 +299,7 @@
                         <Button class="square xsmall" Icon={X} flavor='outline' onclick={removeDate}/>
                     {/if}
                     <PrioritySelector bind:priority={selectedPriority}/>
-                    <TagSelector bind:selectedTags={selectedTags} refreshTags={getAllTags} bind:allTags={tags} />
+                    <TagSelector bind:selectedTags={selectedAddingTags} refreshTags={getAllTags} bind:allTags={tags} />
                     <Datepicker bind:selectedDate={selectedDate}/>
                     <div in:fly|global={{ duration: 1500, delay:1200, y:7, easing: quartOut }}>
                         <Button onclick={submitTask} class="square" flavor="primary" Icon={ArrowUp} />
@@ -322,16 +314,6 @@
     .container {
         padding: 1rem 3rem;
         overflow: hidden;
-    }
-
-    .sidebar {
-        width: 15rem;
-        border-right: 1px solid var(--border-color);
-        height: calc(100vh - 3rem);
-    }
-
-    p {
-        font-size: 1rem;
     }
 
     .header {
@@ -361,5 +343,5 @@
         flex-direction: column;
         gap: 1rem;
     }
-    
+
 </style>

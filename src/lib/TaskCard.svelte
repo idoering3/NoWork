@@ -15,10 +15,11 @@
         allowsEdit?: boolean;
         onComplete: (id: number) => void;
         onDelete?: (id: number) => void;
+        onUpdate: (id: number) => void;
         size?: "big" | "small" | "normal"
     }
 
-    let { task = $bindable(), allowsEdit = true, size="normal", onComplete = $bindable(), onDelete = $bindable()}: Props = $props();
+    let { task = $bindable(), allowsEdit = true, size="normal", onComplete = $bindable(), onDelete = $bindable(), onUpdate = $bindable()}: Props = $props();
 
     function complete() {
         taskChecked = !taskChecked;
@@ -90,12 +91,12 @@
 
     function commitAndCleanup() {
         commit();
-        refreshTask();
+        onUpdate(task.id);
     }
 
     function cancelAndCleanup() {
         cancel();
-        refreshTask();
+        onUpdate(task.id);
     }
 
 
@@ -118,18 +119,14 @@
         startEditing();
     }
 
-    async function refreshTask() {
-        task = await invoke<Task>('get_task_by_id', { 'taskId':task.id });
-    }
-
     async function addTagToTask(id: number) {
         await invoke('add_tag_to_task', { 'taskId':task.id , 'tagId': id });
-        await refreshTask();
+        onUpdate(task.id);
     }
     
     async function removeTagFromTask(id: number) {
         await invoke('remove_tag_from_task', { 'taskId':task.id , 'tagId': id });
-        await refreshTask();
+        onUpdate(task.id);
     }
 
     async function updateTaskPriority(id: number, priority: TaskPriority) {
@@ -337,8 +334,8 @@
 
     .complete-circle {
         display:block;
-        height:1.25rem;
-        width:1.25rem;
+        height:1.0rem;
+        width:1.0rem;
         border-radius: 50%;
         border: 1px solid var(--border-color);
         background: transparent;
@@ -359,8 +356,8 @@
     .complete-circle::before {
         display: block;
         content: "";
-        width:1.0rem;
-        height:1.0rem;
+        width:0.75rem;
+        height:0.75rem;
         border-radius: 50%;
         background: transparent;
         transition: 150ms ease-in-out;
@@ -376,6 +373,7 @@
 
     .small {
         min-height:1.75rem;
+        margin-left: 0.4rem;
     }
 
     .smallname {
