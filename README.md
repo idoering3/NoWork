@@ -1,15 +1,15 @@
 # NoWork
 
-NoWork is a passion project designed to keep track of tasks, focused on providing tools to drive focus and study, as well as task management. I wanted to install a task app, but found that I was not happy with the vast majority of them. NoWork intends to fix that, with version 1.1 aimed at providing the basic features needed for daily life, and version 1.2 aimed at delivering the app to devices that are not desktop computers such as mobile.
+NoWork is a passion project designed to keep track of tasks, focused on providing tools to drive focus and study, as well as task management. I wanted to install a task app, but found that I was not happy with the vast majority of them due to missing features and paid subscriptions. NoWork intends to fix that, with version 1.1 aimed at providing the basic features needed for daily life and version 1.2 aimed at delivering the app to devices that are not desktop computers such as mobile.
 
 <img width="1918" height="1027" alt="image" src="https://github.com/user-attachments/assets/0c6f4e18-369d-454e-b507-88ceb0a4365c" />
 
 # Releases
-NoWork officially released in 1.0 in December of 2025. However, due to various issues, the original repository had to be deleted and re-created. NoWork is quickly approaching version 1.1, which includes a reworked home bar, Apple calendar support, and more advanced tasks.
+NoWork officially released in 1.0 in December of 2025. However, due to various issues, the original repository had to be deleted and re-created. NoWork is quickly approaching version 1.1, which includes a reworked home bar, Apple calendar support, intuitive filtering, and advanced task customization. A fully reworked study tab will be in this release.
 
 ## Roadmap
 
-NoWork 1.2 will be released by the end of 2026. It is intended to allow for self-hosting of a NoWork server, allowing users to utilize Tailscale from any device to access their tasks. Repetitive tasks will also be implemented in this release. The study tab will also be revamped in this version.
+NoWork 1.2 will be released by the end of 2026. It is intended to allow for self-hosting of a NoWork server, allowing users to utilize Tailscale from any device to access their tasks. Repetitive tasks will also be implemented in this release.
 
 # Installation
 
