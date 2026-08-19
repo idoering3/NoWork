@@ -4,7 +4,7 @@ NoWork is a passion project designed to keep track of tasks, focused on providin
 
 <img width="1918" height="1027" alt="image" src="https://github.com/user-attachments/assets/0c6f4e18-369d-454e-b507-88ceb0a4365c" />
 
-# Releases
+## Releases
 NoWork officially released in 1.0 in December of 2025. However, due to various issues, the original repository had to be deleted and re-created. NoWork is quickly approaching version 1.1, which includes a reworked home bar, Apple calendar support, intuitive filtering, and advanced task customization. A fully reworked study tab will be in this release.
 
 ## Roadmap
