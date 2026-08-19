@@ -139,7 +139,7 @@
 
                 {#if dayKey(day) === dayKey(currentDate) && currentTimePixels < dayHeight}
                     <!-- add a red line for the current time -->
-                    {#if showCurrentTime}
+                    {#if showCurrentTime && (currentDate.getHours() + currentDate.getMinutes() / 60) - startingHour > 0}
                         <div style="position: relative;">
                             <div class="current-time" style="top: {currentTimePixels}px">
                                 
