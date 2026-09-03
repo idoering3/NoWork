@@ -1,13 +1,13 @@
 <script lang='ts'>
-    import Button from "./Button.svelte";
+    import Button from "../Button.svelte";
     import { CircleSmall, FlagTriangleRight } from "@lucide/svelte";
-    import type { TaskPriority } from "./types/task";
+    import type { TaskPriority } from "../types/task";
     import { onMount } from "svelte";
   import { quartInOut } from "svelte/easing";
   import { fly } from "svelte/transition";
-  import Badge from "./Badge.svelte";
-  import { flavorMap } from "./stores.svelte";
-  import { getPriorityColor } from "./misc/priority";
+  import Badge from "../Badge.svelte";
+  import { flavorMap } from "../stores.svelte";
+  import { getPriorityColor } from "../misc/priority";
 
 	let dropdownOpen = $state(false);
     

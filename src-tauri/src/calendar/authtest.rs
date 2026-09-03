@@ -146,7 +146,7 @@ fn parse_events(calendar_data: &str) -> Vec<CalendarEvent> {
         for event in calendar.events {
             let props = &event.properties;
 
-            // Grab raw property lines — rrule crate needs the full
+            // Grab raw property lines - rrule crate needs the full
             // "DTSTART;TZID=...:value" form, not just the value.
             let dtstart_raw = get_raw_prop(props, "DTSTART");
             // let dtend_raw   = get_raw_prop(props, "DTEND");
@@ -347,11 +347,11 @@ pub async fn fetch_all_calendars(
                 .await?;
 
             let calendar_text = response.text().await?;
-
+            
             if calendar_text.trim().is_empty() {
                 return Ok(vec![]);
             }
-
+            
             let doc = match roxmltree::Document::parse(&calendar_text) {
                 Ok(d) => d,
                 Err(e) => {
@@ -359,13 +359,13 @@ pub async fn fetch_all_calendars(
                     return Ok(vec![]);
                 }
             };
-
+            
             let events = doc
                 .descendants()
                 .filter(|n| n.tag_name().name() == "calendar-data")
                 .flat_map(|n| parse_events(n.text().unwrap_or("")))
                 .collect();
-
+        
             Ok(events)
         }
     });
@@ -382,5 +382,6 @@ let results: Vec<Result<Vec<CalendarEvent>, Box<dyn std::error::Error + Send + S
         }
     }
 
+    println!("FINAL EVENT COUNT: {}", all_events.len());
     Ok(all_events)
 }

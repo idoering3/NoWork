@@ -2,10 +2,13 @@
     import { CircleSmall, ListFilter } from "@lucide/svelte";
     import BadgeButton from "./BadgeButton.svelte";
     import type { TaskFilter } from "./types/filter";
-  import type { Tag, TaskPriority } from "./types/task";
-  import { flavorMap } from "./stores.svelte";
-  import { fly } from "svelte/transition";
-  import { quartIn, quartOut } from "svelte/easing";
+    import type { Tag, TaskPriority } from "./types/task";
+    import { flavorMap } from "./stores.svelte";
+    import { fly } from "svelte/transition";
+    import { quartIn, quartOut } from "svelte/easing";
+    import FilterSelector from "./dropdowns/FilterSelector.svelte";
+    import { onMount } from "svelte";
+    import { DateFilter } from "./misc/dateFilter";
 
     interface Props {
         filter: TaskFilter;
@@ -36,12 +39,43 @@
         await saveFilter(filter);
     }
 
+    async function filterByDate(dateFilter: DateFilter) {
+        filter.date = dateFilter;
+
+        await saveFilter(filter);
+    }
+
     async function clearFilterTags() {
         filter.tags = [];
         filter.priorities = [];
 
         await saveFilter(filter);
     }
+
+    let filterSelectorEnabled = $state(false);
+    let dateFilter = $state<DateFilter>(null);
+
+    // clicking outside the dropdown must disable it
+
+    onMount(() => {
+		document.addEventListener('click', handleClickOutside);
+		return () => document.removeEventListener('click', handleClickOutside);
+	});
+
+	let dropdownEl: HTMLElement;
+
+	function handleClickOutside(event: MouseEvent) {
+		const target = event.target as HTMLElement;
+
+		if (!dropdownEl.contains(target)) {
+				filterSelectorEnabled = false;
+			return;
+		}
+
+		if (target.closest('button')) {
+			return; // Clicked button inside dropdown, do nothing
+		}
+	}
 </script>
 
 <div class="filter-container">
@@ -119,14 +153,27 @@
         {/if}
     </div>
     <!-- RIGHT FILTER (DETAILED FILTER) -->
-        <div class="filter-container-child">
-        <BadgeButton
-            onClick={() => console.log("")}
-        >
-            <ListFilter size={14}/>
-            Filters
-        </BadgeButton>
+    <div class="filter-container-child">
+        <div bind:this={dropdownEl}>
+            <BadgeButton
+                onClick={() => filterSelectorEnabled = !filterSelectorEnabled}
+                style={`${filterSelectorEnabled ? `
+                        background-color: color-mix(in srgb, 
+                        var(--primary-dark), transparent 90%);
+                    ` : ""}
+                    `}
+            >
+                <ListFilter size={14}/>
+                Filters
+            </BadgeButton>
+            {#if filterSelectorEnabled}
+                <FilterSelector 
+                    dateFilter={filter.date}
+                    onchange={(newDateFilter) => filterByDate(newDateFilter)}
+                />
+            {/if}
         </div>
+    </div>
 </div>
 
 
@@ -134,8 +181,8 @@
     .filter-container-child {
         display: flex;
         flex-direction: row;
-        gap: 0.5rem;
         margin: 1rem 0rem;
+        gap: 0.5rem;
     }
 
     .filter-container {

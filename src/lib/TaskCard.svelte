@@ -6,9 +6,9 @@
     import { getAllTags } from "./stores.svelte";
     import Textbox from "./Textbox.svelte";
     import { invoke } from "@tauri-apps/api/core";
-    import DatePicker from "./DatePicker.svelte";
+    import DatePicker from "./dropdowns/DatePicker.svelte";
     import { getPriorityColor } from "./misc/priority";
-    import PrioritySelector from "./PrioritySelector.svelte";
+    import PrioritySelector from "./dropdowns/PrioritySelector.svelte";
 
     interface Props {
         task: Task;

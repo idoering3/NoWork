@@ -4,10 +4,10 @@
 	import { onMount } from "svelte";
 	import { invoke } from "@tauri-apps/api/core";
 	import { Tags, ArrowUp, Plus, X } from "@lucide/svelte";
-	import Button from "./Button.svelte";
-	import Textbox from "./Textbox.svelte";
-	import Badge from "./Badge.svelte";
-	import { flavorMap } from "./stores.svelte";
+	import Button from "../Button.svelte";
+	import Textbox from "../Textbox.svelte";
+	import Badge from "../Badge.svelte";
+	import { flavorMap } from "../stores.svelte";
 	import type { NewTag, Tag, TagColor } from "$lib/types/task";
 
 	// State

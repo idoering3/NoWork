@@ -60,7 +60,7 @@
             // check if the data is stale
             const age = Date.now() - cachedEvents.lastUpdated;
             // compare against 5 min
-            if (age > 60000 * 5) {
+            if (age > 60000 * 0) {
                 console.log("Date is stale");
                 
                 // we need to go to the api to get calendar events

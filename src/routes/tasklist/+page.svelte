@@ -7,17 +7,17 @@
     import Textbox from "$lib/Textbox.svelte";
     import Button from "$lib/Button.svelte";
     import ArrowUp from "@lucide/svelte/icons/arrow-up";
-    import TagSelector from "$lib/TagSelector.svelte";
+    import TagSelector from "$lib/dropdowns/TagSelector.svelte";
     import { X } from "@lucide/svelte";
     import { onDestroy, onMount } from "svelte";
-    import Datepicker from "$lib/DatePicker.svelte";
+    import Datepicker from "$lib/dropdowns/DatePicker.svelte";
     import { fly } from "svelte/transition";
     import { quartIn, quartInOut, quartOut } from "svelte/easing";
     import { load } from "@tauri-apps/plugin-store";
     import { flip } from "svelte/animate";
     import CustomScrollbar from "$lib/misc/CustomScrollbar.svelte";
     import { setPageEl } from "$lib/misc/context";
-    import PrioritySelector from "$lib/PrioritySelector.svelte";
+    import PrioritySelector from "$lib/dropdowns/PrioritySelector.svelte";
     import { matchesFilter, type TaskFilter } from "$lib/types/filter";
     import FilterBar from "$lib/FilterBar.svelte";
 
@@ -113,6 +113,7 @@
     let filter = $state<TaskFilter>({
         tags: [],
         priorities: [],
+        date: null,
     });
 
 
