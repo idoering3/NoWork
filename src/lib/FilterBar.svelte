@@ -1,5 +1,5 @@
 <script lang='ts'>
-    import { CircleSmall, ListFilter } from "@lucide/svelte";
+    import { CircleSmall, ListFilter, X } from "@lucide/svelte";
     import BadgeButton from "./BadgeButton.svelte";
     import type { TaskFilter } from "./types/filter";
     import type { Tag, TaskPriority } from "./types/task";
@@ -9,6 +9,7 @@
     import FilterSelector from "./dropdowns/FilterSelector.svelte";
     import { onMount } from "svelte";
     import { DateFilter } from "./misc/dateFilter";
+  import Pill from "./misc/Pill.svelte";
 
     interface Props {
         filter: TaskFilter;
@@ -48,6 +49,7 @@
     async function clearFilterTags() {
         filter.tags = [];
         filter.priorities = [];
+        filter.date = DateFilter.None;
 
         await saveFilter(filter);
     }
@@ -138,7 +140,7 @@
                 Low
             </BadgeButton>
         </div>
-        {#if filter.tags.length > 0 || filter.priorities.length > 0}
+        {#if filter.tags.length > 0 || filter.priorities.length > 0 || filter.date}
             <div
                 in:fly={{duration: 1000, y:15, easing: quartOut}}
                 out:fly={{duration:150, y:-15, easing: quartIn}}
@@ -152,19 +154,26 @@
             </div>
         {/if}
     </div>
+
+
     <!-- RIGHT FILTER (DETAILED FILTER) -->
     <div class="filter-container-child">
         <div bind:this={dropdownEl}>
+            <!-- TODO MORE ROBUST CHECKS FOR IF A FILTER IN THE DROPDOWN IS ENABLED -->
+
             <BadgeButton
                 onClick={() => filterSelectorEnabled = !filterSelectorEnabled}
-                style={`${filterSelectorEnabled ? `
-                        background-color: color-mix(in srgb, 
-                        var(--primary-dark), transparent 90%);
-                    ` : ""}
-                    `}
+                style={`${(filter.date) ? `
+                        background-color: color-mix(in srgb, var(--primary-dark), transparent 90%);
+                        border: 1px solid var(--primary-dark);
+                    ` : ""}`
+                    }
             >
                 <ListFilter size={14}/>
                 Filters
+                <div class='filter-counter' class:active={filter.date}>
+                    <Pill text={filter.date ? 1 : 1}/>
+                </div>
             </BadgeButton>
             {#if filterSelectorEnabled}
                 <FilterSelector 
@@ -196,5 +205,27 @@
         border-radius: 25px;
         overflow: hidden;
         margin-left: 1rem;
+    }
+
+    .filter-counter {
+        max-width: 2rem;
+        opacity: 1;
+        transform: translateY(0);
+
+        transition:
+            max-width 150ms ease-in-out,
+            opacity 150ms ease-in-out 75ms,
+            transform 150ms ease-in-out 75ms;
+    }
+
+    .filter-counter:not(.active) {
+        max-width: 0;
+        opacity: 0;
+        transform: translateY(8px);
+
+        transition:
+            opacity 150ms ease-in,
+            transform 150ms ease-in,
+            max-width 150ms ease-in-out 50ms;
     }
 </style>
