@@ -8,12 +8,13 @@
     import { fly } from "svelte/transition";
 
     let tasks: Task[] = $state([]);
-        let runCollapse = $state(true);
+    let runCollapse = $state(true);
+    let numTasks = $state(6);
 
 
     onMount(async () => {
         tasks = await invoke("get_incomplete_tasks");
-        tasks = tasks?.slice(0,7);
+        tasks = tasks?.slice(0,numTasks);
     });
 
     async function completeTask (taskId: number) {
@@ -23,7 +24,7 @@
 
     async function getIncompleteTasks() {
         tasks = await invoke('get_incomplete_tasks');
-        tasks = tasks?.slice(0,7);
+        tasks = tasks?.slice(0,numTasks);
     }
 
     async function refreshTask(taskId: number) {
