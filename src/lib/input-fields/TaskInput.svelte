@@ -10,13 +10,11 @@
   import { fly } from "svelte/transition";
   import { flip } from "svelte/animate";
   import { ArrowUp, X } from "@lucide/svelte";
-  import { submitTask, taskPriorityOptions, type CreateTask, type Task } from "$lib/types/task";
-  import { getAllTags } from "$lib/stores.svelte";
+  import { submitTask, type CreateTask } from "$lib/types/task";
 
 
     interface Props {
         show: boolean;
-        taskBar: HTMLDivElement | undefined;
     }
 
     let placeholders = [
@@ -55,7 +53,7 @@
         }
     );
 
-    let { show, taskBar }: Props = $props();
+    let { show }: Props = $props();
 
     async function removeDate() {
         proposedTask.dueDate = null;
@@ -79,10 +77,17 @@
         };
     }
 
+    function handleKeydown(event: KeyboardEvent) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    }
+
 </script>
 
 {#if show}
-    <div class="task-bar" bind:this={taskBar} in:fly|global={{ duration: 1500, delay:600, y:15, easing: quartOut }}>
+    <div class="task-bar" in:fly|global={{ duration: 1500, delay:600, y:15, easing: quartOut }}>
         <Card expanded class="short">
             <Textbox bind:value={proposedTask.name} {placeholders} />
             {#snippet tagsn(name: string, color: 'default' | 'outline' | 'danger' | 'blue')}

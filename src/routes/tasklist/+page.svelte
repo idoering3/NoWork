@@ -93,6 +93,7 @@
     let selectedTag: Tag | null = $state(null);
 
     onMount (async () => {
+        // probably don't need this
         taskState.tasks = await getIncompleteTasks();
         tags = await getAllTags();
         const store = await load(".settings.json");
@@ -100,7 +101,6 @@
         let filterStore = await store.get<TaskFilter>("taskFilter");
         if (filterStore) {
             filter = filterStore;
-            console.log(filter);
         }
 
         const tag = await store.get<{ id: number, name: string, color: 'default' | 'outline' | 'danger' | 'blue' }>("selectedTag");
@@ -179,7 +179,7 @@
                 </div>
             </CustomScrollbar>
         </div>
-        <TaskInput {show} {taskBar}/>
+        <TaskInput {show} />
     </div>
 </div>
 
