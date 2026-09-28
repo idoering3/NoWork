@@ -1,6 +1,6 @@
 <script lang="ts">
     import { ChevronDown, ChevronUp } from "@lucide/svelte";
-    import Button from "./Button.svelte";
+    import Button from "../Button.svelte";
     import { onMount } from "svelte";
     
     let {

@@ -5,21 +5,20 @@
 	import { invoke } from "@tauri-apps/api/core";
 	import { Tags, ArrowUp, Plus, X } from "@lucide/svelte";
 	import Button from "../Button.svelte";
-	import Textbox from "../Textbox.svelte";
+	import Textbox from "../input-fields/Textbox.svelte";
 	import Badge from "../Badge.svelte";
-	import { flavorMap } from "../stores.svelte";
+	import { flavorMap, getAllTags } from "../stores.svelte";
 	import type { NewTag, Tag, TagColor } from "$lib/types/task";
 
 	// State
 	let dropdownOpen = $state(false);
 	let tagColor: TagColor = $state('default');
 	let tagName = $state('');
+	let allTags = $state<Tag[]>([]);
 
 	// Props
 	let {
-		selectedTags = $bindable([] as Tag[]),
-		refreshTags = $bindable(() => {}),
-		allTags = $bindable([] as Tag[])
+		selectedTags = $bindable([] as Tag[])
 	} = $props();
 
 	// Element Refs
@@ -98,7 +97,6 @@
 		try {
 			await invoke("remove_tag", { tagName: tag.name });
 			await loadTags(); // Refresh from DB
-			refreshTags(); // Refresh parent component
 		} catch (err) {
 			console.error("Failed to remove tag:", err)
 		}

@@ -4,7 +4,7 @@
     import Button from "./Button.svelte";
     import Badge from "./Badge.svelte";
     import { getAllTags } from "./stores.svelte";
-    import Textbox from "./Textbox.svelte";
+    import Textbox from "./input-fields/Textbox.svelte";
     import { invoke } from "@tauri-apps/api/core";
     import DatePicker from "./dropdowns/DatePicker.svelte";
     import { getPriorityColor } from "./misc/priority";

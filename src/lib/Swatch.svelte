@@ -3,7 +3,7 @@
     import Card from "./Card.svelte";
     import { fly } from "svelte/transition";
     import { quartInOut } from "svelte/easing";
-    import Textbox from "./Textbox.svelte";
+    import Textbox from "./input-fields/Textbox.svelte";
 
 	// Use $props() to define the component's properties in Svelte 5.
 	let { color = 'transparent' } = $props();

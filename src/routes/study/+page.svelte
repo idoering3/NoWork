@@ -1,7 +1,7 @@
 <script lang='ts'>
     import Button from '$lib/Button.svelte';
     import Dropdown from '$lib/Dropdown.svelte';
-    import NumberInput from '$lib/NumberInput.svelte';
+    import NumberInput from '$lib/input-fields/NumberInput.svelte';
     import Countdown from '$lib/Countdown.svelte';
     import type { StudyType } from '$lib/types/Study.ts';
     import { timerStore } from '$lib/types/timerStore.svelte';

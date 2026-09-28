@@ -1,114 +1,36 @@
 <script lang='ts'>
     import { invoke } from "@tauri-apps/api/core";
-    import Card from "$lib/Card.svelte";
-    import Badge from "$lib/Badge.svelte";
-    import { type Task, type Tag, type TaskPriority } from "$lib/types/task";
+    import { type Task, type Tag, type TaskPriority, getCompletedTaskCount, submitTask, getIncompleteTasks, type CreateTask, completeTask, deleteTask } from "$lib/types/task";
     import TaskCard from "$lib/TaskCard.svelte";
-    import Textbox from "$lib/Textbox.svelte";
-    import Button from "$lib/Button.svelte";
-    import ArrowUp from "@lucide/svelte/icons/arrow-up";
-    import TagSelector from "$lib/dropdowns/TagSelector.svelte";
-    import { X } from "@lucide/svelte";
     import { onDestroy, onMount } from "svelte";
-    import Datepicker from "$lib/dropdowns/DatePicker.svelte";
     import { fly } from "svelte/transition";
     import { quartIn, quartInOut, quartOut } from "svelte/easing";
     import { load } from "@tauri-apps/plugin-store";
     import { flip } from "svelte/animate";
     import CustomScrollbar from "$lib/misc/CustomScrollbar.svelte";
     import { setPageEl } from "$lib/misc/context";
-    import PrioritySelector from "$lib/dropdowns/PrioritySelector.svelte";
     import { matchesFilter, type TaskFilter } from "$lib/types/filter";
     import FilterBar from "$lib/FilterBar.svelte";
+    import TaskInput from "$lib/input-fields/TaskInput.svelte";
+    import { getAllTags } from "$lib/stores.svelte";
+    import { completedTaskCount, taskState } from "$lib/types/taskStore.svelte";
 
-    let tasks: Task[] = $state([]);
     let show = $state(false);
 
     function handleKeydown(event: KeyboardEvent) {
         if (event.key === "Enter") {
             event.preventDefault();
             event.stopPropagation();
-            submitTask();
         }
     }
 
-    async function getAllTags() {
-        tags = await invoke<Tag[]>('get_all_tags'); 
-    }
-
-    async function getIncompleteTasks() {
-        tasks = await invoke('get_incomplete_tasks');
-        completedTasks = await getCompletedTaskCount();
-    }
-
-    let placeholders = [
-        'steal grandma\'s bagel',
-        'read War and Peace',
-        'get absolutely wasted on a Tuesday morning',
-        'scroll on social media for 6 hours',
-        'add an item to my task list',
-        'make a sad peanut butter jelly sandwich',
-        'cry myself to sleep in a fetal position',
-        'sigh heavily and gaze forlornly out the window',
-        'talk to myself like a crazy person for an hour',
-        'debate with my coffee whether it\'s time to quit or keep going',
-        'become a conspiracy theorist',
-        'run laps in the swivel chair around the cubicle',
-        'make a playlist called \'songs to pretend you\'re working to\'',
-        'try drinking a glass of milk while updside down',
-        'bring a fishing pole to the aquarium',
-        'call John and tell him I can\'t talk right now',
-        'drive around in a clown costume like the clown I am',
-        'streak through the streets, shouting Eureka!',
-        'write a strongly worded email',
-        'impersonate a drunk Lyndon B. Johnson looking for his car keys',
-        'delete those incriminating Watergate tapes',
-        'go for a run',
-        'pretend to do your work'
-    ]
-
-    let taskName = $state("");
-
-    async function submitTask () {
-        if (taskName) {
-            await invoke('add_database_task', {name: taskName, dueDate: selectedDate?.toISOString(), priority: selectedPriority, tags: selectedAddingTags});
-            getIncompleteTasks();
-            selectedDate = null;
-            taskName = '';
-            if (selectedTag) {
-                selectedAddingTags = [selectedTag];
-            }
-        }
-    }
-
-    async function completeTask (taskId: number) {
-        await invoke('complete_task', { taskId: taskId });
-        await getIncompleteTasks();
-    }
-
-    async function deleteTask (taskId: number) {
-        await invoke("delete_task", {taskId: taskId});
-        await getIncompleteTasks();
-    }
-
+    // TODO also move to task.ts
     async function refreshTask(taskId: number) {
         const updatedTask = await invoke<Task>('get_task_by_id', { 'taskId':taskId });
 
-        tasks = tasks.map(task => task.id === updatedTask.id ? updatedTask : task);
+        taskState.tasks = taskState.tasks.map(task => task.id === updatedTask.id ? updatedTask : task);
     }
 
-    async function getCompletedTaskCount (): Promise<number> {
-        return await invoke<number>('get_completed_task_count');
-    }
-
-    function removeTagFromTask(tag: string) {
-        selectedAddingTags = selectedAddingTags.filter(t => t.name !== tag);
-    }
-
-    // tags for adding a task
-    let selectedAddingTags: Tag[] = $state([]);
-    let selectedDate: Date | null = $state(null);
-    let selectedPriority: TaskPriority = $state(null);
     // the filtering variable that stores all filters
     let filter = $state<TaskFilter>({
         tags: [],
@@ -171,8 +93,8 @@
     let selectedTag: Tag | null = $state(null);
 
     onMount (async () => {
-        getIncompleteTasks();
-        getAllTags();
+        taskState.tasks = await getIncompleteTasks();
+        tags = await getAllTags();
         const store = await load(".settings.json");
 
         let filterStore = await store.get<TaskFilter>("taskFilter");
@@ -185,14 +107,10 @@
         if (tag) {
             selectedTag = tag;
         }
-        completedTasks = await getCompletedTaskCount();
-
     });
 
-    let completedTasks = $state();
-
     let visibleTasks = $derived(
-        tasks
+        taskState.tasks
             .filter(task => matchesFilter(task, filter))
             .sort((a, b) => {
                 if (!a.dueDate && !b.dueDate) return 0;
@@ -200,10 +118,6 @@
                 if (!b.dueDate) return -1;
                 return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
     }));
-
-    async function removeDate() {
-        selectedDate = null;
-    }
 
     let pageEl = $state<HTMLElement>();
     setPageEl( () => pageEl );
@@ -232,10 +146,10 @@
             </h1>
             <div style="display: flex; flex-direction: column; gap: 0.5rem;">
                 <h6 in:fly={{ x: -15, delay: 600, duration: 1500, easing: quartOut}}>
-                    {tasks.filter(task => dueToday(task)).length} task{tasks.filter(task => dueToday(task)).length !== 1 ? "s" : ''} due today
+                    {taskState.tasks.filter(task => dueToday(task)).length} task{taskState.tasks.filter(task => dueToday(task)).length !== 1 ? "s" : ''} due today
                 </h6>
                 <h6 in:fly={{ x: -15, delay: 1200, duration: 1500, easing: quartOut}}>
-                    {completedTasks} total tasks completed
+                    {completedTaskCount.completed} total tasks completed
                 </h6>
             </div>
         </div>
@@ -247,67 +161,25 @@
             <CustomScrollbar>
                 <div style="position: relative;">
                     {#key selectedTag}
-                    <div style="display: flex; flex-direction: column; gap: 0.25rem;">
-                        {#each visibleTasks as task, i (task.id)}
-                        <!-- No effing clue why, but the animate and transitions MUST be separated. It breaks otherwise -->
-                        <div animate:flip|global={{ duration: 300, easing: quartInOut }}>
-                            <div
-                                    in:fly|global={{ duration: 1000, y: 15, easing: quartOut, delay: runCollapse ? 150 + 75 * (i + 1) : 0 }}
-                                    out:fly|global={{ duration: 150, y: -15, easing: quartIn }}
-                                    onintroend={() => runCollapse ? runCollapse = false : ""}
-                                >
-                                    <TaskCard {task} onComplete={completeTask} onDelete={deleteTask} onUpdate={refreshTask}/>
+                        <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                            {#each visibleTasks as task, i (task.id)}
+                            <!-- No effing clue why, but the animate and transitions MUST be separated. It breaks otherwise -->
+                                <div animate:flip|global={{ duration: 300, easing: quartInOut }}>
+                                    <div
+                                            in:fly|global={{ duration: 1000, y: 15, easing: quartOut, delay: runCollapse ? 150 + 75 * (i + 1) : 0 }}
+                                            out:fly|global={{ duration: 150, y: -15, easing: quartIn }}
+                                            onintroend={() => runCollapse ? runCollapse = false : ""}
+                                        >
+                                        <TaskCard {task} onComplete={completeTask} onDelete={deleteTask} onUpdate={refreshTask}/>
+                                    </div>
                                 </div>
-                            </div>
                             {/each}
                         </div>
-                        {/key}
-                    </div>
+                    {/key}
+                </div>
             </CustomScrollbar>
         </div>
-        {#if show}
-            <div class="task-bar" bind:this={taskBar} in:fly|global={{ duration: 1500, delay:600, y:15, easing: quartOut }}>
-                <Card expanded class="short">
-                    <Textbox bind:value={taskName} {placeholders} />
-                    {#snippet tagsn(name: string, color: 'default' | 'outline' | 'danger' | 'blue')}
-                        <Badge flavor={color} noPadding>
-                            <span style="padding-left: 0.5rem">
-                                {name}
-                            </span>
-                            <Button flavor="badge" class="square xsmall circular" Icon={X}
-                                onclick={() => {
-                                    removeTagFromTask(name);
-                                }}
-                            />
-                        </Badge>
-                    {/snippet}
-                    {#key selectedTag?.name}
-                        <div
-                            style="display: flex;"
-                        >
-                        {#each selectedAddingTags as tag (tag.name)}
-                            <div animate:flip|global={{ duration: 300, easing: quartInOut }} style="padding: 0.25rem;">
-                                <div style=""
-                                >
-                                    {@render tagsn(tag.name, tag?.color)}
-                                </div>
-                            </div>
-                        {/each}
-                        </div>
-                    {/key}
-                    {#if selectedDate}
-                        {selectedDate.toLocaleDateString()}
-                        <Button class="square xsmall" Icon={X} flavor='outline' onclick={removeDate}/>
-                    {/if}
-                    <PrioritySelector bind:priority={selectedPriority}/>
-                    <TagSelector bind:selectedTags={selectedAddingTags} refreshTags={getAllTags} bind:allTags={tags} />
-                    <Datepicker bind:selectedDate={selectedDate}/>
-                    <div in:fly|global={{ duration: 1500, delay:800, y:5, easing: quartOut }}>
-                        <Button onclick={submitTask} class="square circular" flavor="primary" Icon={ArrowUp} />
-                    </div>
-                </Card>
-            </div>
-        {/if}
+        <TaskInput {show} {taskBar}/>
     </div>
 </div>
 
@@ -324,9 +196,9 @@
     }
 
     .container {
-		width: 100%;
-		height: 100%;
         display: flex;
+        width: 100%;
+        margin-bottom: 1.5rem;
         flex-direction: column;
     }
 
@@ -343,6 +215,7 @@
         display: flex;
         flex-direction: column;
         gap: 1rem;
+        flex-grow: 1;
     }
 
 </style>

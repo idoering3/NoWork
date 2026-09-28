@@ -7,13 +7,13 @@
     import { load } from "@tauri-apps/plugin-store";
     import { getCalendarNumHours, getCalendarStartTime, selectedDateFormat, theme, themes, updateCalendarNumHours, updateCalendarStartTime, username, type ThemeName } from "$lib/stores.svelte";
     import { onMount } from "svelte";
-    import Textbox from "$lib/Textbox.svelte";
+    import Textbox from "$lib/input-fields/Textbox.svelte";
     import { fly } from "svelte/transition";
     import { quartOut } from "svelte/easing";
     import { dateFormatOptions, type DateFormatName } from "$lib/misc/datePrints";
     import { loadCredentials, saveCredentials } from "$lib/cal/calendarCredentialStorage";
     import { setPageEl } from "$lib/misc/context";
-    import NumberInput from "$lib/NumberInput.svelte";
+    import NumberInput from "$lib/input-fields/NumberInput.svelte";
 
     async function resetDatabase() {
         await invoke('reset_database');
