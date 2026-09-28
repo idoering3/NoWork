@@ -11,6 +11,7 @@
   import { flip } from "svelte/animate";
   import { ArrowUp, X } from "@lucide/svelte";
   import { submitTask, type CreateTask } from "$lib/types/task";
+  import { onDestroy, onMount } from "svelte";
 
 
     interface Props {
@@ -81,9 +82,19 @@
         if (event.key === "Enter") {
             event.preventDefault();
             event.stopPropagation();
+
+            trySubmitTask();
         }
     }
 
+    onMount(() => {
+        window.addEventListener("keydown", handleKeydown);
+    });
+
+    onDestroy(() => {
+        window.removeEventListener("keydown", handleKeydown);
+   })
+;
 </script>
 
 {#if show}

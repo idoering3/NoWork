@@ -17,13 +17,6 @@
 
     let show = $state(false);
 
-    function handleKeydown(event: KeyboardEvent) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-    }
-
     // TODO also move to task.ts
     async function refreshTask(taskId: number) {
         const updatedTask = await invoke<Task>('get_task_by_id', { 'taskId':taskId });
@@ -70,13 +63,11 @@
 	onMount(() => {
 		requestAnimationFrame(resize);
 		window.addEventListener("resize", resize);
-        window.addEventListener("keydown", handleKeydown);
         show = true;
 	});
 
 	onDestroy(() => {
 		window.removeEventListener("resize", resize);
-		window.removeEventListener("keydown", handleKeydown);
 	});
 
     let tags: Tag[] = $state([]);
