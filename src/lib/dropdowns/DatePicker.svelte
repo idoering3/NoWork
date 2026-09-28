@@ -187,10 +187,10 @@
 </script>
 
 <div class='container' bind:this={dropdownEl} 
-    in:fly|global={{ duration: slowAnimation ? 1500 : 300, delay: slowAnimation? 900 : 0, y:7, easing: quartOut }}
+    in:fly|global={{ duration: slowAnimation ? 1500 : 300, delay: slowAnimation? 600 : 0, y:7, easing: quartOut }}
     style={posRight ? 'justify-content: start' : 'justify-content:end'}
     >
-    <Button class="square {size}" flavor="outline" Icon={Calendar} onclick={() => dropdownOpen = !dropdownOpen}/>
+    <Button class="square {size} circular" flavor="outline" Icon={Calendar} onclick={() => dropdownOpen = !dropdownOpen}/>
     {#if dropdownOpen}
         <div 
             bind:this={calendarElement}

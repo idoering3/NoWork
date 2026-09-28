@@ -120,9 +120,9 @@
 	];
 </script>
 
-<div class="container" transition:fly|global={{ duration: 1500, delay:600, y:7, easing: quartOut }}>
+<div class="container" transition:fly|global={{ duration: 1500, delay:400, y:7, easing: quartOut }}>
 	<div class="dropdown-container" bind:this={dropdownEl}>
-		<Button class="square" flavor="outline" Icon={Tags} onclick={() => (dropdownOpen = !dropdownOpen)}>
+		<Button class="square circular" flavor="outline" Icon={Tags} onclick={() => (dropdownOpen = !dropdownOpen)}>
 		</Button>
 		{#if dropdownOpen}
 			<div class="context-menu" transition:fly={{ y: 15, easing: quartInOut, duration: 150 }}>

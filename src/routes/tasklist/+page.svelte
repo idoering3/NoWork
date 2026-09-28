@@ -266,7 +266,7 @@
             </CustomScrollbar>
         </div>
         {#if show}
-            <div class="task-bar" bind:this={taskBar} in:fly|global={{ duration: 1500, delay:600, y:30, easing: quartOut }}>
+            <div class="task-bar" bind:this={taskBar} in:fly|global={{ duration: 1500, delay:600, y:15, easing: quartOut }}>
                 <Card expanded class="short">
                     <Textbox bind:value={taskName} {placeholders} />
                     {#snippet tagsn(name: string, color: 'default' | 'outline' | 'danger' | 'blue')}
@@ -302,8 +302,8 @@
                     <PrioritySelector bind:priority={selectedPriority}/>
                     <TagSelector bind:selectedTags={selectedAddingTags} refreshTags={getAllTags} bind:allTags={tags} />
                     <Datepicker bind:selectedDate={selectedDate}/>
-                    <div in:fly|global={{ duration: 1500, delay:1200, y:7, easing: quartOut }}>
-                        <Button onclick={submitTask} class="square" flavor="primary" Icon={ArrowUp} />
+                    <div in:fly|global={{ duration: 1500, delay:800, y:5, easing: quartOut }}>
+                        <Button onclick={submitTask} class="square circular" flavor="primary" Icon={ArrowUp} />
                     </div>
                 </Card>
             </div>
