@@ -11,6 +11,7 @@
     let incompleteTasksDueThisWeek: Task[] = $state([]);
 
     onMount(async () => {
+        // TODO, dynamic integration
         tasksDueToday = await getTasksDueToday();
         tasksDueThisWeek = await getTasksDueThisWeek();
         incompleteTasksDueThisWeek = await getIncompleteTasksDueThisWeek();
@@ -32,7 +33,7 @@
         </div>
     </Badge>
 
-    <Badge flavor="greenoutline">
+    <Badge flavor={numTasksDueToday == 0 ? "greenoutline" : "danger"}>
         {#if numTasksDueToday == 0}
             <CalendarCheck2 size={16} class={numTasksDueToday == 0 ? "no-tasks-icon" : ""} />
         {:else}
