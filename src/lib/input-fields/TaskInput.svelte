@@ -147,7 +147,11 @@
                 </div>
             {/key}
             {#if proposedTask.dueDate !== null}
-                <div>
+                <div
+                    style="display: flex; gap: 0.5rem;"
+                    in:fly={{ duration: 300, y:15, easing: quartInOut }}
+                    out:fly={{ duration: 300, y:-15, easing: quartInOut }}
+                >
                     {proposedTask.dueDate.toLocaleDateString()}
                     <Button class="square xsmall circular" Icon={X} flavor='outline' onclick={removeDate}/>
                 </div>

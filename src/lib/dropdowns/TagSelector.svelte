@@ -8,13 +8,13 @@
 	import Textbox from "../input-fields/Textbox.svelte";
 	import Badge from "../Badge.svelte";
 	import { flavorMap } from "../stores.svelte";
-	import type { NewTag, Tag, TagColor } from "$lib/tasks/task";
+	import { getAllTags, type NewTag, type Tag, type TagColor } from "$lib/tasks/task";
+  import { tagState } from "$lib/tasks/taskStore.svelte";
 
 	// State
 	let dropdownOpen = $state(false);
 	let tagColor: TagColor = $state('default');
 	let tagName = $state('');
-	let allTags = $state<Tag[]>([]);
 
 	// Props
 	let {
@@ -51,12 +51,7 @@
 	}
 
 	async function loadTags() {
-		try {
-			const tags = (await invoke("get_all_tags")) as Tag[];
-			allTags = tags;
-		} catch (err) {
-			console.error("Failed to load tags:", err);
-		}
+		tagState.tags = await getAllTags();
 	}
 
 	function addTagToTask(tag: Tag) {
@@ -70,7 +65,7 @@
 		if (!name) return; // Don't add empty tags
 
 		// Check if tag name already exists
-		const tagExists = allTags.some((t) => t.name === name);
+		const tagExists = tagState.tags.some((t) => t.name === name);
 
 		if (!tagExists) {
 			let newTag: NewTag = {
@@ -84,6 +79,8 @@
 				console.error("Failed to add tag:", err);
 			}
 		}
+
+		tagState.tags = await getAllTags();
 		
 		tagName = ''; // Clear input
 		// We don't auto-add to task here, user must click '+'
@@ -126,7 +123,7 @@
 			<div class="context-menu" transition:fly={{ y: 15, easing: quartInOut, duration: 150 }}>
 				<h8>Tags</h8>
 				<div class="tag-container">
-					{#each allTags as tag (tag.name)}
+					{#each tagState.tags as tag (tag.name)}
 						<Badge noPadding flavor={tag.color ?? "default"}>
 							<Button
 								flavor="badge"
