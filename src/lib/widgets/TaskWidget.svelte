@@ -35,7 +35,11 @@
     
 </script>
 
-<div class="container" in:fly|global={{ y: 30, delay: 600, duration: 1500, easing: quartOut}}>
+<div 
+    class="container" 
+    in:fly|global={{ y: 30, delay: 600, duration: 1500, easing: quartOut}}
+    style={tasks.length < 6 ? "justify-content: flex-start; padding-top: 1rem; height: calc(100% - 1rem);" : "justify-content: space-evenly; height: 100%;"}
+>
     {#if tasks.length > 0}
         {#each tasks as task, i (task.id)}
             <div animate:flip|global={{ duration: 300, easing: quartInOut }}>
@@ -61,8 +65,6 @@
         background-color: var(--primary-light);
         width: 100%;
         display: flex;
-        flex-direction: column;
-        height: 100%;
-        justify-content: space-evenly;
+        flex-direction: column; 
     }
 </style>
