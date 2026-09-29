@@ -1,6 +1,6 @@
 import { flavorMap } from "$lib/stores.svelte";
 import { invoke } from "@tauri-apps/api/core";
-import { completedTaskCount, taskState } from "./taskStore.svelte";
+import { completedTaskCount, tagState, taskState } from "../tasks/taskStore.svelte";
 
 export const taskPriorityOptions = [
     { label: "No priority", value: null },
@@ -98,7 +98,6 @@ async function refreshCompletedTaskCount() {
 }
 
 // tag functions
-async function getAllTags(): Promise<Tag[]> {
+export async function getAllTags() {
     return await invoke<Tag[]>('get_all_tags'); 
 }
-

@@ -11,7 +11,7 @@
 
     let { value = $bindable(), placeholders, preamble = true, onkeydown, children }: Props = $props();
 
-    let placeholder = $state(placeholders[Math.floor(Math.random() * placeholders.length)]);
+    let placeholder = $derived(placeholders[Math.floor(Math.random() * placeholders.length)]);
     onMount(() => {
         if (preamble) {
             placeholder = `Type something, like '${placeholder}'`; 

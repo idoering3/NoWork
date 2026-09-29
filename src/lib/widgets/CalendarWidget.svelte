@@ -2,7 +2,7 @@
     import { fly } from "svelte/transition";
     import { dayKey, getCalendarNumHours, getCalendarStartTime, startClock } from "../stores.svelte";
     import { quartOut } from "svelte/easing";
-    import type { Task } from "../types/task";
+    import type { Task } from "../tasks/task";
     import EventCard from "$lib/cal/EventCard.svelte";
     import { onMount } from "svelte";
     import { load } from "@tauri-apps/plugin-store";

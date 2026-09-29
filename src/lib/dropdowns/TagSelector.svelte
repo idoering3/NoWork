@@ -7,8 +7,8 @@
 	import Button from "../Button.svelte";
 	import Textbox from "../input-fields/Textbox.svelte";
 	import Badge from "../Badge.svelte";
-	import { flavorMap, getAllTags } from "../stores.svelte";
-	import type { NewTag, Tag, TagColor } from "$lib/types/task";
+	import { flavorMap } from "../stores.svelte";
+	import type { NewTag, Tag, TagColor } from "$lib/tasks/task";
 
 	// State
 	let dropdownOpen = $state(false);

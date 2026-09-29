@@ -6,9 +6,9 @@
     import { onMount } from "svelte";
     import { quartOut } from "svelte/easing";
     import { fly } from "svelte/transition";
-    import type { Task } from "$lib/types/task";
+    import type { Task } from "$lib/tasks/task";
     import { getSimpleTimeOfDay } from "$lib/misc/timeofday";
-    import { hasDueDate } from "$lib/types/taskStore.svelte";
+    import { hasDueDate } from "$lib/tasks/taskStore.svelte";
     import { getDayOfWeekAndTextStandardDateShort, dateFormats, type DateFormatName } from "$lib/misc/datePrints";
     import CalendarWidget from "$lib/widgets/CalendarWidget.svelte";
     import WeatherWidget from "$lib/widgets/WeatherWidget.svelte";

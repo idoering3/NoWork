@@ -1,6 +1,6 @@
 <script lang='ts'>
     import { invoke } from "@tauri-apps/api/core";
-    import { type Task, type Tag, type TaskPriority, getCompletedTaskCount, submitTask, getIncompleteTasks, type CreateTask, completeTask, deleteTask } from "$lib/types/task";
+    import { type Task, type Tag, type TaskPriority, getCompletedTaskCount, submitTask, getIncompleteTasks, type CreateTask, completeTask, deleteTask, getAllTags } from "$lib/tasks/task";
     import TaskCard from "$lib/TaskCard.svelte";
     import { onDestroy, onMount } from "svelte";
     import { fly } from "svelte/transition";
@@ -12,8 +12,7 @@
     import { matchesFilter, type TaskFilter } from "$lib/types/filter";
     import FilterBar from "$lib/FilterBar.svelte";
     import TaskInput from "$lib/input-fields/TaskInput.svelte";
-    import { getAllTags } from "$lib/stores.svelte";
-    import { completedTaskCount, taskState } from "$lib/types/taskStore.svelte";
+    import { completedTaskCount, tagState, taskState } from "$lib/tasks/taskStore.svelte";
 
     let show = $state(false);
 
@@ -70,8 +69,6 @@
 		window.removeEventListener("resize", resize);
 	});
 
-    let tags: Tag[] = $state([]);
-
     function dueToday(task: Task) {
         const dueDate: Date | null = task.dueDate ? new Date(task.dueDate) : null;
         const now: Date = new Date();
@@ -86,7 +83,7 @@
     onMount (async () => {
         // probably don't need this
         taskState.tasks = await getIncompleteTasks();
-        tags = await getAllTags();
+        tagState.tags = await getAllTags();
         const store = await load(".settings.json");
 
         let filterStore = await store.get<TaskFilter>("taskFilter");
@@ -146,7 +143,7 @@
         </div>
 
         <!-- FILTERING GOES HERE???? -->
-        <FilterBar bind:filter tags={tags} saveFilter={saveFilter} />
+        <FilterBar bind:filter tags={tagState.tags} saveFilter={saveFilter} />
 
         <div class='task-container' bind:this={taskContainer} in:fly|global={{ duration: 1500, delay:300, y:30, easing: quartOut }}>
             <CustomScrollbar>
@@ -189,7 +186,7 @@
     .container {
         display: flex;
         width: 100%;
-        margin-bottom: 1.5rem;
+        margin-bottom: 0.5rem;
         flex-direction: column;
     }
 

@@ -1,6 +1,6 @@
 <script lang='ts'>
     import Badge from "$lib/Badge.svelte";
-    import { getIncompleteTasksDueThisWeek, getTasksDueThisWeek, getTasksDueToday, type Task } from "$lib/types/task";
+    import { getIncompleteTasksDueThisWeek, getTasksDueThisWeek, getTasksDueToday, type Task } from "$lib/tasks/task";
     import { CalendarCheck2, CalendarClock, CircleCheck } from "@lucide/svelte";
     import { onMount } from "svelte";
     import { quartOut } from "svelte/easing";

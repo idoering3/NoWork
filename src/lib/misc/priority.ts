@@ -1,5 +1,5 @@
 import { flavorMap } from "$lib/stores.svelte";
-import type { TaskPriority } from "$lib/types/task";
+import type { TaskPriority } from "$lib/tasks/task";
 
 export function getPriorityColor(priority: TaskPriority) {
     switch (priority) {

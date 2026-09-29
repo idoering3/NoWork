@@ -2,7 +2,7 @@
     import { CircleSmall, ListFilter, X } from "@lucide/svelte";
     import BadgeButton from "./BadgeButton.svelte";
     import type { TaskFilter } from "./types/filter";
-    import type { Tag, TaskPriority } from "./types/task";
+    import type { Tag, TaskPriority } from "./tasks/task";
     import { flavorMap } from "./stores.svelte";
     import { fly } from "svelte/transition";
     import { quartIn, quartOut } from "svelte/easing";

@@ -14,8 +14,8 @@
     import { cssVarToRGBArray, ShaderRenderer } from '$lib/shaders/shader';
     import { sendNotif } from '$lib/misc/notifications';
     import { invoke } from '@tauri-apps/api/core';
-    import { hasDueDate } from '$lib/types/taskStore.svelte';
-    import type { Task } from '$lib/types/task';
+    import { hasDueDate } from '$lib/tasks/taskStore.svelte';
+    import type { Task } from '$lib/tasks/task';
     import CustomScrollbar from '$lib/misc/CustomScrollbar.svelte';
   import { getGeoPosition } from '$lib/misc/position';
 

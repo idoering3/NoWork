@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import type { Theme } from "./theme";
-import type { Tag, TagColor } from "./types/task";
+import type { Tag, TagColor } from "./tasks/task";
 import type { DateFormatName } from "./misc/datePrints";
 import { load } from "@tauri-apps/plugin-store";
 
@@ -175,10 +175,6 @@ export function startClock(update: (date: Date) => void) {
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-}
-
-export async function getAllTags() {
-  return await invoke<Tag[]>('get_all_tags'); 
 }
 
 export function dayKey(d: Date): string {

@@ -1,6 +1,6 @@
 <script lang='ts'>
     import TaskCard from "$lib/TaskCard.svelte";
-    import type { Task } from "$lib/types/task";
+    import type { Task } from "$lib/tasks/task";
     import { invoke } from "@tauri-apps/api/core";
     import { onMount } from "svelte";
     import { flip } from "svelte/animate";

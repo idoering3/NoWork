@@ -1,4 +1,4 @@
-import { getCompletedTaskCount, type Task } from "./task";
+import { getCompletedTaskCount, type Tag, type Task } from "./task";
 
 export function hasDueDate(
     task: Task
@@ -12,4 +12,8 @@ export const taskState = $state({
 
 export const completedTaskCount = $state({
     completed: await getCompletedTaskCount()
+});
+
+export const tagState = $state({
+    tags: [] as Tag[]
 });

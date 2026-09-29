@@ -10,8 +10,10 @@
   import { fly } from "svelte/transition";
   import { flip } from "svelte/animate";
   import { ArrowUp, X } from "@lucide/svelte";
-  import { submitTask, type CreateTask } from "$lib/types/task";
+  import { submitTask, type CreateTask } from "$lib/tasks/task";
   import { onDestroy, onMount } from "svelte";
+  import { parseTaskText, proposeModifications, type TaskModification } from "$lib/tasks/taskParser";
+  import TaskTextbox from "./TaskTextbox.svelte";
 
 
     interface Props {
@@ -44,15 +46,12 @@
         'pretend to do your work'
     ]
 
-    let proposedTask = $state<CreateTask>(
-        // proposed task must always exist in some form, even if vals set to nothing
-        {
-            name: "",
-            dueDate: null,
-            tags: [],
-            priority: null
-        }
-    );
+    let proposedTask = $state<CreateTask>({
+        name: "",
+        dueDate: null,
+        tags: [],
+        priority: null
+    });
 
     let { show }: Props = $props();
 
@@ -65,6 +64,7 @@
     }
 
     async function trySubmitTask() {
+        // we need to set the proposed task name to the actual stripped out name
         submitTask(proposedTask);
         resetProposedTask();
     }
@@ -76,6 +76,7 @@
             tags: [],
             priority: null
         };
+        taskName = "";
     }
 
     function handleKeydown(event: KeyboardEvent) {
@@ -93,14 +94,32 @@
 
     onDestroy(() => {
         window.removeEventListener("keydown", handleKeydown);
-   })
-;
+   });
+
+   // this runs every time taskName changes
+    let modifications = $derived.by<TaskModification[]>(() => parseTaskText(taskName));
+    let taskName = $state("");
+
+    let parsedTask = $derived(
+        proposeModifications(taskName, modifications)
+    );
+
+    $effect(() => {
+        if (parsedTask !== null || parsedTask !== undefined) {
+            proposedTask.name = parsedTask.name;
+            proposedTask.tags = parsedTask.tags;
+            proposedTask.priority = parsedTask.priority;
+            proposedTask.dueDate = parsedTask.dueDate;
+        }
+    })
 </script>
 
 {#if show}
     <div class="task-bar" in:fly|global={{ duration: 1500, delay:600, y:15, easing: quartOut }}>
         <Card expanded class="short">
-            <Textbox bind:value={proposedTask.name} {placeholders} />
+            <TaskTextbox bind:value={taskName} {placeholders} {modifications}>
+                {taskName}
+            </TaskTextbox>
             {#snippet tagsn(name: string, color: 'default' | 'outline' | 'danger' | 'blue')}
                 <Badge flavor={color} noPadding>
                     <span style="padding-left: 0.5rem">

@@ -1,7 +1,7 @@
 <script lang='ts'>
     import type { Snippet } from "svelte";
     import { flavorMap } from "./stores.svelte";
-    import type { TagColor } from "./types/task";
+    import type { TagColor } from "./tasks/task";
 
     interface Props {
         flavor?: TagColor,

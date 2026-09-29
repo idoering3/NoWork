@@ -1,9 +1,8 @@
 <script lang="ts">
-    import type { TagColor, Task, TaskPriority } from "$lib/types/task";
+    import { getAllTags, type TagColor, type Task, type TaskPriority } from "$lib/tasks/task";
     import { CircleSmall, Plus, Trash, X } from "@lucide/svelte";
     import Button from "./Button.svelte";
     import Badge from "./Badge.svelte";
-    import { getAllTags } from "./stores.svelte";
     import Textbox from "./input-fields/Textbox.svelte";
     import { invoke } from "@tauri-apps/api/core";
     import DatePicker from "./dropdowns/DatePicker.svelte";

@@ -1,5 +1,5 @@
 import { DateFilter } from "$lib/misc/dateFilter";
-import type { Tag, Task, TaskPriority } from "./task";
+import type { Tag, Task, TaskPriority } from "../tasks/task";
 
 export type TaskFilter = {
     tags: Tag[],
