@@ -147,8 +147,10 @@
                 </div>
             {/key}
             {#if proposedTask.dueDate !== null}
-                {proposedTask.dueDate.toLocaleDateString()}
-                <Button class="square xsmall" Icon={X} flavor='outline' onclick={removeDate}/>
+                <div>
+                    {proposedTask.dueDate.toLocaleDateString()}
+                    <Button class="square xsmall circular" Icon={X} flavor='outline' onclick={removeDate}/>
+                </div>
             {/if}
             <PrioritySelector bind:priority={proposedTask.priority}/>
             <TagSelector bind:selectedTags={proposedTask.tags} />

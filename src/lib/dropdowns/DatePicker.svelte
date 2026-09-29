@@ -190,7 +190,7 @@
     in:fly|global={{ duration: slowAnimation ? 1500 : 300, delay: slowAnimation? 600 : 0, y:7, easing: quartOut }}
     style={posRight ? 'justify-content: start' : 'justify-content:end'}
     >
-    <Button class="square {size} circular" flavor="ghost" Icon={Calendar} onclick={() => dropdownOpen = !dropdownOpen}/>
+    <Button class="square {size} circular" flavor="outline" Icon={Calendar} onclick={() => dropdownOpen = !dropdownOpen}/>
     {#if dropdownOpen}
         <div 
             bind:this={calendarElement}

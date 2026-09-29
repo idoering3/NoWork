@@ -260,7 +260,7 @@
                     style="display: flex; gap: 0.5rem; align-items: center;"
                 >
                     {dueDate.toLocaleDateString()}
-                    <Button class="square xsmall" Icon={X} flavor='outline' onclick={removeDate}/>
+                    <Button class="square xsmall circular" Icon={X} flavor='outline' onclick={removeDate}/>
                 </div>
             {/if}
             <PrioritySelector bind:priority={task.priority} size={"small"}/>
@@ -280,7 +280,7 @@
             {/key}
             {#if onDelete}
                 <div>
-                    <Button onclick={deleted} Icon={Trash} flavor="outline" class="square small" />
+                    <Button onclick={deleted} Icon={Trash} flavor="outline" class="square small circular" />
                 </div>
             {/if}
         {/if}
