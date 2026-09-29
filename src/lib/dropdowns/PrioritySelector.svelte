@@ -41,7 +41,7 @@
 	}
 </script>
 <div bind:this={dropdownEl} class="dropdown-container">
-    <Button class={size === "normal" ? "square circular" : "square small circular"} flavor="outline" onclick={() => dropdownOpen =!dropdownOpen}>
+    <Button class={size === "normal" ? "square circular" : "square small circular"} flavor="ghost" onclick={() => dropdownOpen =!dropdownOpen}>
         {#if priority}
             <CircleSmall size={14} strokeWidth={1.1} color={getPriorityColor(priority)} fill={getPriorityColor(priority)}/>
         {:else}
