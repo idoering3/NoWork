@@ -144,8 +144,8 @@
     position: absolute;
     top: 4px;
     bottom: 4px;
-    right: 2px;
-    width: 4px;
+    right: 1px;
+    width: 2px;
     border-radius: 999px;
     background: transparent;
     cursor: pointer;
@@ -159,7 +159,7 @@
   }
 
   .scroll-wrapper:hover .scrollbar-track:not(.hidden) {
-    width: 6px;
+    width: 3px;
     background: var(--primary-color);
   }
 
