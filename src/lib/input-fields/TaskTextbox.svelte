@@ -4,6 +4,7 @@
 
     interface Props {
         value?: string,
+        textWidth?: number,
         modifications: TaskModification[],
         placeholders: string[],
         preamble?: boolean,
@@ -11,7 +12,7 @@
         children?: Snippet
     }
 
-    let { value = $bindable(), placeholders, modifications, preamble = true, onkeydown, children }: Props = $props();
+    let { value = $bindable(), textWidth = $bindable(0), placeholders, modifications, preamble = true, onkeydown, children }: Props = $props();
 
     let placeholder = $derived(placeholders[Math.floor(Math.random() * placeholders.length)]);
     onMount(() => {
@@ -20,13 +21,13 @@
         }
     })
 
-    function onInput() {
-        if (value === '') {
-        // Randomize placeholder
-        const randomIndex = Math.floor(Math.random() * placeholders.length);
-        placeholder = placeholders[randomIndex];
+    function onInput(currentValue: string) {
+        if (currentValue === '') {
+            const randomIndex = Math.floor(Math.random() * placeholders.length);
+            placeholder = placeholders[randomIndex];
+
             if (preamble) {
-                placeholder = `Type something, like '${placeholder}'`; 
+                placeholder = `Type something, like '${placeholder}'`;
             }
         }
     }
@@ -100,16 +101,33 @@
         return final;
     }
 
-    let indexPairs = $derived.by<textIndexPair[]>(() => chunkText(value ? value: "", textIndices)); 
+    // measure the text widt
+    function measureText(input: HTMLInputElement) {
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
 
+        if (!context) return;
+
+        context.font = getComputedStyle(input).font;
+        textWidth = context.measureText(input.value).width;
+    }
+
+    let indexPairs = $derived.by<textIndexPair[]>(() => chunkText(value ? value: "", textIndices));
 </script>
 
 
 <div class="custom-input">
-    <input autocomplete="off" id='input' class='input' bind:value placeholder={placeholder} oninput={onInput} onkeydown={onkeydown}/>
+    <input autocomplete="off" id='input' class='input' bind:value placeholder={placeholder} 
+        oninput={(event) => {
+            measureText(event.currentTarget);
+            onInput(event.currentTarget.value);
+        }}
+        onkeydown={onkeydown}
+    />
     <div class='absolutely'>
         {#each indexPairs as chunk}
             {#if chunk.isMod}
+                <!-- highlighted text has property mod -->
                 <span class='mod'>{chunk.text}</span>
             {:else}
                 <span>{chunk.text}</span>

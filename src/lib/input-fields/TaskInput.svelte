@@ -6,7 +6,6 @@
   import PrioritySelector from "$lib/dropdowns/PrioritySelector.svelte";
   import TagSelector from "$lib/dropdowns/TagSelector.svelte";
   import { quartInOut, quartOut } from "svelte/easing";
-  import Textbox from "./Textbox.svelte";
   import { fly } from "svelte/transition";
   import { flip } from "svelte/animate";
   import { ArrowUp, X } from "@lucide/svelte";
@@ -14,6 +13,8 @@
   import { onDestroy, onMount } from "svelte";
   import { parseTaskText, proposeModifications, type TaskModification } from "$lib/tasks/taskParser";
   import TaskTextbox from "./TaskTextbox.svelte";
+  import TextSuggestor from "$lib/dropdowns/TextSuggestor.svelte";
+  import { tagState } from "$lib/tasks/taskStore.svelte";
 
 
     interface Props {
@@ -112,12 +113,27 @@
             proposedTask.dueDate = parsedTask.dueDate;
         }
     })
+
+    // tag suggestions
+    let mostRecentChar = $derived(taskName?.charAt(taskName.length - 1));
+    let showTags = $derived.by(() => {
+        if (mostRecentChar == '#')
+            return true;
+        return false;
+    });
+    let textWidth = $state(0);
+    function appendText(text: string) {
+        taskName += text;
+    };
 </script>
 
 {#if show}
-    <div class="task-bar" in:fly|global={{ duration: 1500, delay:600, y:15, easing: quartOut }}>
+    <div class="task-bar" in:fly={{ duration: 1500, delay:600, y:15, easing: quartOut }}>
+        {#if showTags}
+            <TextSuggestor xpos={textWidth} text={tagState.tags.map(tag => tag.name)} appendText={appendText}/>
+        {/if}
         <Card expanded class="short">
-            <TaskTextbox bind:value={taskName} {placeholders} {modifications}>
+            <TaskTextbox bind:value={taskName} bind:textWidth={textWidth} {placeholders} {modifications}>
                 {taskName}
             </TaskTextbox>
             {#snippet tagsn(name: string, color: 'default' | 'outline' | 'danger' | 'blue')}
@@ -165,3 +181,9 @@
         </Card>
     </div>
 {/if}
+
+<style>
+    .task-bar {
+        position:relative;
+    }
+</style>
