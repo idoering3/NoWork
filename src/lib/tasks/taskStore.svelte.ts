@@ -11,7 +11,11 @@ export const taskState = $state({
 });
 
 export const completedTaskCount = $state({
-    completed: await getCompletedTaskCount()
+    completed: 0
+});
+
+getCompletedTaskCount().then(count => {
+    completedTaskCount.completed = count;
 });
 
 export const tagState = $state({
