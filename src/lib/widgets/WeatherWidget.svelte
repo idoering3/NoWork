@@ -45,14 +45,24 @@
             }
         })();
     });
+
+    let totalSize = $state(1);
+    let boxSize = 50;
+    let maxBoxes = $derived.by(() => {
+            let estimate = Math.floor(totalSize / (boxSize + boxSize / 10));
+            return estimate < 7 ? estimate : 6;
+            // return estimate;
+        });
 </script>
 
 <!-- make the snippet for the daily forecast -->
-{#snippet dayForecast(day: number)}
+{#snippet dayForecast(day: number, delay: number)}
     <div style="
         display: flex; 
         flex-direction: column; 
-        flex-grow: 1;
+        box-sizing: border-box;
+        flex: 1 0 {boxSize}px;
+        min-width: {boxSize}px;
         justify-content:center;
         align-items: center;
         border: 1px solid var(--border-color);
@@ -61,7 +71,7 @@
         white-space: nowrap;
         {day != 0 ? "background-color:none" : "background-color: var(--secondary-color)"}
         "
-        in:fly|global={{ y: 10, delay: 1200 + day * 75, duration: 1500, easing: quartOut}}
+        in:fly|global={{ y: 10, delay: delay + day * 75, duration: 1500, easing: quartOut}}
     >
         <div style="padding: 0.2rem;">
             {#if ForecastIcons?.[day]}
@@ -140,10 +150,13 @@
                 in
             </p>
         </div>
-        <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-grow: 1;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-grow: 1;"
+            bind:clientWidth={totalSize}
+        >
             {#if currentWeather?.daily.temperature_2m_max}
-                {#each { length: currentWeather?.daily.temperature_2m_max?.length}, day}
-                    {@render dayForecast(day)}
+                <!--  -->
+                {#each { length: Math.min(currentWeather.daily.temperature_2m_max.length, maxBoxes) }, day}
+                    {@render dayForecast(day, 0)}
                 {/each}
             {/if}
         </div>
