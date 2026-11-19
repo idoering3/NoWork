@@ -10,7 +10,6 @@
   import { flip } from "svelte/animate";
   import { ArrowUp, X } from "@lucide/svelte";
   import { submitTask, type CreateTask } from "$lib/tasks/task";
-  import { onDestroy, onMount } from "svelte";
   import { parseTaskText, proposeModifications, type TaskModification } from "$lib/tasks/taskParser";
   import TaskTextbox from "./TaskTextbox.svelte";
   import TextSuggestor from "$lib/dropdowns/TextSuggestor.svelte";
