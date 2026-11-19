@@ -81,21 +81,13 @@
     }
 
     function handleKeydown(event: KeyboardEvent) {
-        if (event.key === "Enter") {
+        if (event.key === "Enter" && !showTags) {
             event.preventDefault();
             event.stopPropagation();
 
             trySubmitTask();
         }
     }
-
-    onMount(() => {
-        window.addEventListener("keydown", handleKeydown);
-    });
-
-    onDestroy(() => {
-        window.removeEventListener("keydown", handleKeydown);
-   });
 
    // this runs every time taskName changes
     let modifications = $derived.by<TaskModification[]>(() => parseTaskText(taskName));
@@ -126,6 +118,8 @@
         taskName += text;
     };
 </script>
+
+<svelte:window onkeydown={handleKeydown} />
 
 {#if show}
     <div class="task-bar" in:fly={{ duration: 1500, delay:600, y:15, easing: quartOut }}>

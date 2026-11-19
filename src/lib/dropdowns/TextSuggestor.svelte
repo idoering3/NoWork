@@ -14,11 +14,46 @@
     function selectText(text: string) {
         appendText(text);
     }
+
+    // we want to handle keyboard events
+    function handleKeydown (event: KeyboardEvent) {
+        switch (event.key) {
+            case "ArrowUp":
+                event.preventDefault();
+                moveHighlightIndex(1);
+                break;
+            case "ArrowDown":
+                event.preventDefault();
+                moveHighlightIndex(-1);
+                break;
+            case "Enter":
+            case "Tab":
+                event.preventDefault();
+                selectText(text[highlightedTextIndex]);
+                break;
+        }
+    }
+
+    function moveHighlightIndex(step: -1 | 1) {
+        const count = text.length;
+        if (count === 0) return;
+
+        highlightedTextIndex = (highlightedTextIndex + step + count) % count;
+    }
+
+    let highlightedTextIndex = $state(0);
 </script>
 
+<svelte:window onkeydown={handleKeydown} />
+
 <div class="context-menu" style="position: absolute; left: {xpos + 25}px; bottom: 3rem;">
-    {#each text as t}
-        <button onclick={() => selectText(t)}>{t}</button>
+    {#each text.toReversed() as t, i}
+        <button 
+            onclick={() => selectText(t)}
+            style="{text.length - i - 1 == highlightedTextIndex ? "background-color: var(--hover-color);" : ""}"
+        >
+            {t}
+        </button>
     {/each}
 </div>
 
@@ -41,7 +76,7 @@
         border: none;
         background-color: transparent;
         color: var(--primary-dark);
-        transition: 0.15s ease-in-out;
+        /* transition: 0.15s ease-in-out; */
         text-align: start;
     }
 
