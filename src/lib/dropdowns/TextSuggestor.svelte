@@ -31,6 +31,7 @@
                 event.preventDefault();
                 selectText(text[highlightedTextIndex]);
                 break;
+            // the escape keyboard event is handled in the parent...
         }
     }
 

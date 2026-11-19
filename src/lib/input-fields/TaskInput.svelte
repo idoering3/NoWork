@@ -81,11 +81,18 @@
     }
 
     function handleKeydown(event: KeyboardEvent) {
-        if (event.key === "Enter" && !showTags) {
-            event.preventDefault();
-            event.stopPropagation();
-
-            trySubmitTask();
+        if (showTags) {
+            if (event.key === "Escape") {
+                event.preventDefault();
+                showTags = false;
+            }
+        } else {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                event.stopPropagation();
+    
+                trySubmitTask();
+            }
         }
     }
 
