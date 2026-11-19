@@ -51,7 +51,14 @@ export function proposeModifications(taskName: string, modifications: TaskModifi
     let priority = priorityMod?.value as TaskPriority ?? null as TaskPriority;
 
     let tagMod = modifications.filter(mod => mod.modType === "tag");
-    let tags: Tag[] = tagMod.map(tag => tag.value as Tag);
+    // bugfix: prevent duplicate tags from ruining a good time :)
+    const tags: Tag[] = [];
+
+    for (const mod of tagMod) {
+        const tag = mod.value as Tag;
+        if (tags.some(existing => existing.id === tag.id)) continue;
+        tags.push(tag);
+    }
 
     let task = {
         name: name,
