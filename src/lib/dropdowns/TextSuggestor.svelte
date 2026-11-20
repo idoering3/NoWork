@@ -1,14 +1,16 @@
 <script lang='ts'>
     interface Props {
         xpos: number,
-        text: string[]
-        appendText: (value: string) => void;
+        text: string[],
+        typedText: string | null,
+        selectText: (value: string) => void;
     }
 
     let { 
         xpos,
         text,
-        appendText,
+        typedText,
+        selectText: appendText,
     }: Props = $props();
 
     function selectText(text: string) {
@@ -27,10 +29,14 @@
                 moveHighlightIndex(-1);
                 break;
             case "Enter":
-            case "Tab":
+            case "Tab": {
+                const selected = text[activeIndex];
+                if (selected === undefined) return;
+
                 event.preventDefault();
-                selectText(text[highlightedTextIndex]);
+                selectText(selected);
                 break;
+            }
             // the escape keyboard event is handled in the parent...
         }
     }
@@ -39,10 +45,11 @@
         const count = text.length;
         if (count === 0) return;
 
-        highlightedTextIndex = (highlightedTextIndex + step + count) % count;
+        highlightedTextIndex = (activeIndex + step + count) % count;
     }
 
     let highlightedTextIndex = $state(0);
+    let activeIndex = $derived(Math.min(highlightedTextIndex, text.length - 1));
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
@@ -51,7 +58,7 @@
     {#each text.toReversed() as t, i}
         <button 
             onclick={() => selectText(t)}
-            style="{text.length - i - 1 == highlightedTextIndex ? "background-color: var(--hover-color);" : ""}"
+            style="{text.length - i - 1 === activeIndex ? "background-color: var(--hover-color);" : ""}"
         >
             {t}
         </button>

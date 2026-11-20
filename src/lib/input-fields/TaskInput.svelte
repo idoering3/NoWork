@@ -113,15 +113,32 @@
     })
 
     // tag suggestions
-    let mostRecentChar = $derived(taskName?.charAt(taskName.length - 1));
-    let showTags = $derived.by(() => {
-        if (mostRecentChar == '#')
-            return true;
-        return false;
+    let caretIndex = $state(0);
+    let taskUntilCaret = $derived(taskName.slice(0, caretIndex));
+    // recall -1 if not found.....
+    let hashIndex = $derived(taskUntilCaret.lastIndexOf("#"));
+    // this is the TEXT AFTER THE #
+    let typedTagText = $derived(
+        hashIndex === -1 ? null : taskUntilCaret.slice(hashIndex + 1)
+    );
+
+    let validTags = $derived.by((): string[] => {
+        const query = typedTagText;
+        if (query === null) return [];
+
+        const tags = tagState.tags.map(tag => tag.name);
+        return tags.filter(tag => tag.startsWith(query) && tag !== query);
     });
+
+    // this is inclusive (so val of 2 is 0 to 2 inclusive)
+    let showTags = $derived(validTags.length > 0);
     let textWidth = $state(0);
-    function appendText(text: string) {
-        taskName += text;
+    function onSelect(text: string) {
+        if (hashIndex === -1) return;
+
+        const before = taskName.slice(0, hashIndex + 1);
+        const after = taskName.slice(caretIndex);
+        taskName = before + text + after + " ";
     };
 </script>
 
@@ -130,10 +147,10 @@
 {#if show}
     <div class="task-bar" in:fly={{ duration: 1500, delay:600, y:15, easing: quartOut }}>
         {#if showTags}
-            <TextSuggestor xpos={textWidth} text={tagState.tags.map(tag => tag.name)} appendText={appendText}/>
+            <TextSuggestor xpos={textWidth} text={validTags} typedText={typedTagText} selectText={onSelect}/>
         {/if}
         <Card expanded class="short">
-            <TaskTextbox bind:value={taskName} bind:textWidth={textWidth} {placeholders} {modifications}>
+            <TaskTextbox bind:value={taskName} bind:textWidth={textWidth} {placeholders} {modifications} bind:caretIndex={caretIndex}>
                 {taskName}
             </TaskTextbox>
             {#snippet tagsn(name: string, color: 'default' | 'outline' | 'danger' | 'blue')}
@@ -153,7 +170,10 @@
                     style="display: flex;"
                 >
                 {#each proposedTask.tags as tag (tag.name)}
-                    <div animate:flip|global={{ duration: 300, easing: quartInOut }} style="padding: 0.25rem;">
+                    <div 
+                        animate:flip={{ duration: 300, easing: quartInOut }}
+                        style="padding: 0.25rem;"
+                    >
                         <div style=""
                         >
                             {@render tagsn(tag.name, tag?.color)}

@@ -8,11 +8,12 @@
         modifications: TaskModification[],
         placeholders: string[],
         preamble?: boolean,
+        caretIndex?: number,
         onkeydown?: ((event: KeyboardEvent) => void) | undefined;
         children?: Snippet
     }
 
-    let { value = $bindable(), textWidth = $bindable(0), placeholders, modifications, preamble = true, onkeydown, children }: Props = $props();
+    let { value = $bindable(), textWidth = $bindable(0), caretIndex = $bindable(0), placeholders, modifications, preamble = true, onkeydown, children }: Props = $props();
 
     let placeholder = $derived(placeholders[Math.floor(Math.random() * placeholders.length)]);
     onMount(() => {
@@ -119,8 +120,13 @@
 <div class="custom-input">
     <input autocomplete="off" id='input' class='input' bind:value placeholder={placeholder} 
         oninput={(event) => {
-            measureText(event.currentTarget);
-            onInput(event.currentTarget.value);
+            const input = event.currentTarget;
+            caretIndex = input.selectionStart ?? 0;
+            measureText(input);
+            onInput(input.value);
+        }}
+        onselectionchange={(event) => {
+            caretIndex = event.currentTarget.selectionStart ?? 0;
         }}
         onkeydown={onkeydown}
     />
